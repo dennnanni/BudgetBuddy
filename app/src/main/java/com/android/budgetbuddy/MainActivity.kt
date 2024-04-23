@@ -42,6 +42,8 @@ import com.android.budgetbuddy.ui.BudgetBuddyNavGraph
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionsState
+import com.android.budgetbuddy.ui.composables.BottomBar
+import com.android.budgetbuddy.ui.composables.TopBar
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.theme.BudgetBuddyTheme
 import java.util.Date
@@ -166,22 +168,5 @@ fun TransactionItem(
         IconButton(onClick = onDelete) {
             Icon(Icons.Outlined.Close, "Remove TODO")
         }
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BudgetBuddyTheme {
-        HomeScreen(NavHostController(LocalContext.current))
     }
 }
