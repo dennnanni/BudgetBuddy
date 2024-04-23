@@ -17,11 +17,16 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +41,10 @@ import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionViewModel
 import com.android.budgetbuddy.ui.TransactionsState
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.android.budgetbuddy.ui.BudgetBuddyNavGraph
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.theme.BudgetBuddyTheme
 import org.koin.androidx.compose.koinViewModel
 import java.util.Date
@@ -53,6 +62,32 @@ class MainActivity : ComponentActivity() {
                     val vm = koinViewModel<TransactionViewModel>()
                     val state by vm.state.collectAsStateWithLifecycle()
                     TransactionList(state, vm.actions)
+                    val navController = rememberNavController()
+                    val backStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute by remember {
+                        derivedStateOf {
+                            BudgetBuddyRoute.routes.find {
+                                it.route == backStackEntry?.destination?.route
+                            } ?: BudgetBuddyRoute.Home
+                        }
+                    }
+
+                    Scaffold(
+                        topBar = {
+                            // TODO: Add top bar
+                            Text(text = currentRoute.title)
+                        },
+                        bottomBar = {
+                            // TODO: Add bottom bar
+                            Text(text = "Bottom Bar")
+                        }
+                    ) { paddingValues ->
+                        BudgetBuddyNavGraph(
+                            navController = navController,
+                            modifier = Modifier.padding(paddingValues)
+                        )
+
+                    }
                 }
             }
         }
