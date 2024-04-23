@@ -59,9 +59,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val vm = koinViewModel<TransactionViewModel>()
-                    val state by vm.state.collectAsStateWithLifecycle()
-                    TransactionList(state, vm.actions)
+
+
                     val navController = rememberNavController()
                     val backStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute by remember {
