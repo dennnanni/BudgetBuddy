@@ -14,11 +14,16 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.android.budgetbuddy.ui.BudgetBuddyNavGraph
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.BottomBar
+import com.android.budgetbuddy.ui.composables.TopBar
+import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.theme.BudgetBuddyTheme
 
 class MainActivity : ComponentActivity() {
@@ -44,11 +49,11 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         topBar = {
                             // TODO: Add top bar
-                            Text(text = currentRoute.title)
+                            TopBar(navController = navController, currentRoute = currentRoute)
                         },
                         bottomBar = {
                             // TODO: Add bottom bar
-                            Text(text = "Bottom Bar")
+                            BottomBar(navController = navController)
                         }
                     ) { paddingValues ->
                         BudgetBuddyNavGraph(
@@ -75,6 +80,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     BudgetBuddyTheme {
-        Greeting("Android")
+        HomeScreen(NavHostController(LocalContext.current))
     }
 }
