@@ -1,5 +1,7 @@
 package com.android.budgetbuddy.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -10,6 +12,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -44,6 +47,7 @@ sealed class BudgetBuddyRoute(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun BudgetBuddyNavGraph(
     navController: NavHostController,
@@ -51,7 +55,7 @@ fun BudgetBuddyNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = BudgetBuddyRoute.Home.route,
+        startDestination = BudgetBuddyRoute.AddTransaction.route,
         modifier = modifier
     ) {
         with(BudgetBuddyRoute.Home) {
@@ -59,6 +63,12 @@ fun BudgetBuddyNavGraph(
                 val vm = koinViewModel<TransactionViewModel>()
                 val state by vm.state.collectAsStateWithLifecycle()
                 HomeScreen(navController, state, vm.actions)
+            }
+        }
+
+        with(BudgetBuddyRoute.AddTransaction) {
+            composable(route) {
+                AddTransactionScreen()
             }
         }
 

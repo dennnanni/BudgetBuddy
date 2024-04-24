@@ -23,10 +23,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,6 +76,9 @@ fun TopBar(
         },
     )*/
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.White,
+        ),
         title = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route){
                 //ProfileSurface("Full Name", "@username")
@@ -82,7 +87,7 @@ fun TopBar(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text = "BudgetBuddy",
+                    Text(text = currentRoute.title,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold
@@ -136,7 +141,7 @@ fun BottomBar(
                     .size(60.dp)
             ) {
                 IconButton(
-                    onClick = { /*navController.navigate(BudgetBuddyRoute.AddTransaction.route)*/ },
+                    onClick = { navController.navigate(BudgetBuddyRoute.AddTransaction.route) },
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
