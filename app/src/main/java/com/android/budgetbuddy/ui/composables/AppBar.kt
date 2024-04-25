@@ -43,38 +43,7 @@ fun TopBar(
     currentRoute: BudgetBuddyRoute
 ) {
     val context = LocalContext.current
-    /*TopAppBar(
-        title = {
-            if(currentRoute.route == BudgetBuddyRoute.Home.route) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Filled.Menu, context.getString(R.string.menu), modifier = Modifier.size(40.dp))
-                    Icon(Icons.Filled.Person, context.getString(R.string.profile), modifier = Modifier.size(40.dp))
-                }
-            }
-        },
-        navigationIcon = {
-            if(navController.previousBackStackEntry != null) {
-                IconButton(
-                    onClick = { navController.navigateUp() }
-                ) {
-                    Icon(Icons.Filled.ArrowBack, context.getString(R.string.back))
-                }
-            }
-        },
-        actions = {
-            if(currentRoute.route == BudgetBuddyRoute.Home.route) {
-                IconButton(
-                    onClick = { *//*navController.navigate(BudgetBuddyRoute.Settings.route)*//* }
-                ) {
-                    Icon(Icons.Filled.Settings, context.getString(R.string.settings))
-                }
-            }
-        },
-    )*/
+
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White,
@@ -109,7 +78,7 @@ fun TopBar(
         actions = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route){
                 IconButton({ navController.navigate(BudgetBuddyRoute.Settings.route) }) {
-                    Icon(Icons.Filled.Settings, "Go to settings")
+                    Icon(Icons.Filled.Settings, context.getString(R.string.settings))
                 }
             }
         }

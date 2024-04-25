@@ -47,7 +47,6 @@ sealed class BudgetBuddyRoute(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun BudgetBuddyNavGraph(
     navController: NavHostController,

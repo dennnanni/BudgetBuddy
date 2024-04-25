@@ -2,8 +2,6 @@
 
 package com.android.budgetbuddy.ui.screens.addTransaction
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +40,6 @@ import androidx.compose.ui.unit.sp
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import java.time.LocalDate
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun AddTransactionScreen() {
     val options = listOf("Expense", "Income")
