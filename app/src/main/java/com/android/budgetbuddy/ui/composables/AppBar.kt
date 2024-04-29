@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -90,7 +91,11 @@ fun BottomBar(
     navController: NavHostController
 ) {
     val context = LocalContext.current
-    BottomAppBar {
+    BottomAppBar(
+        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        tonalElevation = 0.dp,
+        modifier = Modifier.clip(shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -108,6 +113,7 @@ fun BottomBar(
             Surface(
                 modifier = Modifier
                     .size(60.dp)
+                    .clip(CircleShape)
             ) {
                 IconButton(
                     onClick = { navController.navigate(BudgetBuddyRoute.AddTransaction.route) },

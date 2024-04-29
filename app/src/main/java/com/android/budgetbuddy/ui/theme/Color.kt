@@ -12,4 +12,5 @@ val Pink40 = Color(0xFF7D5260)*/
 
 val BrightPink = Color(0xFFFD454E)
 val LightPink = Color(0xFFFFB6A8)
-val Yellow = Color(0xFFF5F8DE)
+val LightGreen = Color(0xFFF5F8DE)
+val Sand = Color(0xFFF6E9D2)

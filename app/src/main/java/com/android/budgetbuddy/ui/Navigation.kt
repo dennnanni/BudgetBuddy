@@ -39,11 +39,16 @@ sealed class BudgetBuddyRoute(
         fun buildRoute(transactionId: String) = "editTransaction/$transactionId"
     }
 
+    data object Register: BudgetBuddyRoute("register", "Register")
+
+    data object Login: BudgetBuddyRoute("login", "Login")
+
     // TODO: add other routes here
 
     companion object {
         // TODO: add other routes here
-        val routes = setOf(Home, AddTransaction, TransactionDetails, Settings, EditTransaction)
+        val routes = setOf(Home, AddTransaction, TransactionDetails, Settings, EditTransaction,
+            Register, Login)
     }
 }
 
