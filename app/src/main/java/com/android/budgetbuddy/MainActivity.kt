@@ -102,7 +102,8 @@ fun TransactionList(
                 onSubmit = { content -> actions.addTransaction(Transaction(
                     title = content,
                     description = "description",
-                    type = "affitto",
+                    type = "Expense",
+                    category = "affitto",
                     amount = 20.15,
                     date = Date(),
                     periodic = false

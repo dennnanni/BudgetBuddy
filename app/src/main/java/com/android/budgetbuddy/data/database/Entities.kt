@@ -13,6 +13,7 @@ data class Transaction (
     @ColumnInfo val title: String,
     @ColumnInfo val description: String,
     @ColumnInfo val type: String,
+    @ColumnInfo val category: String,
     @ColumnInfo val amount: Double,
     @ColumnInfo val date: Date,
     @ColumnInfo val periodic: Boolean
