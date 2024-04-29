@@ -12,6 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
+import com.android.budgetbuddy.ui.screens.login.LoginScreen
+import com.android.budgetbuddy.ui.screens.register.RegisterScreen
 import org.koin.androidx.compose.koinViewModel
 
 sealed class BudgetBuddyRoute(
@@ -45,8 +47,8 @@ sealed class BudgetBuddyRoute(
 
     companion object {
         // TODO: add other routes here
-        val routes = setOf(Home, AddTransaction, TransactionDetails, Settings, EditTransaction,
-            Register, Login)
+        val routes = setOf(Register, Login, Home, AddTransaction, TransactionDetails, EditTransaction, Settings)
+        val bottomBarRoutes = setOf(Home, AddTransaction, TransactionDetails, EditTransaction, Settings)
     }
 }
 
@@ -59,7 +61,7 @@ fun BudgetBuddyNavGraph(
     val state by vm.state.collectAsStateWithLifecycle()
     NavHost(
         navController = navController,
-        startDestination = BudgetBuddyRoute.Home.route,
+        startDestination = BudgetBuddyRoute.Register.route,
         modifier = modifier
     ) {
 
@@ -72,6 +74,18 @@ fun BudgetBuddyNavGraph(
         with(BudgetBuddyRoute.AddTransaction) {
             composable(route) {
                 AddTransactionScreen(navController, state, vm.actions)
+            }
+        }
+
+        with(BudgetBuddyRoute.Register) {
+            composable(route) {
+                RegisterScreen(navController)
+            }
+        }
+
+        with(BudgetBuddyRoute.Login) {
+            composable(route) {
+                LoginScreen(navController)
             }
         }
 

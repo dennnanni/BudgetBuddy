@@ -70,12 +70,10 @@ class MainActivity : ComponentActivity() {
 
                     Scaffold(
                         topBar = {
-                            // TODO: Add top bar
                             TopBar(navController = navController, currentRoute = currentRoute)
                         },
                         bottomBar = {
-                            // TODO: Add bottom bar
-                            BottomBar(navController = navController)
+                            if (currentRoute in BudgetBuddyRoute.bottomBarRoutes) BottomBar(navController = navController)
                         }
                     ) { paddingValues ->
                         BudgetBuddyNavGraph(
