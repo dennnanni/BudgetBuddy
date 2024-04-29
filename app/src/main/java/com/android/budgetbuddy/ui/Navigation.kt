@@ -1,7 +1,5 @@
 package com.android.budgetbuddy.ui
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -52,22 +50,23 @@ fun BudgetBuddyNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val vm = koinViewModel<TransactionViewModel>()
+    val state by vm.state.collectAsStateWithLifecycle()
     NavHost(
         navController = navController,
-        startDestination = BudgetBuddyRoute.AddTransaction.route,
+        startDestination = BudgetBuddyRoute.Home.route,
         modifier = modifier
     ) {
+
         with(BudgetBuddyRoute.Home) {
             composable(route) {
-                val vm = koinViewModel<TransactionViewModel>()
-                val state by vm.state.collectAsStateWithLifecycle()
                 HomeScreen(navController, state, vm.actions)
             }
         }
 
         with(BudgetBuddyRoute.AddTransaction) {
             composable(route) {
-                AddTransactionScreen()
+                AddTransactionScreen(navController, state, vm.actions)
             }
         }
 
