@@ -17,3 +17,14 @@ interface TransactionDAO {
     @Delete
     suspend fun delete(transaction: Transaction)
 }
+
+@Dao
+interface UserDAO {
+    @Query("SELECT * FROM `user`")
+    fun getAll(): Flow<List<User>>
+
+    @Upsert
+    suspend fun upsert(user: User)
+    @Delete
+    suspend fun delete(user: User)
+}

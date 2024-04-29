@@ -19,6 +19,15 @@ data class Transaction (
     @ColumnInfo val periodic: Boolean
 )
 
+@Entity(tableName = "user")
+data class User(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo val name: String,
+    @ColumnInfo val username: String,
+    @ColumnInfo val password: String,
+    @ColumnInfo val profilePic: String
+)
+
 class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
