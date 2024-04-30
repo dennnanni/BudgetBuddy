@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.data.repositories
 
+import androidx.compose.runtime.mutableStateOf
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.database.TransactionDAO
 import com.android.budgetbuddy.data.database.User
@@ -18,4 +19,5 @@ class UserRepository(private val userDAO: UserDAO) {
 
     suspend fun upsert(user: User) = userDAO.upsert(user)
     suspend fun delete(user: User) = userDAO.delete(user)
+    suspend fun login(username: String, password: String): User = userDAO.login(username, password)
 }

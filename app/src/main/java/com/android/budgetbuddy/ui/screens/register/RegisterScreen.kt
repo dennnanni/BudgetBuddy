@@ -28,9 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.android.budgetbuddy.data.database.User
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.viewmodel.UserActions
+import com.android.budgetbuddy.ui.viewmodel.UserState
 
 @Composable
-fun RegisterScreen(navController: NavHostController) {
+fun RegisterScreen(navController: NavHostController, userState: UserState, actions: UserActions) {
 
     val fullName = rememberSaveable { mutableStateOf("") }
     val username = rememberSaveable { mutableStateOf("") }
@@ -87,7 +91,14 @@ fun RegisterScreen(navController: NavHostController) {
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
-                onClick = { /*TODO*/ }
+                onClick = {
+                    actions.addUser(User(
+                        name = fullName.value,
+                        username = username.value,
+                        password = password.value
+                    ))
+                    navController.navigate(BudgetBuddyRoute.Home.route)
+                }
             ) {
                 Text(text = "Register")
             }

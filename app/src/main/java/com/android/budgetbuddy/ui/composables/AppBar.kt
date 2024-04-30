@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,20 +43,24 @@ fun TopBar(
     currentRoute: BudgetBuddyRoute
 ) {
     val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White,
         ),
         title = {
-            if (currentRoute.route == BudgetBuddyRoute.Home.route){
+            if (currentRoute.route == BudgetBuddyRoute.Home.route) {
                 //ProfileSurface("Full Name", "@username")
             } else {
+                val title: String =
+                    sharedPreferences.getString("username", null) ?: currentRoute.title
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text = currentRoute.title,
+                    Text(
+                        text = title,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold
@@ -77,7 +80,7 @@ fun TopBar(
             }
         },
         actions = {
-            if (currentRoute.route == BudgetBuddyRoute.Home.route){
+            if (currentRoute.route == BudgetBuddyRoute.Home.route) {
                 IconButton({ navController.navigate(BudgetBuddyRoute.Settings.route) }) {
                     Icon(Icons.Filled.Settings, context.getString(R.string.settings))
                 }
@@ -91,6 +94,8 @@ fun BottomBar(
     navController: NavHostController
 ) {
     val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
+
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         tonalElevation = 0.dp,
@@ -121,7 +126,8 @@ fun BottomBar(
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
                 ) {
-                    Icon(Icons.Filled.Add,
+                    Icon(
+                        Icons.Filled.Add,
                         "Add transaction",
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(40.dp)
@@ -130,7 +136,12 @@ fun BottomBar(
             }
 
             IconButton(
-                onClick = { /*navController.navigate(BudgetBuddyRoute.Profile.route)*/ },
+                onClick = {
+                    with(sharedPreferences.edit()) {
+                        remove("username")
+                        apply()
+                    }
+                },
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.secondary)
