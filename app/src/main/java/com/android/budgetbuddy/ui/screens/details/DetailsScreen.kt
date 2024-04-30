@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -31,65 +34,125 @@ import com.android.budgetbuddy.data.database.Transaction
 @Composable
 fun DetailsScreen(transaction: Transaction) {
     val context = LocalContext.current
-    Card(
-        shape = RoundedCornerShape(30.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+    Column {
+        Card(
+            shape = RoundedCornerShape(30.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight()
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier.padding(16.dp)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.default_propic),
-                    contentDescription = context.getString(R.string.category_icon),
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .size(50.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_propic),
+                        contentDescription = context.getString(R.string.category_icon),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .size(50.dp)
+                    )
+
+                    Text(
+                        text = transaction.title,
+                        style = TextStyle(
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                DetailRow(
+                    context = context,
+                    key = context.getString(R.string.type),
+                    value = transaction.type
+                )
+                DetailRow(
+                    context = context,
+                    key = context.getString(R.string.amount),
+                    value = "${transaction.amount} €"
+                )
+                DetailRow(
+                    context = context,
+                    key = context.getString(R.string.date),
+                    value = transaction.date.toString()
+                )
+                DetailRow(
+                    context = context,
+                    key = context.getString(R.string.category),
+                    value = transaction.category
                 )
 
+                Spacer(modifier = Modifier.padding(5.dp))
+
+                if (transaction.description.isNotEmpty()) {
+                    Column {
+                        Text(
+                            text = context.getString(R.string.description),
+                            style = TextStyle(
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                            )
+                        )
+
+                        Text(
+                            text = transaction.description,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .padding(16.dp, 0.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier.size(150.dp, 40.dp),
+                onClick = { /*TODO*/ }
+            ) {
                 Text(
-                    text = transaction.title,
+                    text = context.getString(R.string.edit),
                     style = TextStyle(
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
                     )
                 )
             }
 
-            Spacer(modifier = Modifier.padding(10.dp))
-
-            DetailRow(context = context, key = context.getString(R.string.type), value = transaction.type)
-            DetailRow(context = context, key = context.getString(R.string.amount), value = transaction.amount.toString())
-            DetailRow(context = context, key = context.getString(R.string.date), value = transaction.date.toString())
-            DetailRow(context = context, key = context.getString(R.string.category), value = transaction.category)
-
-            Spacer(modifier = Modifier.padding(5.dp))
-
-            Column {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier.size(150.dp, 40.dp),
+                onClick = { /*TODO*/ }
+            ) {
                 Text(
-                    text = context.getString(R.string.description),
+                    text = context.getString(R.string.delete),
                     style = TextStyle(
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
                     )
                 )
-
-                Text(
-                    text = transaction.description,
-                    style = MaterialTheme.typography.bodyMedium
-                )
             }
-
         }
     }
 }
