@@ -89,7 +89,7 @@ fun BudgetBuddyNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = defaultRoute,
+        startDestination = BudgetBuddyRoute.Home.route,//defaultRoute, TODO: uncomment this line
         modifier = modifier
     ) {
 

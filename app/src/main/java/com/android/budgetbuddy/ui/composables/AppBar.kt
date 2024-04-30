@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,24 +34,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.database.User
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
     navController: NavHostController,
-    currentRoute: BudgetBuddyRoute
+    currentRoute: BudgetBuddyRoute,
 ) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
+    val user = User(name = "Goku", username = "iamgoku", password = "", profilePic = "")
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White,
         ),
         title = {
-            if (currentRoute.route == BudgetBuddyRoute.Home.route) {
-                //ProfileSurface("Full Name", "@username")
+            if (user != null && currentRoute.route == BudgetBuddyRoute.Home.route) {
+                ProfileHome(user)
             } else {
                 val title: String =
                     sharedPreferences.getString("username", null) ?: currentRoute.title
@@ -82,7 +84,9 @@ fun TopBar(
         actions = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
                 IconButton({ navController.navigate(BudgetBuddyRoute.Settings.route) }) {
-                    Icon(Icons.Filled.Settings, context.getString(R.string.settings))
+                    Icon(Icons.Outlined.Settings, context.getString(R.string.settings),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
