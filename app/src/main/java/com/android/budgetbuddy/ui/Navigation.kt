@@ -16,6 +16,8 @@ import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
 import com.android.budgetbuddy.ui.screens.register.RegisterScreen
+import com.android.budgetbuddy.ui.screens.settings.SettingsScreen
+import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -47,6 +49,9 @@ sealed class BudgetBuddyRoute(
 
     data object Login : BudgetBuddyRoute("login", "Login")
 
+    data object AllTransactions : BudgetBuddyRoute("allTransactions", "All Transactions")
+
+
     // TODO: add other routes here
 
     companion object {
@@ -58,10 +63,11 @@ sealed class BudgetBuddyRoute(
             AddTransaction,
             TransactionDetails,
             EditTransaction,
-            Settings
+            Settings,
+            AllTransactions
         )
         val bottomBarRoutes =
-            setOf(Home, AddTransaction, TransactionDetails, EditTransaction, Settings)
+            setOf(Home, AddTransaction, TransactionDetails, EditTransaction, AllTransactions)
     }
 }
 
@@ -95,7 +101,7 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Home) {
             composable(route) {
-                HomeScreen(navController, transactionsState, transactionViewModel.actions)
+                HomeScreen(navController, transactionsState)
             }
         }
 
@@ -114,6 +120,18 @@ fun BudgetBuddyNavGraph(
         with(BudgetBuddyRoute.Login) {
             composable(route) {
                 LoginScreen(navController, userState, userViewModel.actions)
+            }
+        }
+
+        with(BudgetBuddyRoute.Settings) {
+            composable(route) {
+                SettingsScreen()
+            }
+        }
+
+        with(BudgetBuddyRoute.AllTransactions) {
+            composable(route) {
+                AllTransactionsScreen()
             }
         }
 
