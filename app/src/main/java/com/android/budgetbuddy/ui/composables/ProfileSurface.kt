@@ -1,6 +1,7 @@
 package com.android.budgetbuddy.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,14 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.User
 
 @Composable
-fun ProfileHome(user: User) {
+fun ProfileHome(user: User, navController: NavHostController) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            navController.navigate("profile")
+        }
     ) {
         Image(
             painter = painterResource(id = R.drawable.default_propic),

@@ -1,6 +1,5 @@
 package com.android.budgetbuddy.data.repositories
 
-import androidx.compose.runtime.mutableStateOf
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.database.TransactionDAO
 import com.android.budgetbuddy.data.database.User
