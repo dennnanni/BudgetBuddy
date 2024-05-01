@@ -1,7 +1,8 @@
 package com.android.budgetbuddy.ui.screens.details
 
+import android.Manifest
 import android.content.Context
-import android.media.Image
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,10 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.ui.utils.rememberCameraLauncher
+import com.android.budgetbuddy.ui.utils.rememberPermission
 
 @Composable
 fun DetailsScreen(transaction: Transaction) {
     val context = LocalContext.current
+
     Column {
         Card(
             shape = RoundedCornerShape(30.dp),
