@@ -22,7 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +38,6 @@ import com.android.budgetbuddy.ui.viewmodel.UserState
 @Composable
 fun RegisterScreen(navController: NavHostController, userState: UserState, actions: UserActions) {
 
-    val context = LocalContext.current
     val fullName = rememberSaveable { mutableStateOf("") }
     val username = rememberSaveable { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -54,21 +53,21 @@ fun RegisterScreen(navController: NavHostController, userState: UserState, actio
             modifier = Modifier.padding(16.dp, 16.dp)
         ) {
             OutlinedTextField(
-                label = { Text(context.getString(R.string.full_name)) },
+                label = { Text(stringResource(R.string.full_name)) },
                 value = fullName.value,
                 onValueChange = { fullName.value = it }, modifier = Modifier
                     .fillMaxWidth()
             )
 
             OutlinedTextField(
-                label = { Text(context.getString(R.string.username)) },
+                label = { Text(stringResource(R.string.username)) },
                 value = username.value,
                 onValueChange = { username.value = it }, modifier = Modifier
                     .fillMaxWidth()
             )
 
             OutlinedTextField(
-                label = { Text(context.getString(R.string.password)) },
+                label = { Text(stringResource(R.string.password)) },
                 value = password.value,
                 onValueChange = { password.value = it }, modifier = Modifier
                     .fillMaxWidth(),
@@ -76,7 +75,7 @@ fun RegisterScreen(navController: NavHostController, userState: UserState, actio
             )
 
             OutlinedTextField(
-                label = { Text(context.getString(R.string.confirm_password)) },
+                label = { Text(stringResource(R.string.confirm_password)) },
                 value = confirmPassword.value,
                 onValueChange = { confirmPassword.value = it }, modifier = Modifier
                     .fillMaxWidth(),
@@ -108,14 +107,14 @@ fun RegisterScreen(navController: NavHostController, userState: UserState, actio
 
             Row {
                 Text(
-                    text = context.getString(R.string.already_registered),
+                    text = stringResource(R.string.already_registered),
                     style = MaterialTheme.typography.bodySmall
                 )
 
                 Spacer(modifier = Modifier.size(4.dp))
 
                 ClickableText(
-                    text = AnnotatedString(context.getString(R.string.login)),
+                    text = AnnotatedString(stringResource(R.string.login)),
                     style = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,

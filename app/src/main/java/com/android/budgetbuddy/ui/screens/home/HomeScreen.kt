@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
-import co.yml.charts.ui.linechart.LineChart
 import co.yml.charts.ui.linechart.model.Line
 import co.yml.charts.ui.linechart.model.LineChartData
 import co.yml.charts.ui.linechart.model.LinePlotData
@@ -52,7 +52,7 @@ fun HomeScreen(
     val context = LocalContext.current
     val pointsData: MutableList<Point> = mutableListOf(Point(-1f, 0f))
     val xAxisData = AxisData.Builder()
-        .axisStepSize(200.dp)
+        .axisStepSize(50.dp)
         .steps(pointsData.size)
         .labelData { i -> i.toString() }
         .build()
@@ -63,8 +63,11 @@ fun HomeScreen(
 
 
     val lineChartData = LineChartData(
-        paddingRight = 0.dp,
+        isZoomAllowed = false,
+        paddingTop = 0.dp,
         bottomPadding = 0.dp,
+        paddingRight= 0.dp,
+        containerPaddingEnd = 0.dp,
         linePlotData = LinePlotData(
             lines = listOf(
                 Line(
@@ -119,7 +122,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = context.getString(R.string.total_balance),
+                    text = stringResource(R.string.total_balance),
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
@@ -140,16 +143,19 @@ fun HomeScreen(
                         .padding(10.dp)
                         .background(color = MaterialTheme.colorScheme.surface)
                 ) {
-                    LineChart(
+                    /*LineChart(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(300.dp)
                             .background(color = MaterialTheme.colorScheme.secondary),
                         lineChartData = lineChartData
-                    )
+                    )*/
+
+
                 }
             }
         }
+
 
         if (viewModelState.transactions.isNotEmpty()) {
             Row(
@@ -159,7 +165,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.End
             ) {
                 ClickableText(
-                    text = AnnotatedString(context.getString(R.string.see_all)),
+                    text = AnnotatedString(stringResource(R.string.see_all)),
                     style = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize,

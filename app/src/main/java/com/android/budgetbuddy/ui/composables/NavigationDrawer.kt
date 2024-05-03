@@ -1,16 +1,14 @@
 package com.android.budgetbuddy.ui.composables
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.EmojiEvents
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Map
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Repeat
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.StackedLineChart
 import androidx.compose.material3.Divider
@@ -20,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemColors
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
@@ -84,9 +82,9 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
                 Divider()
                 NavigationDrawerItem(
                     colors = colors,
-                    label = { Text(context.getString(R.string.all_transactions)) },
+                    label = { Text(stringResource(R.string.all_transactions)) },
                     selected = false,
-                    icon = { Icon(Icons.Outlined.List, context.getString(R.string.all_transactions)) },
+                    icon = { Icon(Icons.Outlined.List, stringResource(R.string.all_transactions)) },
                     onClick = {
                         coroutineScope.launch {
                             drawerState.close()
@@ -97,9 +95,22 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
 
                 NavigationDrawerItem(
                     colors = colors,
-                    label = { Text(context.getString(R.string.charts)) },
+                    label = { Text(stringResource(R.string.regular_transactions)) },
                     selected = false,
-                    icon = { Icon(Icons.Outlined.StackedLineChart, context.getString(R.string.charts)) },
+                    icon = { Icon(Icons.Outlined.Repeat, stringResource(R.string.regular_transactions)) },
+                    onClick = {
+                        coroutineScope.launch {
+                            drawerState.close()
+                        }
+                        //navController.navigate(BudgetBuddyRoute.RegularTransactions.route)
+                    }
+                )
+
+                NavigationDrawerItem(
+                    colors = colors,
+                    label = { Text(stringResource(R.string.charts)) },
+                    selected = false,
+                    icon = { Icon(Icons.Outlined.StackedLineChart, stringResource(R.string.charts)) },
                     onClick = {
                         coroutineScope.launch {
                             drawerState.close()
@@ -110,9 +121,9 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
 
                 NavigationDrawerItem(
                     colors = colors,
-                    label = { Text(context.getString(R.string.map)) },
+                    label = { Text(stringResource(R.string.map)) },
                     selected = false,
-                    icon = { Icon(Icons.Outlined.Map, context.getString(R.string.map)) },
+                    icon = { Icon(Icons.Outlined.Map, stringResource(R.string.map)) },
                     onClick = {
                         coroutineScope.launch {
                             drawerState.close()
@@ -123,9 +134,9 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
 
                 NavigationDrawerItem(
                     colors = colors,
-                    label = { Text(context.getString(R.string.badges)) },
+                    label = { Text(stringResource(R.string.badges)) },
                     selected = false,
-                    icon = { Icon(Icons.Outlined.EmojiEvents, context.getString(R.string.badges)) },
+                    icon = { Icon(Icons.Outlined.EmojiEvents, stringResource(R.string.badges)) },
                     onClick = {
                         coroutineScope.launch {
                             drawerState.close()
@@ -136,9 +147,9 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
 
                 NavigationDrawerItem(
                     colors = colors,
-                    label = { Text(context.getString(R.string.settings)) },
+                    label = { Text(stringResource(R.string.settings)) },
                     selected = false,
-                    icon = { Icon(Icons.Outlined.Settings, context.getString(R.string.settings)) },
+                    icon = { Icon(Icons.Outlined.Settings, stringResource(R.string.settings)) },
                     onClick = {
                         coroutineScope.launch {
                             drawerState.close()
