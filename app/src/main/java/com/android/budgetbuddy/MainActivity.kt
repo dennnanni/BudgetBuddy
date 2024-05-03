@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+
                     val navController = rememberNavController()
                     val backStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute by remember {
@@ -74,7 +75,8 @@ class MainActivity : ComponentActivity() {
                         },
                         bottomBar = {
                             if (currentRoute in BudgetBuddyRoute.bottomBarRoutes) BottomBar(navController = navController)
-                        }
+                        },
+
                     ) { paddingValues ->
                         BudgetBuddyNavGraph(
                             navController = navController,
