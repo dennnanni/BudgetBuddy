@@ -31,11 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.android.budgetbuddy.data.database.User
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.android.budgetbuddy.ui.viewmodel.UserState
-import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(navController: NavHostController, userState: UserState, actions: UserActions) {
@@ -44,6 +42,21 @@ fun LoginScreen(navController: NavHostController, userState: UserState, actions:
     val password = remember { mutableStateOf("") }
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
+
+    if (actions.getLoggedUser() != null) {
+        Log.d("LoginScreen", "User logged in")
+        with(sharedPreferences.edit()) {
+            putString("username", username.value)
+            putString("name", actions.getLoggedUser()?.name)
+            putString("profilePic", actions.getLoggedUser()?.profilePic)
+            apply()
+        }
+        navController.navigate(BudgetBuddyRoute.Home.route) {
+            popUpTo(navController.graph.id) {
+                inclusive = true
+            }
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -82,15 +95,6 @@ fun LoginScreen(navController: NavHostController, userState: UserState, actions:
                 ),
                 onClick = {
                     actions.login(username.value, password.value)
-
-                    if (actions.getLoggedUser() != null) {
-                        Log.d("LoginScreen", "User logged in")
-                        with(sharedPreferences.edit()) {
-                            putString("username", username.value)
-                            apply()
-                        }
-                        navController.navigate(BudgetBuddyRoute.Home.route)
-                    }
                 }
             ) {
                 Text(text = "Login")

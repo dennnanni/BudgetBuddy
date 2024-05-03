@@ -20,7 +20,6 @@ interface UserActions {
     fun addUser(user: User): Job
     fun removeUser(user: User): Job
     fun login(username: String, password: String): Job
-
     fun getLoggedUser(): User?
 }
 
@@ -47,7 +46,6 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
         }
 
         override fun getLoggedUser(): User? {
-            Log.d("UserViewModel", "getLoggedUser: ${user.value}")
             return user.value
         }
     }

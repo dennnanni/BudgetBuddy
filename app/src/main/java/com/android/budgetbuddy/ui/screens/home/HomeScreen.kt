@@ -20,21 +20,30 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import co.yml.charts.axis.AxisData
+import co.yml.charts.common.model.Point
+import co.yml.charts.ui.linechart.LineChart
+import co.yml.charts.ui.linechart.model.Line
+import co.yml.charts.ui.linechart.model.LineChartData
+import co.yml.charts.ui.linechart.model.LinePlotData
+import co.yml.charts.ui.linechart.model.LineStyle
+import co.yml.charts.ui.linechart.model.LineType
+import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
+import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
+import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.ui.composables.TransactionItem
-import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionsState
+import com.android.budgetbuddy.ui.composables.TransactionItem
 
 @Composable
 fun HomeScreen(
@@ -42,6 +51,55 @@ fun HomeScreen(
     viewModelState: TransactionsState
 ) {
     val context = LocalContext.current
+    val pointsData: MutableList<Point> = mutableListOf(Point(-1f, 0f))
+    val xAxisData = AxisData.Builder()
+        .axisStepSize(200.dp)
+        .steps(pointsData.size)
+        .labelData { i -> i.toString() }
+        .build()
+
+    val yAxisData = AxisData.Builder()
+        .backgroundColor(Color.Red)
+        .build()
+
+
+    val lineChartData = LineChartData(
+        paddingRight = 0.dp,
+        bottomPadding = 0.dp,
+        linePlotData = LinePlotData(
+            lines = listOf(
+                Line(
+                    dataPoints = pointsData,
+                    LineStyle(
+                        lineType = LineType.SmoothCurve(isDotted = false),
+                        color = MaterialTheme.colorScheme.primary
+                    ),
+                    intersectionPoint = null,
+                    SelectionHighlightPoint(),
+                    ShadowUnderLine(
+                        brush = Brush.verticalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.secondary,
+                                Color.Transparent
+                            )
+                        ), alpha = 1f
+                    ),
+                    SelectionHighlightPopUp()
+                )
+            ),
+        ),
+        xAxisData = xAxisData,
+        yAxisData = yAxisData,
+        backgroundColor = MaterialTheme.colorScheme.surface
+    )
+
+    var totalBalance: Double = 0.0
+    var i = 0f
+    for (transaction in viewModelState.transactions) {
+        totalBalance += transaction.amount
+        pointsData.add(Point(i++, totalBalance.toFloat()))
+
+    }
 
     Column(
         modifier = Modifier.padding(10.dp)
@@ -50,7 +108,7 @@ fun HomeScreen(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primary
             ),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(45.dp),
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth()
@@ -58,23 +116,39 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp, 15.dp, 15.dp, 0.dp),
+                    .padding(30.dp, 15.dp, 30.dp, 0.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = context.getString(R.string.total_balance),
+                Text(
+                    text = context.getString(R.string.total_balance),
                     style = MaterialTheme.typography.titleLarge
                 )
-                Text(text = "1234.56 €",
+                Text(
+                    text = "$totalBalance €",
                     style = MaterialTheme.typography.titleLarge
                 )
             }
 
-            Box(modifier = Modifier
-                .padding(15.dp)
-                .clip(RoundedCornerShape(30.dp))
-                .background(MaterialTheme.colorScheme.secondary)
-                .fillMaxSize()
+            Box(
+                modifier = Modifier
+                    .padding(15.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(color = MaterialTheme.colorScheme.surface)
+                    .fillMaxSize()
             ) {
+                Box(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .background(color = MaterialTheme.colorScheme.surface)
+                ) {
+                    LineChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)
+                            .background(color = MaterialTheme.colorScheme.secondary),
+                        lineChartData = lineChartData
+                    )
+                }
             }
         }
 
@@ -116,5 +190,7 @@ fun HomeScreen(
                 }
             }
         }
+
+        //TransactionList(state = viewModelState, actions = viewModelActions)
     }
 }

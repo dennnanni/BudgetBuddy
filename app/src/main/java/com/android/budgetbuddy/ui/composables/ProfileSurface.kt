@@ -26,14 +26,41 @@ fun ProfileHome(user: User) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.default_propic),
-            contentDescription = R.string.profile_picture.toString(),
-            modifier = Modifier.clip(RoundedCornerShape(10.dp))
+            contentDescription = "R.string.profile_picture.toString()",
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
                 .size(50.dp)
         )
         Spacer(modifier = Modifier.size(16.dp))
         Column {
             Text(text = user.name)
-            Text(text = "@${user.username}",
+            Text(
+                text = "@${user.username}",
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun ProfileProfile(name: String, username: String, profilePic: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.default_propic),
+            contentDescription = "R.string.profile_picture.toString()",
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .size(150.dp)
+        )
+        Spacer(modifier = Modifier.size(16.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = name)
+            Text(
+                text = "@${username}",
                 style = MaterialTheme.typography.labelMedium
             )
         }

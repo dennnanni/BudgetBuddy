@@ -15,6 +15,7 @@ import androidx.navigation.navArgument
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
+import com.android.budgetbuddy.ui.screens.profile.ProfileScreen
 import com.android.budgetbuddy.ui.screens.register.RegisterScreen
 import com.android.budgetbuddy.ui.screens.settings.SettingsScreen
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
@@ -28,6 +29,7 @@ sealed class BudgetBuddyRoute(
 ) {
     data object Home : BudgetBuddyRoute("home", "BudgetBuddy")
     data object AddTransaction : BudgetBuddyRoute("addTransaction", "Add Transaction")
+    data object Profile : BudgetBuddyRoute("profile", "Profile")
     data object TransactionDetails : BudgetBuddyRoute(
         "transactionDetails/{transactionId}",
         "Transaction Details",
@@ -95,7 +97,7 @@ fun BudgetBuddyNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = BudgetBuddyRoute.Home.route,//defaultRoute, TODO: uncomment this line
+        startDestination = defaultRoute, //TODO: uncomment this line
         modifier = modifier
     ) {
 
@@ -135,6 +137,11 @@ fun BudgetBuddyNavGraph(
             }
         }
 
+        with(BudgetBuddyRoute.Profile) {
+            composable(route) {
+                ProfileScreen(navController)
+            }
+        }
         // TODO: add other screens here
     }
 }

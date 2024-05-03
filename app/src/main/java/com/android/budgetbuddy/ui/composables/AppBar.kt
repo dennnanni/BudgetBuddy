@@ -52,8 +52,11 @@ fun TopBar(
             containerColor = Color.White,
         ),
         title = {
-            if (user != null && currentRoute.route == BudgetBuddyRoute.Home.route) {
-                ProfileHome(user)
+            if (
+                currentRoute.route == BudgetBuddyRoute.Home.route
+                && currentRoute.route != BudgetBuddyRoute.Profile.route
+            ) {
+                    //ProfileHome(user)
             } else {
                 val title: String =
                     sharedPreferences.getString("username", null) ?: currentRoute.title
@@ -84,7 +87,8 @@ fun TopBar(
         actions = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
                 IconButton({ navController.navigate(BudgetBuddyRoute.Settings.route) }) {
-                    Icon(Icons.Outlined.Settings, context.getString(R.string.settings),
+                    Icon(
+                        Icons.Outlined.Settings, context.getString(R.string.settings),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -141,10 +145,11 @@ fun BottomBar(
 
             IconButton(
                 onClick = {
-                    with(sharedPreferences.edit()) {
+                    /*with(sharedPreferences.edit()) {
                         remove("username")
                         apply()
-                    }
+                    }*/
+                    navController.navigate(BudgetBuddyRoute.Profile.route)
                 },
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
