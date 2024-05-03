@@ -33,6 +33,8 @@ fun ProfileScreen(navController: NavHostController) {
                 apply()
             }
 
+            userActions.logout()
+
             navController.navigate("login") {
                 popUpTo(navController.graph.id) {
                     inclusive = true
