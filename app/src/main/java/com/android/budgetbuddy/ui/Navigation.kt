@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
+import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
 import com.android.budgetbuddy.ui.screens.profile.ProfileScreen
@@ -31,11 +32,11 @@ sealed class BudgetBuddyRoute(
     data object AddTransaction : BudgetBuddyRoute("addTransaction", "Add Transaction")
     data object Profile : BudgetBuddyRoute("profile", "Profile")
     data object TransactionDetails : BudgetBuddyRoute(
-        "transactionDetails/{transactionId}",
+        "transactions/{transactionId}",
         "Transaction Details",
         listOf(navArgument("transactionId") { type = NavType.StringType })
     ) {
-        fun buildRoute(transactionId: String) = "transactionDetails/$transactionId"
+        fun buildRoute(transactionId: String) = "transactions/$transactionId"
     }
 
     data object Settings : BudgetBuddyRoute("settings", "Settings")
@@ -142,6 +143,15 @@ fun BudgetBuddyNavGraph(
                 ProfileScreen(navController)
             }
         }
+        with(BudgetBuddyRoute.TransactionDetails) {
+            composable(route, args) { backStackEntry ->
+                val transaction = requireNotNull(transactionsState.transactions.find {
+                    it.id == backStackEntry.arguments?.getString("transactionId")?.toInt()
+                })
+                DetailsScreen(transaction)
+            }
+        }
+
         // TODO: add other screens here
     }
 }

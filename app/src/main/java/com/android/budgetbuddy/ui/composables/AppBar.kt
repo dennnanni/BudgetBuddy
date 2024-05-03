@@ -66,7 +66,7 @@ fun TopBar(
                 ) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -79,7 +79,8 @@ fun TopBar(
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back button"
+                        contentDescription = context.getString(R.string.back),
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }

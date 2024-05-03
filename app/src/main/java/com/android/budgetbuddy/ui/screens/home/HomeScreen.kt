@@ -184,9 +184,8 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier.padding(10.dp, 0.dp)
             ) {
-                Log.d("HomeScreen", "Transaction list: ${viewModelState.transactions.size}")
                 items(viewModelState.transactions) {
-                    TransactionItem(transaction = it)
+                    TransactionItem(it, navController)
                 }
             }
         }
