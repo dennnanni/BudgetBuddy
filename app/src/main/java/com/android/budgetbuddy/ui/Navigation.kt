@@ -140,7 +140,13 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Profile) {
             composable(route) {
-                ProfileScreen(navController)
+                ProfileScreen(
+                    navController,
+                    transactionsState,
+                    transactionViewModel.actions,
+                    userState,
+                    userViewModel.actions
+                )
             }
         }
         with(BudgetBuddyRoute.TransactionDetails) {

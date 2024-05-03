@@ -11,7 +11,13 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.ui.composables.ProfileProfile
 
 @Composable
-fun ProfileScreen(navController: NavHostController) {
+fun ProfileScreen(
+    navController: NavHostController,
+    transactionsState: TransactionsState,
+    transactionActions: TransactionActions,
+    userState: UserState,
+    userActions: UserActions
+) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
     val name = sharedPreferences.getString("name", null) ?: ""
