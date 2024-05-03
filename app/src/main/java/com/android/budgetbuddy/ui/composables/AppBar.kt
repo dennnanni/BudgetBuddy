@@ -42,24 +42,22 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 fun TopBar(
     navController: NavHostController,
     currentRoute: BudgetBuddyRoute,
+    name: String,
+    username: String,
+    profilePic: String,
 ) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
-    val user = User(name = "Goku", username = "iamgoku", password = "", profilePic = "")
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White,
         ),
         title = {
-            if (
-                currentRoute.route == BudgetBuddyRoute.Home.route
-                && currentRoute.route != BudgetBuddyRoute.Profile.route
-            ) {
-                    //ProfileHome(user)
+            if (currentRoute.route == BudgetBuddyRoute.Home.route) {
+                ProfileHome(name = name, username = username, profilePic = profilePic, navController = navController)
             } else {
-                val title: String =
-                    sharedPreferences.getString("username", null) ?: currentRoute.title
+                val title: String = currentRoute.title
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -100,10 +98,10 @@ fun TopBar(
 
 @Composable
 fun BottomBar(
-    navController: NavHostController
+    navController: NavHostController,
+    menuClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
 
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -116,7 +114,7 @@ fun BottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { /* TODO: open menu */ },
+                onClick = { menuClick() },
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.secondary)

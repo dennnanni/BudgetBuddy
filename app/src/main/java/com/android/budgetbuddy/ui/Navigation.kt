@@ -29,7 +29,7 @@ sealed class BudgetBuddyRoute(
     val args: List<NamedNavArgument> = emptyList()
 ) {
     data object Home : BudgetBuddyRoute("home", "BudgetBuddy")
-    data object AddTransaction : BudgetBuddyRoute("addTransaction", "Add Transaction")
+    data object AddTransaction : BudgetBuddyRoute("transactions/add", "Add Transaction")
     data object Profile : BudgetBuddyRoute("profile", "Profile")
     data object TransactionDetails : BudgetBuddyRoute(
         "transactions/{transactionId}",
@@ -63,14 +63,21 @@ sealed class BudgetBuddyRoute(
             Register,
             Login,
             Home,
+            Profile,
             AddTransaction,
             TransactionDetails,
             EditTransaction,
             Settings,
             AllTransactions
         )
-        val bottomBarRoutes =
-            setOf(Home, AddTransaction, TransactionDetails, EditTransaction, AllTransactions)
+        val bottomBarRoutes = setOf(
+            Home,
+            Profile,
+            AddTransaction,
+            TransactionDetails,
+            EditTransaction,
+            AllTransactions
+        )
     }
 }
 

@@ -18,15 +18,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.data.database.User
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
 
 @Composable
-fun ProfileHome(user: User, navController: NavHostController) {
+fun ProfileHome(
+    name: String,
+    username: String,
+    profilePic: String,
+    navController: NavHostController
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable {
-            navController.navigate("profile")
+            navController.navigate(BudgetBuddyRoute.Profile.route)
         }
     ) {
         Image(
@@ -38,9 +43,9 @@ fun ProfileHome(user: User, navController: NavHostController) {
         )
         Spacer(modifier = Modifier.size(16.dp))
         Column {
-            Text(text = user.name)
+            Text(text = name)
             Text(
-                text = "@${user.username}",
+                text = "@${username}",
                 style = MaterialTheme.typography.labelMedium
             )
         }
