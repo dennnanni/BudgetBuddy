@@ -1,10 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.android.budgetbuddy.ui.screens.addTransaction
 
-import android.Manifest
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,12 +42,11 @@ import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionsState
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
-import com.android.budgetbuddy.ui.utils.rememberCameraLauncher
-import com.android.budgetbuddy.ui.utils.rememberPermission
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     navController: NavHostController,
@@ -69,31 +63,6 @@ fun AddTransactionScreen(
     var expanded by remember { mutableStateOf(false) }
     val description = rememberSaveable { mutableStateOf("") }
     val title = rememberSaveable { mutableStateOf("") }
-
-
-    val context = LocalContext.current
-
-    /* TODO: move in profile page */
-    val cameraLauncher = rememberCameraLauncher { imageUri ->
-        Log.d("AddTransactionScreen", "Image URI: $imageUri")
-    }
-
-    val cameraPermission = rememberPermission(Manifest.permission.CAMERA) { status ->
-        if (status.isGranted) {
-            cameraLauncher.captureImage()
-        } else {
-            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun takePicture() {
-        if (cameraPermission.status.isGranted) {
-            cameraLauncher.captureImage()
-        } else {
-            cameraPermission.launchPermissionRequest()
-        }
-    }
-
 
     // UI
     Column {
@@ -203,12 +172,6 @@ fun AddTransactionScreen(
             }
 
 
-        }
-        Button(
-            modifier = Modifier.padding(12.dp, 0.dp).fillMaxWidth().height(50.dp),
-            onClick = ::takePicture
-        ) {
-            Text(text = "Take Picture", fontSize = 20.sp)
         }
 
         Button(
