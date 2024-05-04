@@ -47,6 +47,7 @@ fun TransactionItem(transaction: Transaction, navController: NavHostController) 
             Text(text = transaction.title)
         }
 
-        Text(text = "${transaction.amount} €")
+        val sign = if (transaction.isExpense) "-" else "+"
+        Text(text = "${sign}${transaction.amount} €")
     }
 }

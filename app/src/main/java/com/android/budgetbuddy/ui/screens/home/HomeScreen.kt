@@ -19,10 +19,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -30,78 +30,80 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import co.yml.charts.axis.AxisData
-import co.yml.charts.common.model.Point
-import co.yml.charts.ui.linechart.model.Line
-import co.yml.charts.ui.linechart.model.LineChartData
-import co.yml.charts.ui.linechart.model.LinePlotData
-import co.yml.charts.ui.linechart.model.LineStyle
-import co.yml.charts.ui.linechart.model.LineType
-import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
-import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
-import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.TransactionsState
 import com.android.budgetbuddy.ui.composables.TransactionItem
+import com.android.budgetbuddy.ui.composables.rememberMarker
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineSpec
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.common.shader.color
+import com.patrykandpatrick.vico.core.cartesian.Scroll
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.common.shader.DynamicShader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+
+const val TRANSACTION_PREVIEW_COUNT = 10
 
 @Composable
 fun HomeScreen(
     navController: NavHostController,
     viewModelState: TransactionsState
 ) {
-    val context = LocalContext.current
-    val pointsData: MutableList<Point> = mutableListOf(Point(-1f, 0f))
-    val xAxisData = AxisData.Builder()
-        .axisStepSize(50.dp)
-        .steps(pointsData.size)
-        .labelData { i -> i.toString() }
-        .build()
 
-    val yAxisData = AxisData.Builder()
-        .backgroundColor(Color.Red)
-        .build()
+    var totalBalance = 0.0
+    val data = mutableMapOf<Float, Float>()
 
-
-    val lineChartData = LineChartData(
-        isZoomAllowed = false,
-        paddingTop = 0.dp,
-        bottomPadding = 0.dp,
-        paddingRight= 0.dp,
-        containerPaddingEnd = 0.dp,
-        linePlotData = LinePlotData(
-            lines = listOf(
-                Line(
-                    dataPoints = pointsData,
-                    LineStyle(
-                        lineType = LineType.SmoothCurve(isDotted = false),
-                        color = MaterialTheme.colorScheme.primary
-                    ),
-                    intersectionPoint = null,
-                    SelectionHighlightPoint(),
-                    ShadowUnderLine(
-                        brush = Brush.verticalGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.secondary,
-                                Color.Transparent
-                            )
-                        ), alpha = 1f
-                    ),
-                    SelectionHighlightPopUp()
-                )
-            ),
-        ),
-        xAxisData = xAxisData,
-        yAxisData = yAxisData,
-        backgroundColor = MaterialTheme.colorScheme.surface
-    )
-
-    var totalBalance: Double = 0.0
     var i = 0f
     for (transaction in viewModelState.transactions) {
-        totalBalance += transaction.amount
-        pointsData.add(Point(i++, totalBalance.toFloat()))
-
+        if (transaction.type == "Expense") {
+            totalBalance -= transaction.amount
+        } else {
+            totalBalance += transaction.amount
+        }
+        data[i++] = totalBalance.toFloat()
     }
+
+    // Chart settings
+    val modelProducer = remember { CartesianChartModelProducer.build() }
+    if (viewModelState.transactions.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            withContext(Dispatchers.Default) {
+                modelProducer.tryRunTransaction {
+                    lineSeries { series(data.keys, data.values)}
+                }
+            }
+        }
+    }
+
+    val marker = rememberMarker()
+    val cartesianChart = rememberCartesianChart(
+        rememberLineCartesianLayer(
+            listOf(rememberLineSpec(
+                DynamicShader.color(MaterialTheme.colorScheme.primary),
+                backgroundShader = null
+            ))
+        ),
+        startAxis = rememberStartAxis(
+            horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
+        ),
+        bottomAxis = rememberBottomAxis(
+            label = null,
+            guideline = null
+        ),
+    )
+    val scrollState = rememberVicoScrollState(
+        initialScroll = Scroll.Absolute.End,
+        scrollEnabled = true,
+    )
 
     Column(
         modifier = Modifier.padding(10.dp)
@@ -143,15 +145,13 @@ fun HomeScreen(
                         .padding(10.dp)
                         .background(color = MaterialTheme.colorScheme.surface)
                 ) {
-                    /*LineChart(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .background(color = MaterialTheme.colorScheme.secondary),
-                        lineChartData = lineChartData
-                    )*/
-
-
+                    CartesianChartHost(
+                        chart = cartesianChart,
+                        scrollState = scrollState,
+                        modifier = Modifier.fillMaxSize().padding(bottom = 30.dp),
+                        modelProducer = modelProducer,
+                        marker = marker
+                    )
                 }
             }
         }
@@ -189,12 +189,13 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier.padding(10.dp, 0.dp)
             ) {
-                items(viewModelState.transactions) {
+                val orderedList = viewModelState.transactions
+                    .sortedByDescending { it.date }
+                    .take(TRANSACTION_PREVIEW_COUNT)
+                items(orderedList) {
                     TransactionItem(it, navController)
                 }
             }
         }
-
-        //TransactionList(state = viewModelState, actions = viewModelActions)
     }
 }
