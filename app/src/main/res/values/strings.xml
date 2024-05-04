@@ -30,4 +30,7 @@
     <string name="charts">Charts</string>
     <string name="map">Map</string>
     <string name="regular_transactions">Regular transactions</string>
+    <string name="personal_info">Personal info</string>
+    <string name="change_username">Change username</string>
+    <string name="change_password">Change password</string>
 </resources>
