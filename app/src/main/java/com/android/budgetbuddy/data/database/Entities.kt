@@ -17,7 +17,12 @@ data class Transaction (
     @ColumnInfo val amount: Double,
     @ColumnInfo val date: Date,
     @ColumnInfo val periodic: Boolean
-)
+) {
+    val isExpense: Boolean
+        get() {
+            return type == "Expense"
+        }
+}
 
 @Entity(tableName = "user")
 data class User(

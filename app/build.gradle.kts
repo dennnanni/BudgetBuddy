@@ -50,8 +50,6 @@ android {
 }
 
 dependencies {
-    implementation("co.yml:ycharts:2.1.0")
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -84,5 +82,11 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("org.osmdroid:osmdroid-android:6.1.16")
     implementation("tech.utsmankece:osm-android-compose:0.0.5")
+
+    implementation("com.patrykandpatrick.vico:compose:2.0.0-alpha.19")
+    implementation("com.patrykandpatrick.vico:compose-m2:2.0.0-alpha.19")
+    implementation("com.patrykandpatrick.vico:compose-m3:2.0.0-alpha.19")
+    implementation("com.patrykandpatrick.vico:core:2.0.0-alpha.19")
+    implementation("com.patrykandpatrick.vico:views:2.0.0-alpha.19")
 
 }

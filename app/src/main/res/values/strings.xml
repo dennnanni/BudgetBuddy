@@ -17,4 +17,20 @@
     <string name="see_all">See all</string>
     <string name="category_icon">Category icon</string>
     <string name="total_balance">Total balance:</string>
+    <string name="already_registered">Already have an account?</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="first_time">First time?</string>
+    <string name="username">Username</string>
+    <string name="full_name">Full name</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="all_transactions">All transactions</string>
+    <string name="badges">Badges</string>
+    <string name="charts">Charts</string>
+    <string name="map">Map</string>
+    <string name="regular_transactions">Regular transactions</string>
+    <string name="personal_info">Personal info</string>
+    <string name="change_username">Change username</string>
+    <string name="change_password">Change password</string>
 </resources>

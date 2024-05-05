@@ -30,11 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.data.database.User
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,24 +42,21 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 fun TopBar(
     navController: NavHostController,
     currentRoute: BudgetBuddyRoute,
+    name: String,
+    username: String,
+    profilePic: String,
 ) {
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
-    val user = User(name = "Goku", username = "iamgoku", password = "", profilePic = "")
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White,
         ),
         title = {
-            if (
-                currentRoute.route == BudgetBuddyRoute.Home.route
-                && currentRoute.route != BudgetBuddyRoute.Profile.route
-            ) {
-                    //ProfileHome(user)
+            if (currentRoute.route == BudgetBuddyRoute.Home.route) {
+                ProfileHome(name = name, username = username, profilePic = profilePic, navController = navController)
             } else {
-                val title: String =
-                    sharedPreferences.getString("username", null) ?: currentRoute.title
+                val title: String = currentRoute.title
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -79,7 +76,7 @@ fun TopBar(
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = context.getString(R.string.back),
+                        contentDescription = stringResource(R.string.back),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -89,7 +86,7 @@ fun TopBar(
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
                 IconButton({ navController.navigate(BudgetBuddyRoute.Settings.route) }) {
                     Icon(
-                        Icons.Outlined.Settings, context.getString(R.string.settings),
+                        Icons.Outlined.Settings, stringResource(R.string.settings),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -100,10 +97,10 @@ fun TopBar(
 
 @Composable
 fun BottomBar(
-    navController: NavHostController
+    navController: NavHostController,
+    menuClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
 
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -116,12 +113,12 @@ fun BottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { /* TODO: open menu */ },
+                onClick = { menuClick() },
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                Icon(Icons.Filled.Menu, context.getString(R.string.menu))
+                Icon(Icons.Filled.Menu, stringResource(R.string.menu))
             }
 
             Surface(
@@ -156,7 +153,7 @@ fun BottomBar(
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                Icon(Icons.Filled.Person, context.getString(R.string.profile))
+                Icon(Icons.Filled.Person, stringResource(R.string.profile))
             }
 
         }

@@ -19,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,21 +29,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.android.budgetbuddy.data.database.Transaction
-import com.android.budgetbuddy.ui.BudgetBuddyNavGraph
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionsState
-import com.android.budgetbuddy.ui.composables.BottomBar
-import com.android.budgetbuddy.ui.composables.TopBar
-import com.android.budgetbuddy.ui.screens.home.HomeScreen
+import com.android.budgetbuddy.ui.composables.NavigationDrawer
 import com.android.budgetbuddy.ui.theme.BudgetBuddyTheme
 import java.util.Date
 
@@ -68,22 +61,9 @@ class MainActivity : ComponentActivity() {
                             } ?: BudgetBuddyRoute.Home
                         }
                     }
+                    
+                    NavigationDrawer(navController = navController, currentRoute = currentRoute)
 
-                    Scaffold(
-                        topBar = {
-                            TopBar(navController = navController, currentRoute = currentRoute)
-                        },
-                        bottomBar = {
-                            if (currentRoute in BudgetBuddyRoute.bottomBarRoutes) BottomBar(navController = navController)
-                        },
-
-                    ) { paddingValues ->
-                        BudgetBuddyNavGraph(
-                            navController = navController,
-                            modifier = Modifier.padding(paddingValues)
-                        )
-
-                    }
                 }
             }
         }
@@ -164,7 +144,9 @@ fun TransactionItem(
         Text(
             item.title,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(start = 16.dp).weight(1F)
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .weight(1F)
         )
         IconButton(onClick = onDelete) {
             Icon(Icons.Outlined.Close, "Remove TODO")

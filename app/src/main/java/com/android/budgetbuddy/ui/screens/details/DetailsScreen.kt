@@ -1,8 +1,6 @@
 package com.android.budgetbuddy.ui.screens.details
 
-import android.Manifest
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,13 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
-import com.android.budgetbuddy.ui.utils.rememberCameraLauncher
-import com.android.budgetbuddy.ui.utils.rememberPermission
 
 @Composable
 fun DetailsScreen(transaction: Transaction) {
@@ -58,7 +55,7 @@ fun DetailsScreen(transaction: Transaction) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.default_propic),
-                        contentDescription = context.getString(R.string.category_icon),
+                        contentDescription = stringResource(R.string.category_icon),
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
                             .size(50.dp)
@@ -77,22 +74,22 @@ fun DetailsScreen(transaction: Transaction) {
 
                 DetailRow(
                     context = context,
-                    key = context.getString(R.string.type),
+                    key = stringResource(R.string.type),
                     value = transaction.type
                 )
                 DetailRow(
                     context = context,
-                    key = context.getString(R.string.amount),
+                    key = stringResource(R.string.amount),
                     value = "${transaction.amount} €"
                 )
                 DetailRow(
                     context = context,
-                    key = context.getString(R.string.date),
+                    key = stringResource(R.string.date),
                     value = transaction.date.toString()
                 )
                 DetailRow(
                     context = context,
-                    key = context.getString(R.string.category),
+                    key = stringResource(R.string.category),
                     value = transaction.category
                 )
 
@@ -101,7 +98,7 @@ fun DetailsScreen(transaction: Transaction) {
                 if (transaction.description.isNotEmpty()) {
                     Column {
                         Text(
-                            text = context.getString(R.string.description),
+                            text = stringResource(R.string.description),
                             style = TextStyle(
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = MaterialTheme.typography.bodyMedium.fontSize
@@ -132,7 +129,7 @@ fun DetailsScreen(transaction: Transaction) {
                 onClick = { /*TODO*/ }
             ) {
                 Text(
-                    text = context.getString(R.string.edit),
+                    text = stringResource(R.string.edit),
                     style = TextStyle(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize
@@ -149,7 +146,7 @@ fun DetailsScreen(transaction: Transaction) {
                 onClick = { /*TODO*/ }
             ) {
                 Text(
-                    text = context.getString(R.string.delete),
+                    text = stringResource(R.string.delete),
                     style = TextStyle(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize
