@@ -25,7 +25,7 @@ data class User(
     @ColumnInfo val name: String,
     @ColumnInfo val username: String,
     @ColumnInfo val password: String,
-    @ColumnInfo(defaultValue = "temp") val profilePic: String? = ""
+    @ColumnInfo(defaultValue = "temp") var profilePic: String? = ""
 )
 
 class Converters {

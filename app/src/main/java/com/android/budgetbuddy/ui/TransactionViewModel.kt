@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.budgetbuddy.data.database.Transaction
@@ -15,6 +16,11 @@ data class TransactionsState(val transactions: List<Transaction>)
 interface TransactionActions {
     fun addTransaction(transaction: Transaction): Job
     fun removeTransaction(transaction: Transaction): Job
+
+    fun loadMostPopularCategories(): Job
+
+    fun getMostPopularCategories(): List<String>
+
 }
 
 class TransactionViewModel(private val repository: TransactionRepository) : ViewModel() {
@@ -24,6 +30,8 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
         initialValue = TransactionsState(emptyList())
     )
 
+    var mostPopularCategories = mutableStateOf<List<String>>(emptyList())
+
     val actions = object : TransactionActions {
         override fun addTransaction(transaction: Transaction) = viewModelScope.launch{
             repository.upsert(transaction)
@@ -31,6 +39,14 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
 
         override fun removeTransaction(transaction: Transaction) = viewModelScope.launch{
             repository.delete(transaction)
+        }
+
+        override fun loadMostPopularCategories(): Job = viewModelScope.launch {
+            mostPopularCategories.value = repository.getMostPopularCategories()
+        }
+
+        override fun getMostPopularCategories(): List<String> {
+            return mostPopularCategories.value
         }
     }
 }

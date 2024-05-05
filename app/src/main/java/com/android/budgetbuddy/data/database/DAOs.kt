@@ -12,8 +12,18 @@ interface TransactionDAO {
     @Query("SELECT * FROM `transaction`")
     fun getAll(): Flow<List<Transaction>>
 
+    @Query(
+        "SELECT category\n" +
+                "FROM `transaction`\n" +
+                "GROUP BY category\n" +
+                "ORDER BY SUM(amount) DESC\n" +
+                "LIMIT 2"
+    )
+    suspend fun getMostPopularCategories(): List<String>
+
     @Upsert
     suspend fun upsert(transaction: Transaction)
+
     @Delete
     suspend fun delete(transaction: Transaction)
 }
@@ -23,11 +33,12 @@ interface UserDAO {
     @Query("SELECT * FROM `user`")
     fun getAll(): Flow<List<User>>
 
-    @Query("SELECT * FROM `user` WHERE username = :username OR password = :password LIMIT 1")
+    @Query("SELECT * FROM `user` WHERE username = :username AND password = :password LIMIT 1")
     suspend fun login(username: String, password: String): User
 
     @Upsert
     suspend fun upsert(user: User)
+
     @Delete
     suspend fun delete(user: User)
 }

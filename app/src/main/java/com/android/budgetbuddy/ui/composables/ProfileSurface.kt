@@ -1,13 +1,25 @@
 package com.android.budgetbuddy.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,13 +64,28 @@ fun ProfileProfile(name: String, username: String, profilePic: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.default_propic),
-            contentDescription = "R.string.profile_picture.toString()",
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .size(150.dp)
-        )
+        Box {
+            Image(
+                painter = painterResource(id = R.drawable.default_propic),
+                contentDescription = "R.string.profile_picture.toString()",
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(150.dp)
+            )
+            IconButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .offset(x = 110.dp, y = 110.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                ) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
         Spacer(modifier = Modifier.size(16.dp))
         Column(
             horizontalAlignment = Alignment.CenterHorizontally

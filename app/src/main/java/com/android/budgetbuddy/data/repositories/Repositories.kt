@@ -11,6 +11,7 @@ class TransactionRepository(private val transactionDAO: TransactionDAO) {
 
     suspend fun upsert(transaction: Transaction) = transactionDAO.upsert(transaction)
     suspend fun delete(transaction: Transaction) = transactionDAO.delete(transaction)
+    suspend fun getMostPopularCategories(): List<String> = transactionDAO.getMostPopularCategories()
 }
 
 class UserRepository(private val userDAO: UserDAO) {
