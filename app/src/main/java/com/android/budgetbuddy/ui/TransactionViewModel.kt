@@ -21,6 +21,8 @@ interface TransactionActions {
 
     fun getMostPopularCategories(): List<String>
 
+    fun nukeTable(): Job
+
 }
 
 class TransactionViewModel(private val repository: TransactionRepository) : ViewModel() {
@@ -47,6 +49,10 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
 
         override fun getMostPopularCategories(): List<String> {
             return mostPopularCategories.value
+        }
+
+        override fun nukeTable(): Job = viewModelScope.launch {
+            repository.nukeTable()
         }
     }
 }

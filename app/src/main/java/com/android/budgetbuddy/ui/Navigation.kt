@@ -19,6 +19,8 @@ import com.android.budgetbuddy.ui.screens.login.LoginScreen
 import com.android.budgetbuddy.ui.screens.profile.ProfileScreen
 import com.android.budgetbuddy.ui.screens.register.RegisterScreen
 import com.android.budgetbuddy.ui.screens.settings.SettingsScreen
+import com.android.budgetbuddy.ui.screens.settings.ThemeState
+import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -73,9 +75,6 @@ sealed class BudgetBuddyRoute(
         val bottomBarRoutes = setOf(
             Home,
             Profile,
-            AddTransaction,
-            TransactionDetails,
-            EditTransaction,
             AllTransactions
         )
     }
@@ -84,7 +83,9 @@ sealed class BudgetBuddyRoute(
 @Composable
 fun BudgetBuddyNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    themeViewModel: ThemeViewModel,
+    themeState: ThemeState
 ) {
     val transactionViewModel = koinViewModel<TransactionViewModel>()
     val transactionsState by transactionViewModel.state.collectAsStateWithLifecycle()
@@ -105,7 +106,7 @@ fun BudgetBuddyNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = defaultRoute, //TODO: uncomment this line
+        startDestination = defaultRoute,
         modifier = modifier
     ) {
 
@@ -135,7 +136,7 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Settings) {
             composable(route) {
-                SettingsScreen()
+                SettingsScreen(themeViewModel::changeTheme, themeState, transactionViewModel.actions)
             }
         }
 

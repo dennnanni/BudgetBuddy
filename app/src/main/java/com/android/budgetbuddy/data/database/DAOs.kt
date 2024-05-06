@@ -26,6 +26,9 @@ interface TransactionDAO {
 
     @Delete
     suspend fun delete(transaction: Transaction)
+
+    @Query("DELETE FROM `transaction`")
+    suspend fun nukeTable()
 }
 
 @Dao

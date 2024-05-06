@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.StackedLineChart
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -34,10 +35,17 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyNavGraph
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.screens.settings.ThemeState
+import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddyRoute) {
+fun NavigationDrawer(
+    navController: NavHostController,
+    currentRoute: BudgetBuddyRoute,
+    themeViewModel: ThemeViewModel,
+    themeState: ThemeState
+) {
     val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -79,7 +87,8 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
                     )
                 }
 
-                Divider()
+                HorizontalDivider()
+
                 NavigationDrawerItem(
                     colors = colors,
                     label = { Text(stringResource(R.string.all_transactions)) },
@@ -115,7 +124,7 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
                         coroutineScope.launch {
                             drawerState.close()
                         }
-                        //navController.navigate(BudgetBuddyRoute.Profile.route)
+                        //navController.navigate(BudgetBuddyRoute.Charts.route)
                     }
                 )
 
@@ -128,7 +137,7 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
                         coroutineScope.launch {
                             drawerState.close()
                         }
-                        //navController.navigate(BudgetBuddyRoute.Profile.route)
+                        //navController.navigate(BudgetBuddyRoute.Map.route)
                     }
                 )
 
@@ -190,7 +199,9 @@ fun NavigationDrawer(navController: NavHostController, currentRoute: BudgetBuddy
             ) { paddingValues ->
             BudgetBuddyNavGraph(
                 navController = navController,
-                modifier = Modifier.padding(paddingValues)
+                modifier = Modifier.padding(paddingValues),
+                themeViewModel = themeViewModel,
+                themeState = themeState
             )
 
         }

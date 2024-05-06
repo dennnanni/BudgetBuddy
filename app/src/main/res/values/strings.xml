@@ -33,4 +33,7 @@
     <string name="personal_info">Personal info</string>
     <string name="change_username">Change username</string>
     <string name="change_password">Change password</string>
+    <string name="app_settings">App settings</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="currency">Currency</string>
 </resources>

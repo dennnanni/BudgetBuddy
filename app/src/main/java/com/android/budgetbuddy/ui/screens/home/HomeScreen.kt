@@ -35,6 +35,9 @@ import com.android.budgetbuddy.ui.TransactionsState
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
@@ -93,9 +96,15 @@ fun HomeScreen(
             ))
         ),
         startAxis = rememberStartAxis(
+            label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onSurface),
+            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
             horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
+            guideline = rememberAxisGuidelineComponent(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+            )
         ),
         bottomAxis = rememberBottomAxis(
+            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
             label = null,
             guideline = null
         ),
@@ -148,7 +157,9 @@ fun HomeScreen(
                     CartesianChartHost(
                         chart = cartesianChart,
                         scrollState = scrollState,
-                        modifier = Modifier.fillMaxSize().padding(bottom = 30.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 20.dp),
                         modelProducer = modelProducer,
                         marker = marker
                     )

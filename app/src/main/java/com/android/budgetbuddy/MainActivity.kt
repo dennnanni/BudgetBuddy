@@ -3,6 +3,7 @@ package com.android.budgetbuddy
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.android.budgetbuddy.data.database.Transaction
@@ -38,14 +40,29 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionsState
 import com.android.budgetbuddy.ui.composables.NavigationDrawer
+import com.android.budgetbuddy.ui.screens.settings.Theme
+import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.theme.BudgetBuddyTheme
+import org.koin.androidx.compose.koinViewModel
 import java.util.Date
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            BudgetBuddyTheme {
+
+            val themeViewModel = koinViewModel<ThemeViewModel>()
+            val themeState by themeViewModel.state.collectAsStateWithLifecycle()
+
+            BudgetBuddyTheme(
+                darkTheme = when(themeState.theme) {
+                    Theme.Light -> false
+                    Theme.Dark -> true
+                    Theme.System -> isSystemInDarkTheme()
+                }
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -62,7 +79,8 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     
-                    NavigationDrawer(navController = navController, currentRoute = currentRoute)
+                    NavigationDrawer(navController = navController, currentRoute = currentRoute,
+                        themeViewModel = themeViewModel, themeState = themeState)
 
                 }
             }
