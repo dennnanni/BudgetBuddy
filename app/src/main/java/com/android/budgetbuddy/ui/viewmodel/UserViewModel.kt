@@ -19,10 +19,11 @@ data class UserState(val users: List<User>)
 interface UserActions {
     fun addUser(user: User): Job
     fun removeUser(user: User): Job
+    fun getUserId(): Int?
     fun login(username: String, password: String): Job
     fun getLoggedUser(): User?
-
     fun logout()
+    fun loadCurrentUser(username: String): Job
 }
 
 class UserViewModel(private val repository: UserRepository) : ViewModel() {
@@ -43,6 +44,10 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
             repository.delete(user)
         }
 
+        override fun getUserId(): Int? {
+            return user.value?.id
+        }
+
         override fun login(username: String, password: String): Job = viewModelScope.launch {
             user.value = repository.login(username, password)
         }
@@ -53,6 +58,10 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
         override fun logout() {
             user.value = null
+        }
+
+        override fun loadCurrentUser(username: String): Job = viewModelScope.launch {
+            user.value = repository.getUser(username)
         }
     }
 }

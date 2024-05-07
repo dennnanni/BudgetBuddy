@@ -43,18 +43,18 @@ sealed class BudgetBuddyRoute(
 
     data object Settings : BudgetBuddyRoute("settings", "Settings")
     data object EditTransaction : BudgetBuddyRoute(
-        "editTransaction/{transactionId}",
+        "transactions/edit/{transactionId}",
         "Edit Transaction",
         listOf(navArgument("transactionId") { type = NavType.StringType })
     ) {
-        fun buildRoute(transactionId: String) = "editTransaction/$transactionId"
+        fun buildRoute(transactionId: String) = "transactions/edit/$transactionId"
     }
 
     data object Register : BudgetBuddyRoute("register", "Register")
 
     data object Login : BudgetBuddyRoute("login", "Login")
 
-    data object AllTransactions : BudgetBuddyRoute("allTransactions", "All Transactions")
+    data object Transactions : BudgetBuddyRoute("transactions", "All Transactions")
 
 
     // TODO: add other routes here
@@ -70,12 +70,12 @@ sealed class BudgetBuddyRoute(
             TransactionDetails,
             EditTransaction,
             Settings,
-            AllTransactions
+            Transactions
         )
         val bottomBarRoutes = setOf(
             Home,
             Profile,
-            AllTransactions
+            Transactions
         )
     }
 }
@@ -112,13 +112,13 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Home) {
             composable(route) {
-                HomeScreen(navController, transactionsState)
+                HomeScreen(navController, transactionViewModel, transactionViewModel.actions, userViewModel.actions)
             }
         }
 
         with(BudgetBuddyRoute.AddTransaction) {
             composable(route) {
-                AddTransactionScreen(navController, transactionsState, transactionViewModel.actions)
+                AddTransactionScreen(navController, userViewModel, transactionViewModel.actions)
             }
         }
 
@@ -140,7 +140,7 @@ fun BudgetBuddyNavGraph(
             }
         }
 
-        with(BudgetBuddyRoute.AllTransactions) {
+        with(BudgetBuddyRoute.Transactions) {
             composable(route) {
                 AllTransactionsScreen()
             }

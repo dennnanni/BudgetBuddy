@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Repeat
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.StackedLineChart
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -93,12 +93,12 @@ fun NavigationDrawer(
                     colors = colors,
                     label = { Text(stringResource(R.string.all_transactions)) },
                     selected = false,
-                    icon = { Icon(Icons.Outlined.List, stringResource(R.string.all_transactions)) },
+                    icon = { Icon(Icons.AutoMirrored.Outlined.List, stringResource(R.string.all_transactions)) },
                     onClick = {
                         coroutineScope.launch {
                             drawerState.close()
                         }
-                        navController.navigate(BudgetBuddyRoute.AllTransactions.route)
+                        navController.navigate(BudgetBuddyRoute.Transactions.route)
                     }
                 )
 

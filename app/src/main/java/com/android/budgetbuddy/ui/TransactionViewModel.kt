@@ -1,11 +1,14 @@
 package com.android.budgetbuddy.ui
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.repositories.TransactionRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -17,8 +20,9 @@ interface TransactionActions {
     fun addTransaction(transaction: Transaction): Job
     fun removeTransaction(transaction: Transaction): Job
 
+    fun loadUserTransactions(userId: Int): Job
+    fun getUserTransactions(userId: Int): List<Transaction>
     fun loadMostPopularCategories(): Job
-
     fun getMostPopularCategories(): List<String>
 
     fun nukeTable(): Job
@@ -32,15 +36,26 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
         initialValue = TransactionsState(emptyList())
     )
 
+    var userTransactions by mutableStateOf<List<Transaction>>(emptyList())
+
     var mostPopularCategories = mutableStateOf<List<String>>(emptyList())
 
     val actions = object : TransactionActions {
-        override fun addTransaction(transaction: Transaction) = viewModelScope.launch{
+        override fun addTransaction(transaction: Transaction) = viewModelScope.launch {
             repository.upsert(transaction)
+            delay(100)
         }
 
-        override fun removeTransaction(transaction: Transaction) = viewModelScope.launch{
+        override fun removeTransaction(transaction: Transaction) = viewModelScope.launch {
             repository.delete(transaction)
+        }
+
+        override fun loadUserTransactions(userId: Int): Job = viewModelScope.launch {
+            userTransactions = repository.getUserTransactions(userId)
+        }
+
+        override fun getUserTransactions(userId: Int): List<Transaction> {
+            return userTransactions
         }
 
         override fun loadMostPopularCategories(): Job = viewModelScope.launch {

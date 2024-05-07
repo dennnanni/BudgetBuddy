@@ -3,11 +3,20 @@ package com.android.budgetbuddy.data.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import java.util.Date
 
-@Entity(tableName = "transaction")
+@Entity(tableName = "transaction",
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ])
 data class Transaction (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val title: String,
@@ -16,7 +25,8 @@ data class Transaction (
     @ColumnInfo val category: String,
     @ColumnInfo val amount: Double,
     @ColumnInfo val date: Date,
-    @ColumnInfo val periodic: Boolean
+    @ColumnInfo val periodic: Boolean,
+    @ColumnInfo val userId: Int
 ) {
     val isExpense: Boolean
         get() {

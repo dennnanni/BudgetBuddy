@@ -34,14 +34,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionsState
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
+import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -50,7 +54,7 @@ import java.util.Date
 @Composable
 fun AddTransactionScreen(
     navController: NavHostController,
-    state: TransactionsState,
+    userViewModel: UserViewModel,
     actions: TransactionActions
 ) {
     val options = listOf("Expense", "Income")
@@ -163,7 +167,7 @@ fun AddTransactionScreen(
                 }
 
                 OutlinedTextField(
-                    label = { Text("Description") },
+                    label = { Text(stringResource(R.string.description)) },
                     value = description.value,
                     onValueChange = { description.value = it }, modifier = Modifier
                         .fillMaxWidth()
@@ -184,6 +188,10 @@ fun AddTransactionScreen(
                 Log.d("AddTransactionScreen", "Selected Option Text: $selectedOptionText")
                 Log.d("AddTransactionScreen", "Description: ${description.value}")
 
+                if (userViewModel.actions.getLoggedUser() == null) {
+                    return@Button
+                }
+
                 actions.addTransaction(
                     Transaction(
                         title = title.value,
@@ -194,10 +202,15 @@ fun AddTransactionScreen(
                         date = Date.from(
                             date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
                         ),
-                        periodic = false
+                        periodic = false,
+                        userId = userViewModel.actions.getUserId()!!
                     )
                 )
-                navController.popBackStack()
+                navController.navigate(BudgetBuddyRoute.Home.route) {
+                    popUpTo(BudgetBuddyRoute.Home.route) {
+                        inclusive = true
+                    }
+                }
             }
         ) {
             Text(text = "Add Transaction", fontSize = 20.sp)

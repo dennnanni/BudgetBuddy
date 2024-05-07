@@ -104,7 +104,8 @@ fun TransactionList(
                     category = "affitto",
                     amount = 20.15,
                     date = Date(),
-                    periodic = false
+                    periodic = false,
+                    userId = 1
                 )) },
                 modifier = Modifier.padding(16.dp)
             )

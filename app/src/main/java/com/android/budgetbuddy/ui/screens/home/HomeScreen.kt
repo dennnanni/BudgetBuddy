@@ -1,5 +1,8 @@
 package com.android.budgetbuddy.ui.screens.home
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +23,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -31,9 +38,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.ui.TransactionsState
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.TransactionActions
+import com.android.budgetbuddy.ui.TransactionViewModel
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
+import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
@@ -49,6 +59,7 @@ import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer.ColumnProvider.Companion.series
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -56,17 +67,29 @@ import kotlinx.coroutines.withContext
 
 const val TRANSACTION_PREVIEW_COUNT = 10
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    viewModelState: TransactionsState
+    transactionViewModel: TransactionViewModel,
+    transactionActions: TransactionActions,
+    userActions: UserActions
 ) {
-
+    val context = LocalContext.current
     var totalBalance = 0.0
+
+    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
+    val username = sharedPreferences.getString("username", null)
+
+    userActions.loadCurrentUser(username!!)
+    val userId = userActions.getUserId() ?: return /* TODO: handle */
+    transactionActions.loadUserTransactions(userId)
+    val transactions = transactionActions.getUserTransactions(userId)
+
     val data = mutableMapOf<Float, Float>()
 
     var i = 0f
-    for (transaction in viewModelState.transactions) {
+    for (transaction in transactionViewModel.userTransactions) {
         if (transaction.type == "Expense") {
             totalBalance -= transaction.amount
         } else {
@@ -77,11 +100,11 @@ fun HomeScreen(
 
     // Chart settings
     val modelProducer = remember { CartesianChartModelProducer.build() }
-    if (viewModelState.transactions.isNotEmpty()) {
+    if (data.isNotEmpty()) {
         LaunchedEffect(Unit) {
             withContext(Dispatchers.Default) {
                 modelProducer.tryRunTransaction {
-                    lineSeries { series(data.keys, data.values)}
+                    lineSeries { series(data.keys, data.values) }
                 }
             }
         }
@@ -168,7 +191,7 @@ fun HomeScreen(
         }
 
 
-        if (viewModelState.transactions.isNotEmpty()) {
+        if (transactions.isNotEmpty()) {
             Row(
                 modifier = Modifier
                     .padding(16.dp, 10.dp, 16.dp, 5.dp)
@@ -183,28 +206,29 @@ fun HomeScreen(
                         fontWeight = FontWeight.ExtraBold
                     )
                 ) {
-                    navController.navigate("allTransactions")
+                    navController.navigate(BudgetBuddyRoute.Transactions.route)
                 }
             }
-        }
 
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            shape = RoundedCornerShape(30.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        ) {
-            LazyColumn(
-                modifier = Modifier.padding(10.dp, 0.dp)
+
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                shape = RoundedCornerShape(30.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
             ) {
-                val orderedList = viewModelState.transactions
-                    .sortedByDescending { it.date }
-                    .take(TRANSACTION_PREVIEW_COUNT)
-                items(orderedList) {
-                    TransactionItem(it, navController)
+                LazyColumn(
+                    modifier = Modifier.padding(10.dp, 0.dp)
+                ) {
+                    val orderedList = transactions
+                        .sortedByDescending { it.id }
+                        .take(TRANSACTION_PREVIEW_COUNT)
+                    items(orderedList) {
+                        TransactionItem(it, navController)
+                    }
                 }
             }
         }

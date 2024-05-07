@@ -1,7 +1,9 @@
 package com.android.budgetbuddy.ui.screens.settings
 
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.repositories.ThemeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,7 +34,14 @@ class ThemeViewModel(
         }
 }
 
-data class CurrencyState(val name: String, val symbol: String, val rate: Double)
+enum class Currency {
+    USD,
+    EUR,
+    GBP,
+    JPY
+}
+
+data class CurrencyState(val currency: Currency, val rate: Double)
 
 class CurrencyViewModel(
 

@@ -12,6 +12,9 @@ interface TransactionDAO {
     @Query("SELECT * FROM `transaction`")
     fun getAll(): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM `transaction` WHERE userId = :userId")
+    suspend fun getUserTransactions(userId: Int): List<Transaction>
+
     @Query(
         "SELECT category\n" +
                 "FROM `transaction`\n" +
@@ -39,9 +42,15 @@ interface UserDAO {
     @Query("SELECT * FROM `user` WHERE username = :username AND password = :password LIMIT 1")
     suspend fun login(username: String, password: String): User
 
+    @Query("SELECT id FROM `user` WHERE username = :username LIMIT 1")
+    suspend fun getUserId(username: String): Int
+
     @Upsert
     suspend fun upsert(user: User)
 
     @Delete
     suspend fun delete(user: User)
+
+    @Query("SELECT * FROM `user` WHERE username = :username LIMIT 1")
+    suspend fun getUser(username: String): User
 }
