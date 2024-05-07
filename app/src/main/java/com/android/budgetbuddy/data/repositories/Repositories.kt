@@ -1,17 +1,19 @@
 package com.android.budgetbuddy.data.repositories
 
-import com.android.budgetbuddy.data.database.Transaction
-import com.android.budgetbuddy.data.database.TransactionDAO
-import com.android.budgetbuddy.data.database.User
-import com.android.budgetbuddy.data.database.UserDAO
-import com.android.budgetbuddy.ui.screens.settings.Theme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.android.budgetbuddy.data.database.Category
+import com.android.budgetbuddy.data.database.CategoryDAO
+import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.data.database.TransactionDAO
+import com.android.budgetbuddy.data.database.User
+import com.android.budgetbuddy.data.database.UserDAO
 import com.android.budgetbuddy.ui.screens.settings.Currency
+import com.android.budgetbuddy.ui.screens.settings.Theme
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class TransactionRepository(private val transactionDAO: TransactionDAO) {
     val transactions: Flow<List<Transaction>> = transactionDAO.getAll()
@@ -31,6 +33,12 @@ class UserRepository(private val userDAO: UserDAO) {
     suspend fun upsert(user: User) = userDAO.upsert(user)
     suspend fun delete(user: User) = userDAO.delete(user)
     suspend fun login(username: String, password: String): User = userDAO.login(username, password)
+}
+
+class CategoryRepository(private val categoryDAO: CategoryDAO) {
+    suspend fun getAll(userId: Int): List<Category> = categoryDAO.getAll(userId)
+    suspend fun upsert(category: Category) = categoryDAO.upsert(category)
+    suspend fun delete(category: Category) = categoryDAO.delete(category)
 }
 
 

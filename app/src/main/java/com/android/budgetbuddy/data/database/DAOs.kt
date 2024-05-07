@@ -54,3 +54,15 @@ interface UserDAO {
     @Query("SELECT * FROM `user` WHERE username = :username LIMIT 1")
     suspend fun getUser(username: String): User
 }
+
+@Dao
+interface CategoryDAO {
+    @Query("SELECT * FROM `category` where userId = :userId")
+    suspend fun getAll(userId: Int): List<Category>
+
+    @Upsert
+    suspend fun upsert(category: Category)
+
+    @Delete
+    suspend fun delete(category: Category)
+}

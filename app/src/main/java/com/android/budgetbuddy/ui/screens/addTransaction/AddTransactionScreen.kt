@@ -11,14 +11,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -43,8 +45,10 @@ import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.TransactionActions
-import com.android.budgetbuddy.ui.TransactionsState
+import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
+import com.android.budgetbuddy.ui.composables.CustomDropDown
+import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import java.time.LocalDate
 import java.time.ZoneId
@@ -55,18 +59,38 @@ import java.util.Date
 fun AddTransactionScreen(
     navController: NavHostController,
     userViewModel: UserViewModel,
-    actions: TransactionActions
+    actions: TransactionActions,
+    categoryActions: CategoryActions
 ) {
     val options = listOf("Expense", "Income")
-    val selectOptions = listOf("Groceries", "Drugs", "Bills")
+    val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
-    var selectedOptionText by remember { mutableStateOf(selectOptions[0]) }
+
+    var selectedOptionText by remember { mutableStateOf(String()) }
+
+    if(categoryActions.getCategories().isNotEmpty()){
+        selectedOptionText = categoryActions.getCategories()[0].name
+    } else {
+        showDialog.value = true
+    }
 
     val amount: MutableState<Double> = remember { mutableDoubleStateOf(0.0) }
     val date = remember { mutableStateOf(LocalDate.now()) }
     var expanded by remember { mutableStateOf(false) }
     val description = rememberSaveable { mutableStateOf("") }
     val title = rememberSaveable { mutableStateOf("") }
+
+
+    if (showDialog.value) {
+         AddCategory(
+             categoryActions,
+             onDismissRequest = {
+                 showDialog.value = false
+                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
+             },
+             userViewModel
+         )
+    }
 
     // UI
     Column {
@@ -130,41 +154,28 @@ fun AddTransactionScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded },
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
+                    if(categoryActions.getCategories().isNotEmpty()) {
+                        CustomDropDown(options = categoryActions.getCategories().map { it.name }, fun (it: String) {selectedOptionText = it})
+                    }
+                    IconButton(
+                        onClick = { showDialog.value = true},
                         modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        readOnly = true,
-                        value = selectedOptionText,
-                        onValueChange = { },
-                        label = { Text("Category") },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                expanded = expanded
-                            )
-                        }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-                            expanded = false
-                        }
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary),
                     ) {
-                        selectOptions.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                text = { Text(text = selectionOption) },
-                                onClick = {
-                                    selectedOptionText = selectionOption
-                                    expanded = false
-                                }
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 }
+
 
                 OutlinedTextField(
                     label = { Text(stringResource(R.string.description)) },
@@ -179,7 +190,10 @@ fun AddTransactionScreen(
         }
 
         Button(
-            modifier = Modifier.padding(12.dp, 0.dp).fillMaxWidth().height(50.dp),
+            modifier = Modifier
+                .padding(12.dp, 0.dp)
+                .fillMaxWidth()
+                .height(50.dp),
             onClick = {
                 Log.d("AddTransactionScreen", "Title: ${title.value}")
                 Log.d("AddTransactionScreen", "Selected Option: $selectedOption")

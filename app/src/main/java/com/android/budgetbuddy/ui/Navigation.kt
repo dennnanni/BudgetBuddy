@@ -22,6 +22,7 @@ import com.android.budgetbuddy.ui.screens.settings.SettingsScreen
 import com.android.budgetbuddy.ui.screens.settings.ThemeState
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
+import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -93,6 +94,8 @@ fun BudgetBuddyNavGraph(
     val userViewModel = koinViewModel<UserViewModel>()
     val userState by userViewModel.state.collectAsStateWithLifecycle()
 
+    val categoryActions = koinViewModel<CategoryViewModel>().actions
+
     val context = LocalContext.current
 
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
@@ -112,13 +115,13 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Home) {
             composable(route) {
-                HomeScreen(navController, transactionViewModel, transactionViewModel.actions, userViewModel.actions)
+                HomeScreen(navController, transactionViewModel, categoryActions,transactionViewModel.actions, userViewModel.actions)
             }
         }
 
         with(BudgetBuddyRoute.AddTransaction) {
             composable(route) {
-                AddTransactionScreen(navController, userViewModel, transactionViewModel.actions)
+                AddTransactionScreen(navController, userViewModel, transactionViewModel.actions, categoryActions)
             }
         }
 

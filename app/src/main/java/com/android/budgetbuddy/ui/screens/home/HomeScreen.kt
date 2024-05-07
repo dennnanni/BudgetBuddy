@@ -23,11 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +39,7 @@ import com.android.budgetbuddy.ui.TransactionActions
 import com.android.budgetbuddy.ui.TransactionViewModel
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
+import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
@@ -59,7 +56,6 @@ import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer.ColumnProvider.Companion.series
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -72,6 +68,7 @@ const val TRANSACTION_PREVIEW_COUNT = 10
 fun HomeScreen(
     navController: NavHostController,
     transactionViewModel: TransactionViewModel,
+    categoryActions: CategoryActions,
     transactionActions: TransactionActions,
     userActions: UserActions
 ) {
@@ -87,6 +84,7 @@ fun HomeScreen(
     val transactions = transactionActions.getUserTransactions(userId)
 
     val data = mutableMapOf<Float, Float>()
+    categoryActions.loadCategories(userActions.getUserId()!!)
 
     var i = 0f
     for (transaction in transactionViewModel.userTransactions) {
@@ -113,10 +111,12 @@ fun HomeScreen(
     val marker = rememberMarker()
     val cartesianChart = rememberCartesianChart(
         rememberLineCartesianLayer(
-            listOf(rememberLineSpec(
-                DynamicShader.color(MaterialTheme.colorScheme.primary),
-                backgroundShader = null
-            ))
+            listOf(
+                rememberLineSpec(
+                    DynamicShader.color(MaterialTheme.colorScheme.primary),
+                    backgroundShader = null
+                )
+            )
         ),
         startAxis = rememberStartAxis(
             label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onSurface),
@@ -223,11 +223,23 @@ fun HomeScreen(
                 LazyColumn(
                     modifier = Modifier.padding(10.dp, 0.dp)
                 ) {
-                    val orderedList = transactions
-                        .sortedByDescending { it.id }
+                    val orderedList = transactionViewModel.userTransactions
+                        .sortedByDescending { it.date }
                         .take(TRANSACTION_PREVIEW_COUNT)
+
                     items(orderedList) {
-                        TransactionItem(it, navController)
+                        var icon: String? = "Filled.Add"
+                        if (categoryActions.getCategories().isNotEmpty()) {
+                            icon = categoryActions.getCategories()
+                                .find { category -> category.name == it.category }?.icon
+                            categoryActions.getCategories()
+                                .find { category -> category.name == it.category }?.toString()
+                                ?.let { it1 -> Log.d("Home", it1) }
+                            Log.d("Home", "not empty")
+                        }
+                        if (icon == null)
+                            icon = "Filled.Add"
+                        TransactionItem(it, icon, navController)
                     }
                 }
             }

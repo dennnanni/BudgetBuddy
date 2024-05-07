@@ -43,6 +43,21 @@ data class User(
     @ColumnInfo(defaultValue = "temp") var profilePic: String? = ""
 )
 
+@Entity(tableName = "category", foreignKeys = [
+    ForeignKey(
+        entity = User::class,
+        parentColumns = ["id"],
+        childColumns = ["userId"],
+        onDelete = ForeignKey.CASCADE
+    )
+])
+data class Category(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo val name: String,
+    @ColumnInfo val icon: String,
+    @ColumnInfo val userId: Int
+)
+
 class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
