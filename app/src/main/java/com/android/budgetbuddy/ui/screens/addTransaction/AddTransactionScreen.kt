@@ -1,6 +1,5 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,18 +43,17 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
-import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import com.android.budgetbuddy.ui.composables.CustomDropDown
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     navController: NavHostController,
@@ -64,7 +61,7 @@ fun AddTransactionScreen(
     actions: TransactionActions,
     categoryActions: CategoryActions
 ) {
-    val options = listOf("Expense", "Income")
+    val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
 

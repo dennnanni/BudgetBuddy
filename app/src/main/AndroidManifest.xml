@@ -18,6 +18,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <queries>
+        <intent>
+            <action android:name="android.settings.WIRELESS_SETTINGS"/>
+        </intent>
+    </queries>
+
     <application
         android:name=".BudgetBuddyApplication"
         android:allowBackup="true"

@@ -48,7 +48,6 @@ fun TopBar(
     username: String,
     profilePic: String,
 ) {
-    val context = LocalContext.current
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -56,7 +55,6 @@ fun TopBar(
         ),
         title = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
-                Log.d("AppBar", "name: $name, username: $username, profilePic: $profilePic")
                 ProfileHome(name = name, username = username, profilePic = profilePic, navController = navController)
             } else {
                 val title: String = currentRoute.title

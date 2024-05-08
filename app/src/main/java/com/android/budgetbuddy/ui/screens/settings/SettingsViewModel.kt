@@ -38,7 +38,26 @@ enum class Currency {
     USD,
     EUR,
     GBP,
-    JPY
+    JPY;
+
+    fun getSymbol() = when(this) {
+        USD -> "$"
+        EUR -> "€"
+        GBP -> "£"
+        JPY -> "¥"
+    }
+
+    companion object {
+        fun fromString(value: String): Currency {
+            return when(value) {
+                "USD" -> USD
+                "EUR" -> EUR
+                "GBP" -> GBP
+                "JPY" -> JPY
+                else -> throw IllegalArgumentException("Invalid currency")
+            }
+        }
+    }
 }
 
 data class CurrencyState(val currency: Currency, val rate: Double)

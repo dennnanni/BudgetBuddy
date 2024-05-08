@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.screens.settings
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,24 +35,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.UserActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onThemeChange: (Theme) -> Unit,
     themeState: ThemeState,
-    actions: TransactionActions
+    transactionActions: TransactionActions,
+    userActions: UserActions,
+    navController: NavHostController
 ) {
 
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
     var checked by remember { mutableStateOf(themeState.theme == Theme.Dark) }
     var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf("USD") }
+    var selected by remember { mutableStateOf(Currency.USD) }
 
     Column(
         modifier = Modifier.padding(horizontal = 10.dp)
@@ -179,7 +188,7 @@ fun SettingsScreen(
                         modifier = Modifier.size(150.dp, 60.dp)
                     ) {
                         OutlinedTextField(
-                            value = selected,
+                            value = selected.toString(),
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -200,12 +209,18 @@ fun SettingsScreen(
                             onDismissRequest = { expanded = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("EUR") },
-                                onClick = { selected = "EUR" },
+                                text = { Text(Currency.EUR.toString()) },
+                                onClick = {
+                                    selected = Currency.EUR
+                                    sharedPreferences.edit().putString("currency", selected.toString()).apply()
+                                },
                             )
                             DropdownMenuItem(
-                                text = { Text("USD") },
-                                onClick = { selected = "USD" }
+                                text = { Text(Currency.USD.toString()) },
+                                onClick = {
+                                    selected = Currency.USD
+                                    sharedPreferences.edit().putString("currency", selected.toString()).apply()
+                                },
                             )
                         }
                     }
@@ -244,10 +259,38 @@ fun SettingsScreen(
             }
         }
 
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+            with(sharedPreferences.edit()) {
+                remove("username")
+                remove("name")
+                remove("profilePic")
+                apply()
+            }
+
+            userActions.logout()
+
+            navController.navigate(BudgetBuddyRoute.Login.route) {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
+            }
+        }) {
+            Text(
+                text = stringResource(id = R.string.logout),
+                style = TextStyle(
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
+
         // TODO: remove this button
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { actions.nukeTable() }
+            onClick = { transactionActions.nukeTable() }
         ) {
             Text(text = "Nuke")
         }

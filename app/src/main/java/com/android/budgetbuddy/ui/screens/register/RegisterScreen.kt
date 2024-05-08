@@ -52,7 +52,6 @@ fun RegisterScreen(navController: NavHostController, userState: UserState, actio
     val coroutineScope = rememberCoroutineScope()
 
     if (actions.getLoggedUser() != null) {
-        Log.d("LoginScreen", "User logged in")
         with(sharedPreferences.edit()) {
             putString("username", username.value)
             putString("name", actions.getLoggedUser()?.name)
@@ -134,7 +133,7 @@ fun RegisterScreen(navController: NavHostController, userState: UserState, actio
                     }
                 }
             ) {
-                Text(text = "Register")
+                Text(text = stringResource(id = R.string.register))
             }
 
             Spacer(modifier = Modifier.height(5.dp))

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.devtools.ksp")
+    kotlin("plugin.serialization") version "1.9.0"
 }
 android {
     namespace = "com.android.budgetbuddy"
@@ -74,6 +75,7 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
+
     implementation("io.insert-koin:koin-androidx-compose:3.5.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -82,6 +84,12 @@ dependencies {
     implementation("com.maxkeppeler.sheets-compose-dialogs:calendar:1.2.0")
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    val ktorVersion = "2.3.8"
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // Mappa
     implementation("com.google.android.gms:play-services-location:21.2.0")

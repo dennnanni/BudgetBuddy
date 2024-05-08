@@ -72,7 +72,7 @@ fun ProfileScreen(
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ProfileProfile(name = name, username = username, profilePic = profilePic)
 
@@ -117,26 +117,6 @@ fun ProfileScreen(
         }
 
         Spacer(modifier = Modifier.size(20.dp))
-
-        Button(onClick = {
-            with(sharedPreferences.edit()) {
-                remove("username")
-                remove("name")
-                remove("profilePic")
-                apply()
-            }
-
-            userActions.logout()
-
-            navController.navigate("login") {
-                popUpTo(navController.graph.id) {
-                    inclusive = true
-                }
-            }
-
-        }) {
-            Text(text = "Logout")
-        }
 
         Button(onClick = {
             photoPickerLauncher.launch("image/*")

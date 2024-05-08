@@ -39,6 +39,7 @@ import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
+import com.android.budgetbuddy.ui.screens.settings.Currency
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -77,6 +78,7 @@ fun HomeScreen(
 
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
     val username = sharedPreferences.getString("username", null)
+    val currency = sharedPreferences.getString("currency", Currency.USD.toString()) ?: Currency.USD.toString()
 
     val userId = userActions.getUserId() ?: return /* TODO: handle */
     transactionActions.loadUserTransactions(userId)
@@ -238,7 +240,7 @@ fun HomeScreen(
                         }
                         if (icon == null)
                             icon = "Filled.Add"
-                        TransactionItem(it, icon, navController)
+                        TransactionItem(it, Currency.fromString(currency), icon, navController)
                     }
                 }
             }

@@ -140,7 +140,12 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Settings) {
             composable(route) {
-                SettingsScreen(themeViewModel::changeTheme, themeState, transactionViewModel.actions)
+                SettingsScreen(themeViewModel::changeTheme,
+                    themeState,
+                    transactionViewModel.actions,
+                    userViewModel.actions,
+                    navController
+                )
             }
         }
 

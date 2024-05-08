@@ -36,4 +36,7 @@
     <string name="app_settings">App settings</string>
     <string name="dark_theme">Dark theme</string>
     <string name="currency">Currency</string>
+    <string name="expense">Expense</string>
+    <string name="income">Income</string>
+    <string name="logout">Logout</string>
 </resources>

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.screens.settings.Currency
 
 val iconList: List<ImageVector> = listOf(
     Icons.Filled.Add,
@@ -37,7 +38,7 @@ val iconList: List<ImageVector> = listOf(
 )
 
 @Composable
-fun TransactionItem(transaction: Transaction, icon: String, navController: NavHostController) {
+fun TransactionItem(transaction: Transaction, currency: Currency, icon: String, navController: NavHostController) {
     Row(
         modifier = Modifier
             .padding(10.dp)
@@ -66,7 +67,7 @@ fun TransactionItem(transaction: Transaction, icon: String, navController: NavHo
                         it.name
                             .lowercase()
                             .contains(icon.lowercase())
-                    }[0], "Add TODO"
+                    }[0], null
                 )
             }
 
@@ -74,6 +75,6 @@ fun TransactionItem(transaction: Transaction, icon: String, navController: NavHo
         }
 
         val sign = if (transaction.isExpense) "-" else "+"
-        Text(text = "${sign}${transaction.amount} €")
+        Text(text = "${sign}${transaction.amount} ${currency.getSymbol()}")
     }
 }
