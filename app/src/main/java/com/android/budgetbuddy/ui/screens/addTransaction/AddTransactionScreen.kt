@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,12 +45,13 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
-import com.android.budgetbuddy.ui.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import com.android.budgetbuddy.ui.composables.CustomDropDown
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -79,6 +81,7 @@ fun AddTransactionScreen(
     var expanded by remember { mutableStateOf(false) }
     val description = rememberSaveable { mutableStateOf("") }
     val title = rememberSaveable { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
 
     if (showDialog.value) {
@@ -195,39 +198,33 @@ fun AddTransactionScreen(
                 .fillMaxWidth()
                 .height(50.dp),
             onClick = {
-                Log.d("AddTransactionScreen", "Title: ${title.value}")
-                Log.d("AddTransactionScreen", "Selected Option: $selectedOption")
-                Log.d("AddTransactionScreen", "Amount: ${amount.value}")
-                Log.d("AddTransactionScreen", "Date: ${date.value}")
-                Log.d("AddTransactionScreen", "Selected Option Text: $selectedOptionText")
-                Log.d("AddTransactionScreen", "Description: ${description.value}")
+                val userId = userViewModel.actions.getUserId() ?: return@Button
 
-                if (userViewModel.actions.getLoggedUser() == null) {
-                    return@Button
-                }
-
-                actions.addTransaction(
-                    Transaction(
-                        title = title.value,
-                        description = description.value,
-                        type = selectedOption,
-                        category = selectedOptionText,
-                        amount = amount.value,
-                        date = Date.from(
-                            date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
-                        ),
-                        periodic = false,
-                        userId = userViewModel.actions.getUserId()!!
-                    )
-                )
-                navController.navigate(BudgetBuddyRoute.Home.route) {
-                    popUpTo(BudgetBuddyRoute.Home.route) {
-                        inclusive = true
+                coroutineScope.launch {
+                    actions.addTransaction(
+                        Transaction(
+                            title = title.value,
+                            description = description.value,
+                            type = selectedOption,
+                            category = selectedOptionText,
+                            amount = amount.value,
+                            date = Date.from(
+                                date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                            ),
+                            periodic = false,
+                            userId = userId
+                        )
+                    ).join()
+                    actions.loadUserTransactions(userId).join()
+                    navController.navigate(BudgetBuddyRoute.Home.route) {
+                        popUpTo(BudgetBuddyRoute.Home.route) {
+                            inclusive = true
+                        }
                     }
                 }
             }
         ) {
-            Text(text = "Add Transaction", fontSize = 20.sp)
+            Text(text = stringResource(id = R.string.add_transaction), fontSize = 20.sp)
         }
     }
 }

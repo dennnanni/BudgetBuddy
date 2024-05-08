@@ -25,12 +25,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.android.budgetbuddy.ui.viewmodel.UserState
@@ -67,17 +69,15 @@ fun LoginScreen(navController: NavHostController, userState: UserState, actions:
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp, 16.dp)
         ) {
-            Text("Login Screen")
-
             OutlinedTextField(
-                label = { Text("Username") },
+                label = { Text(stringResource(id = R.string.username)) },
                 value = username.value,
                 onValueChange = { username.value = it }, modifier = Modifier
                     .fillMaxWidth()
             )
 
             OutlinedTextField(
-                label = { Text("Password") },
+                label = { Text(stringResource(id = R.string.password)) },
                 value = password.value,
                 onValueChange = { password.value = it }, modifier = Modifier
                     .fillMaxWidth(),
@@ -97,26 +97,26 @@ fun LoginScreen(navController: NavHostController, userState: UserState, actions:
                     actions.login(username.value, password.value)
                 }
             ) {
-                Text(text = "Login")
+                Text(text = stringResource(id = R.string.login))
             }
 
             Row {
                 Text(
-                    text = "First time?",
+                    text = stringResource(id = R.string.first_time),
                     style = MaterialTheme.typography.bodySmall
                 )
 
                 Spacer(modifier = Modifier.size(4.dp))
 
                 ClickableText(
-                    text = AnnotatedString("Register"),
+                    text = AnnotatedString(stringResource(id = R.string.register)),
                     style = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         fontSize = MaterialTheme.typography.bodySmall.fontSize
                     )
                 ) {
-                    navController.navigate("register") {
+                    navController.navigate(BudgetBuddyRoute.Register.route) {
                         popUpTo(navController.graph.id) {
                             inclusive = true
                         }

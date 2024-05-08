@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.composables
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,7 @@ fun TopBar(
         ),
         title = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
+                Log.d("AppBar", "name: $name, username: $username, profilePic: $profilePic")
                 ProfileHome(name = name, username = username, profilePic = profilePic, navController = navController)
             } else {
                 val title: String = currentRoute.title

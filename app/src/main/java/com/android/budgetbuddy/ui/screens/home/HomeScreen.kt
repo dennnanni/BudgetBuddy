@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
-import com.android.budgetbuddy.ui.TransactionActions
-import com.android.budgetbuddy.ui.TransactionViewModel
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
@@ -78,7 +78,6 @@ fun HomeScreen(
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
     val username = sharedPreferences.getString("username", null)
 
-    userActions.loadCurrentUser(username!!)
     val userId = userActions.getUserId() ?: return /* TODO: handle */
     transactionActions.loadUserTransactions(userId)
     val transactions = transactionActions.getUserTransactions(userId)

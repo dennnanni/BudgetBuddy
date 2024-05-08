@@ -23,6 +23,7 @@ import com.android.budgetbuddy.ui.screens.settings.ThemeState
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
 import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
+import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
 

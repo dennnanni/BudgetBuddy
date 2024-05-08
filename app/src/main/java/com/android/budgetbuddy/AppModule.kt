@@ -8,7 +8,7 @@ import com.android.budgetbuddy.data.repositories.CategoryRepository
 import com.android.budgetbuddy.data.repositories.ThemeRepository
 import com.android.budgetbuddy.data.repositories.TransactionRepository
 import com.android.budgetbuddy.data.repositories.UserRepository
-import com.android.budgetbuddy.ui.TransactionViewModel
+import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel

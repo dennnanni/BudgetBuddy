@@ -1,4 +1,4 @@
-package com.android.budgetbuddy.ui
+package com.android.budgetbuddy.ui.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +43,6 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
     val actions = object : TransactionActions {
         override fun addTransaction(transaction: Transaction) = viewModelScope.launch {
             repository.upsert(transaction)
-            delay(100)
         }
 
         override fun removeTransaction(transaction: Transaction) = viewModelScope.launch {

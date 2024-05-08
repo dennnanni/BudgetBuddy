@@ -37,8 +37,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
-import com.android.budgetbuddy.ui.TransactionActions
-import com.android.budgetbuddy.ui.TransactionsState
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionsState
 import com.android.budgetbuddy.ui.composables.NavigationDrawer
 import com.android.budgetbuddy.ui.screens.settings.Theme
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel

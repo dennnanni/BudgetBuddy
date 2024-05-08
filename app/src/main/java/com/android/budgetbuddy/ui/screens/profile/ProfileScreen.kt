@@ -3,8 +3,6 @@ package com.android.budgetbuddy.ui.screens.profile
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -35,8 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.ui.TransactionActions
-import com.android.budgetbuddy.ui.TransactionsState
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionsState
 import com.android.budgetbuddy.ui.composables.ProfileProfile
 import com.android.budgetbuddy.ui.utils.saveImageToStorage
 import com.android.budgetbuddy.ui.viewmodel.UserActions
