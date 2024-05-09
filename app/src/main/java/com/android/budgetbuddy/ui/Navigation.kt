@@ -1,7 +1,10 @@
 package com.android.budgetbuddy.ui
 
+import android.app.Activity
 import android.content.Context
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -12,12 +15,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.android.budgetbuddy.data.remote.RatesDataSource
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
 import com.android.budgetbuddy.ui.screens.profile.ProfileScreen
 import com.android.budgetbuddy.ui.screens.register.RegisterScreen
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.screens.settings.SettingsScreen
 import com.android.budgetbuddy.ui.screens.settings.ThemeState
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
@@ -26,6 +31,7 @@ import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 sealed class BudgetBuddyRoute(
     val route: String,
@@ -87,7 +93,8 @@ fun BudgetBuddyNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     themeViewModel: ThemeViewModel,
-    themeState: ThemeState
+    themeState: ThemeState,
+    snackbarHostState: SnackbarHostState
 ) {
     val transactionViewModel = koinViewModel<TransactionViewModel>()
     val transactionsState by transactionViewModel.state.collectAsStateWithLifecycle()
@@ -96,6 +103,8 @@ fun BudgetBuddyNavGraph(
     val userState by userViewModel.state.collectAsStateWithLifecycle()
 
     val categoryActions = koinViewModel<CategoryViewModel>().actions
+
+    val currencyViewModel = koinViewModel<CurrencyViewModel>()
 
     val context = LocalContext.current
 
@@ -116,7 +125,14 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Home) {
             composable(route) {
-                HomeScreen(navController, transactionViewModel, categoryActions,transactionViewModel.actions, userViewModel.actions)
+                HomeScreen(
+                    navController,
+                    currencyViewModel,
+                    transactionViewModel,
+                    categoryActions,
+                    transactionViewModel.actions,
+                    userViewModel.actions,
+                    snackbarHostState)
             }
         }
 
@@ -140,7 +156,10 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Settings) {
             composable(route) {
-                SettingsScreen(themeViewModel::changeTheme,
+                SettingsScreen(
+                    themeViewModel::changeTheme,
+                    currencyViewModel::changeCurrency,
+                    currencyViewModel::getCurrency,
                     themeState,
                     transactionViewModel.actions,
                     userViewModel.actions,

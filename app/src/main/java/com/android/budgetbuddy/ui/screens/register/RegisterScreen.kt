@@ -41,7 +41,9 @@ import com.android.budgetbuddy.ui.viewmodel.UserState
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(navController: NavHostController, userState: UserState, actions: UserActions) {
+fun RegisterScreen(navController: NavHostController,
+                   userState: UserState,
+                   actions: UserActions) {
 
     val fullName = rememberSaveable { mutableStateOf("") }
     val username = rememberSaveable { mutableStateOf("") }

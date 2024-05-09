@@ -1,6 +1,7 @@
 package com.android.budgetbuddy
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -23,10 +24,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,9 +43,11 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionsState
 import com.android.budgetbuddy.ui.composables.NavigationDrawer
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.screens.settings.Theme
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.theme.BudgetBuddyTheme
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.util.Date
 
@@ -86,89 +91,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
+    override fun onDestroy() {
+        super.onDestroy()
 
-@Composable
-fun TransactionList(
-    state: TransactionsState,
-    actions: TransactionActions
-) {
-    LazyColumn {
-        item {
-            AddTransactionField(
-                onSubmit = { content -> actions.addTransaction(Transaction(
-                    title = content,
-                    description = "description",
-                    type = "Expense",
-                    category = "affitto",
-                    amount = 20.15,
-                    date = Date(),
-                    periodic = false,
-                    userId = 1
-                )) },
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-        items(state.transactions) {
-            TransactionItem(
-                it,
-                onDelete = { actions.removeTransaction(it) }
-            )
-        }
-    }
-}
-
-@Composable
-fun AddTransactionField(
-    onSubmit: (content: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var content by remember { mutableStateOf("") }
-    OutlinedTextField(
-        value = content,
-        onValueChange = { content = it },
-        label = { Text("TODO") },
-        modifier = modifier.fillMaxWidth(),
-        trailingIcon = {
-            IconButton(onClick = {
-                if (content.isBlank()) return@IconButton
-                onSubmit(content)
-                content = ""
-            }) {
-                Icon(Icons.Outlined.Add, "Add TODO")
-            }
-        },
-    )
-}
-
-@Composable
-fun TransactionItem(
-    item: Transaction,
-    onDelete: () -> Unit
-) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .toggleable(
-                value = false,
-                onValueChange = { },
-                role = Role.Checkbox
-            )
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(checked = false, onCheckedChange = null)
-        Text(
-            item.title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .weight(1F)
-        )
-        IconButton(onClick = onDelete) {
-            Icon(Icons.Outlined.Close, "Remove TODO")
-        }
+        val sharedPreferences = getSharedPreferences("BudgetBuddy", MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("updated", false).apply()
+        Log.d("Pippo", "Pulita la shared preference")
     }
 }

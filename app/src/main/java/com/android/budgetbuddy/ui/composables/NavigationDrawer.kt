@@ -1,5 +1,11 @@
 package com.android.budgetbuddy.ui.composables
 
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.provider.Settings
+import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,9 +27,15 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -169,7 +181,12 @@ fun NavigationDrawer(
             }
         }
     ) {
+
+        val snackbarHostState = remember { SnackbarHostState() }
+
+
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 val name = sharedPreferences.getString("name", null) ?: ""
                 val username = sharedPreferences.getString("username", null) ?: ""
@@ -201,9 +218,11 @@ fun NavigationDrawer(
                 navController = navController,
                 modifier = Modifier.padding(paddingValues),
                 themeViewModel = themeViewModel,
-                themeState = themeState
+                themeState = themeState,
+                snackbarHostState = snackbarHostState
             )
 
         }
     }
 }
+

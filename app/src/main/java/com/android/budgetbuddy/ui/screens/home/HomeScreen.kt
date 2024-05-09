@@ -1,7 +1,10 @@
 package com.android.budgetbuddy.ui.screens.home
 
-import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.provider.Settings
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,10 +23,14 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -35,12 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
-import com.android.budgetbuddy.ui.viewmodel.TransactionActions
-import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
-import com.android.budgetbuddy.ui.screens.settings.Currency
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
@@ -64,22 +71,48 @@ import kotlinx.coroutines.withContext
 
 const val TRANSACTION_PREVIEW_COUNT = 10
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun HomeScreen(
     navController: NavHostController,
+    currencyViewModel: CurrencyViewModel,
     transactionViewModel: TransactionViewModel,
     categoryActions: CategoryActions,
     transactionActions: TransactionActions,
-    userActions: UserActions
+    userActions: UserActions,
+    snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
     var totalBalance = 0.0
 
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
-    val username = sharedPreferences.getString("username", null)
-    val currency = sharedPreferences.getString("currency", Currency.USD.toString()) ?: Currency.USD.toString()
+    val username = sharedPreferences.getString("username", null) ?: return
+    val coroutineScope = rememberCoroutineScope()
+    val upToDateRate = sharedPreferences.getBoolean("updated", false)
+    /*TODO farlo solo quando si sa che non è aggiornato */
+    if (true) {
+        if (isOnline(context)) {
+            LaunchedEffect(Unit) {
+                currencyViewModel.updateRate().join()
+                sharedPreferences.edit().putBoolean("updated", true).apply()
+            }
+        } else {
+            LaunchedEffect(snackbarHostState) {
+                val res = snackbarHostState.showSnackbar(
+                    "Internet connection is required for exchange rate updates.",
+                    "Go to Settings",
+                    duration = SnackbarDuration.Long
+                )
+                if (res == SnackbarResult.ActionPerformed) {
+                    openWirelessSettings(context)
+                }
+            }
+        }
 
+    }
+
+    val currency = currencyViewModel.getCurrency()
+
+    userActions.loadCurrentUser(username)
     val userId = userActions.getUserId() ?: return /* TODO: handle */
     transactionActions.loadUserTransactions(userId)
     val transactions = transactionActions.getUserTransactions(userId)
@@ -160,8 +193,9 @@ fun HomeScreen(
                     text = stringResource(R.string.total_balance),
                     style = MaterialTheme.typography.titleLarge
                 )
+
                 Text(
-                    text = "$totalBalance €",
+                    text = "${currencyViewModel.convert(totalBalance)} ${currency.getSymbol()}",
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -240,10 +274,27 @@ fun HomeScreen(
                         }
                         if (icon == null)
                             icon = "Filled.Add"
-                        TransactionItem(it, Currency.fromString(currency), icon, navController)
+                        TransactionItem(it, currencyViewModel, icon, navController)
                     }
                 }
             }
         }
+    }
+}
+
+fun isOnline(ctx: Context): Boolean {
+    val connectivityManager = ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||capabilities?.hasTransport(
+        NetworkCapabilities.TRANSPORT_WIFI) == true
+}
+
+fun openWirelessSettings(ctx: Context) {
+    val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS).apply {
+        flags = Intent.
+        FLAG_ACTIVITY_NEW_TASK
+    }
+    if (intent.resolveActivity(ctx.applicationContext.packageManager) != null) {
+        ctx.applicationContext.startActivity(intent)
     }
 }

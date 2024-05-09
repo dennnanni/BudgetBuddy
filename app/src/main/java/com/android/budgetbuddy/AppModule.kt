@@ -6,9 +6,11 @@ import androidx.room.Room
 import com.android.budgetbuddy.data.database.BudgetBuddyDatabase
 import com.android.budgetbuddy.data.remote.RatesDataSource
 import com.android.budgetbuddy.data.repositories.CategoryRepository
+import com.android.budgetbuddy.data.repositories.CurrencyRepository
 import com.android.budgetbuddy.data.repositories.ThemeRepository
 import com.android.budgetbuddy.data.repositories.TransactionRepository
 import com.android.budgetbuddy.data.repositories.UserRepository
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
@@ -47,11 +49,13 @@ val appModule = module {
     single { RatesDataSource(get()) }
 
     single { TransactionRepository(get<BudgetBuddyDatabase>().transactionDAO()) }
-    single { UserRepository(get<BudgetBuddyDatabase>().userDao()) }
+    single { UserRepository(get<BudgetBuddyDatabase>().userDAO()) }
     single { CategoryRepository(get<BudgetBuddyDatabase>().categoryDAO()) }
     single { ThemeRepository(get()) }
+    single { CurrencyRepository(get(), get()) }
     viewModel { TransactionViewModel(get()) }
     viewModel { UserViewModel(get()) }
     viewModel { CategoryViewModel(get()) }
+    viewModel { CurrencyViewModel(get()) }
     viewModel { ThemeViewModel(get()) }
 }

@@ -14,6 +14,6 @@ import androidx.room.TypeConverters
 @TypeConverters(Converters::class)
 abstract class BudgetBuddyDatabase : RoomDatabase() {
     abstract fun transactionDAO(): TransactionDAO
-    abstract fun userDao(): UserDAO
+    abstract fun userDAO(): UserDAO
     abstract fun categoryDAO(): CategoryDAO
 }

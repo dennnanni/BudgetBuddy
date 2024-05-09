@@ -50,6 +50,8 @@ import com.android.budgetbuddy.ui.viewmodel.UserActions
 @Composable
 fun SettingsScreen(
     onThemeChange: (Theme) -> Unit,
+    onCurrencyChange: (Currency) -> Unit,
+    selectedCurrency: () -> Currency,
     themeState: ThemeState,
     transactionActions: TransactionActions,
     userActions: UserActions,
@@ -60,7 +62,7 @@ fun SettingsScreen(
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
     var checked by remember { mutableStateOf(themeState.theme == Theme.Dark) }
     var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf(Currency.USD) }
+    var selected by remember { mutableStateOf(selectedCurrency()) }
 
     Column(
         modifier = Modifier.padding(horizontal = 10.dp)
@@ -212,14 +214,14 @@ fun SettingsScreen(
                                 text = { Text(Currency.EUR.toString()) },
                                 onClick = {
                                     selected = Currency.EUR
-                                    sharedPreferences.edit().putString("currency", selected.toString()).apply()
+                                    onCurrencyChange(selected)
                                 },
                             )
                             DropdownMenuItem(
                                 text = { Text(Currency.USD.toString()) },
                                 onClick = {
                                     selected = Currency.USD
-                                    sharedPreferences.edit().putString("currency", selected.toString()).apply()
+                                    onCurrencyChange(selected)
                                 },
                             )
                         }

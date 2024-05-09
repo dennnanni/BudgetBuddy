@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.data.repositories
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -10,9 +11,11 @@ import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.database.TransactionDAO
 import com.android.budgetbuddy.data.database.User
 import com.android.budgetbuddy.data.database.UserDAO
+import com.android.budgetbuddy.data.remote.RatesDataSource
 import com.android.budgetbuddy.ui.screens.settings.Currency
 import com.android.budgetbuddy.ui.screens.settings.Theme
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class TransactionRepository(private val transactionDAO: TransactionDAO) {
@@ -48,7 +51,7 @@ class ThemeRepository(private val dataStore: DataStore<Preferences>) {
     }
     val theme = dataStore.data.map { preferences ->
             try {
-                Theme.valueOf(preferences[THEME_KEY] ?: "System")
+                Theme.valueOf(preferences[THEME_KEY] ?: Theme.System.toString())
             } catch (_: Exception) {
                 Theme.System
             }
@@ -56,16 +59,25 @@ class ThemeRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun setTheme(theme: Theme) = dataStore.edit { it[THEME_KEY] = theme.toString() }
 }
 
-class Currency(private val dataStore: DataStore<Preferences>) {
+class CurrencyRepository(private val dataStore: DataStore<Preferences>, private val ratesDataSource: RatesDataSource) {
     companion object {
         private val CURRENCY_KEY = stringPreferencesKey("currency")
     }
     val currency = dataStore.data.map { preferences ->
         try {
-            preferences[CURRENCY_KEY] ?: "USD"
+            Log.d("Pippo", "Currency: ${preferences[CURRENCY_KEY]}")
+            Currency.valueOf(preferences[CURRENCY_KEY] ?: Currency.USD.toString())
         } catch (_: Exception) {
-            "USD"
+            Currency.USD
         }
     }
+
+    suspend fun getCurrency(): Currency = currency.first()
+
     suspend fun setCurrency(currency: Currency) = dataStore.edit { it[CURRENCY_KEY] = currency.toString() }
+
+    suspend fun getUpdatedRate(): Double? {
+        Log.d("Pippo", "Chiamata: ${ratesDataSource.getExchangeRates().rates[currency.first().toString()]}")
+        return ratesDataSource.getExchangeRates().rates[currency.first().toString()]
+    }
 }
