@@ -65,7 +65,6 @@ class CurrencyRepository(private val dataStore: DataStore<Preferences>, private 
     }
     val currency = dataStore.data.map { preferences ->
         try {
-            Log.d("Pippo", "Currency: ${preferences[CURRENCY_KEY]}")
             Currency.valueOf(preferences[CURRENCY_KEY] ?: Currency.USD.toString())
         } catch (_: Exception) {
             Currency.USD

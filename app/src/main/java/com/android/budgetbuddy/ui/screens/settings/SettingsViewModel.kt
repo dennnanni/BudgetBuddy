@@ -82,7 +82,6 @@ class CurrencyViewModel(
     }
 
     fun convert(amount: Double): Double {
-        Log.d("Pippo", "Convertito")
         return  amount * rate
     }
 }

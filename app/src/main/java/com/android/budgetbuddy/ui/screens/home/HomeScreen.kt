@@ -29,8 +29,11 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -65,6 +68,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
+import io.ktor.client.network.sockets.ConnectTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -86,28 +90,61 @@ fun HomeScreen(
 
     val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
     val username = sharedPreferences.getString("username", null) ?: return
-    val coroutineScope = rememberCoroutineScope()
-    val upToDateRate = sharedPreferences.getBoolean("updated", false)
-    /*TODO farlo solo quando si sa che non è aggiornato */
-    if (true) {
+
+    val upToDateRate = sharedPreferences.getBoolean("upToDateRate", false)
+    var showInternetRequiredSnackBar by remember { mutableStateOf(false) }
+    var showConnectionIssuesSnackBar by remember { mutableStateOf(false) }
+    var showGenericErrorSnackbar by remember { mutableStateOf(false) }
+
+    Log.d("Pippo", "upToDateRate: $upToDateRate")
+
+    if (!upToDateRate) {
+        Log.d("Pippo", "Devo aggiornare")
         if (isOnline(context)) {
             LaunchedEffect(Unit) {
-                currencyViewModel.updateRate().join()
-                sharedPreferences.edit().putBoolean("updated", true).apply()
+                try {
+                    currencyViewModel.updateRate().join()
+                    sharedPreferences.edit().putBoolean("upToDateRate", true).apply()
+                } catch(ex: ConnectTimeoutException) {
+                    Log.d("Pippo", "Connection timeout")
+                    showConnectionIssuesSnackBar = true
+                } catch(ex: Exception) {
+                    showGenericErrorSnackbar = true
+                }
             }
         } else {
-            LaunchedEffect(snackbarHostState) {
-                val res = snackbarHostState.showSnackbar(
-                    "Internet connection is required for exchange rate updates.",
-                    "Go to Settings",
-                    duration = SnackbarDuration.Long
-                )
-                if (res == SnackbarResult.ActionPerformed) {
-                    openWirelessSettings(context)
-                }
+            showInternetRequiredSnackBar = true
+        }
+
+    }
+
+    if (showInternetRequiredSnackBar) {
+        LaunchedEffect(snackbarHostState) {
+            val res = snackbarHostState.showSnackbar(
+                context.getString(R.string.internet_required_for_rate_update),
+                context.getString(R.string.go_to_settings),
+                duration = SnackbarDuration.Long
+            )
+            if (res == SnackbarResult.ActionPerformed) {
+                openWirelessSettings(context)
             }
         }
 
+        showInternetRequiredSnackBar = false
+    }
+
+    if (showConnectionIssuesSnackBar) {
+        LaunchedEffect(snackbarHostState) {
+            val res = snackbarHostState.showSnackbar(
+                context.getString(R.string.unknown_communication_error),
+                duration = SnackbarDuration.Long
+            )
+            if (res == SnackbarResult.ActionPerformed) {
+                openWirelessSettings(context)
+            }
+        }
+
+        showConnectionIssuesSnackBar = false
     }
 
     val currency = currencyViewModel.getCurrency()

@@ -1,5 +1,7 @@
 package com.android.budgetbuddy
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -33,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,8 +59,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
+        val sharedPreferences = getSharedPreferences("BudgetBuddy", MODE_PRIVATE)
+        sharedPreferences.edit().remove("upToDateRate").apply()
 
+        setContent {
             val themeViewModel = koinViewModel<ThemeViewModel>()
             val themeState by themeViewModel.state.collectAsStateWithLifecycle()
 
@@ -90,13 +95,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        val sharedPreferences = getSharedPreferences("BudgetBuddy", MODE_PRIVATE)
-        sharedPreferences.edit().putBoolean("updated", false).apply()
-        Log.d("Pippo", "Pulita la shared preference")
     }
 }
