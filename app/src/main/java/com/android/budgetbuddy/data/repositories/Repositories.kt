@@ -78,7 +78,6 @@ class CurrencyRepository(private val dataStore: DataStore<Preferences>, private 
     suspend fun setCurrency(currency: Currency) = dataStore.edit { it[CURRENCY_KEY] = currency.toString() }
 
     suspend fun getUpdatedRate(): Double? {
-        Log.d("Pippo", "Chiamata: ${ratesDataSource.getExchangeRates().rates[currency.first().toString()]}")
         return ratesDataSource.getExchangeRates().rates[currency.first().toString()]
     }
 }

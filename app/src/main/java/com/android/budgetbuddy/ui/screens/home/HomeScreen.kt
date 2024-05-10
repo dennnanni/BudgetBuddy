@@ -47,6 +47,7 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
+import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
@@ -86,35 +87,31 @@ fun HomeScreen(
     val context = LocalContext.current
     var totalBalance = 0.0
 
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
-    val username = sharedPreferences.getString("username", null) ?: return
+    val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, Context.MODE_PRIVATE)
+    val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: return
 
-    val upToDateRate = sharedPreferences.getBoolean("upToDateRate", false)
+    val upToDateRate = sharedPreferences.getBoolean(SPConstants.UP_TO_DATE_RATE, false)
+    val alreadyTriedConnection = sharedPreferences.getBoolean(SPConstants.TRIED_CONNECTION, false)
     var showInternetRequiredSnackBar by remember { mutableStateOf(false) }
     var showConnectionIssuesSnackBar by remember { mutableStateOf(false) }
-    var showGenericErrorSnackbar by remember { mutableStateOf(false) }
 
-    Log.d("Pippo", "upToDateRate: $upToDateRate")
-
-    /*if (!upToDateRate) {
-        Log.d("Pippo", "Devo aggiornare")
+    /* Gestione dell'aggiornamento dei tassi di cambio in modo che venga
+    visualizzata la snackbar una sola volta */
+    if (!upToDateRate) {
         if (isOnline(context)) {
             LaunchedEffect(Unit) {
-                try {
-                    currencyViewModel.updateRate().join()
-                    sharedPreferences.edit().putBoolean("upToDateRate", true).apply()
-                } catch(ex: ConnectTimeoutException) {
-                    Log.d("Pippo", "Connection timeout")
+                currencyViewModel.updateRate().join()
+                if (!currencyViewModel.defaultRate) {
+                    sharedPreferences.edit().putBoolean(SPConstants.UP_TO_DATE_RATE, true).apply()
+                } else if (!alreadyTriedConnection) {
                     showConnectionIssuesSnackBar = true
-                } catch(ex: Exception) {
-                    showGenericErrorSnackbar = true
                 }
             }
-        } else {
+        } else if (!alreadyTriedConnection) {
             showInternetRequiredSnackBar = true
         }
-
-    }*/
+        sharedPreferences.edit().putBoolean(SPConstants.TRIED_CONNECTION, true).apply()
+    }
 
     if (showInternetRequiredSnackBar) {
         LaunchedEffect(snackbarHostState) {
@@ -126,23 +123,22 @@ fun HomeScreen(
             if (res == SnackbarResult.ActionPerformed) {
                 openWirelessSettings(context)
             }
+            if (res == SnackbarResult.Dismissed) {
+                showInternetRequiredSnackBar = false
+            }
         }
-
-        showInternetRequiredSnackBar = false
     }
 
     if (showConnectionIssuesSnackBar) {
         LaunchedEffect(snackbarHostState) {
             val res = snackbarHostState.showSnackbar(
                 context.getString(R.string.unknown_communication_error),
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Long,
             )
-            if (res == SnackbarResult.ActionPerformed) {
-                openWirelessSettings(context)
+            if (res == SnackbarResult.Dismissed) {
+                showConnectionIssuesSnackBar = false
             }
         }
-
-        showConnectionIssuesSnackBar = false
     }
 
     val currency = currencyViewModel.getCurrency()

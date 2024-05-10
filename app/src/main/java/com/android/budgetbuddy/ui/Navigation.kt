@@ -26,6 +26,7 @@ import com.android.budgetbuddy.ui.screens.settings.ThemeState
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.screens.viewAll.AllRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
+import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
@@ -110,8 +111,8 @@ fun BudgetBuddyNavGraph(
 
     val context = LocalContext.current
 
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
-    val username = sharedPreferences.getString("username", null)
+    val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, Context.MODE_PRIVATE)
+    val username = sharedPreferences.getString(SPConstants.USERNAME, null)
 
     val defaultRoute: String = if (username == null) {
         BudgetBuddyRoute.Register.route
@@ -178,7 +179,7 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Transactions) {
             composable(route) {
-                AllTransactionsScreen()
+                AllTransactionsScreen(transactionViewModel, currencyViewModel)
             }
         }
 
