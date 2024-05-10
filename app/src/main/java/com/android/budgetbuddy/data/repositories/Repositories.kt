@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.android.budgetbuddy.data.database.Category
 import com.android.budgetbuddy.data.database.CategoryDAO
+import com.android.budgetbuddy.data.database.RegularTransaction
+import com.android.budgetbuddy.data.database.RegularTransactionDAO
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.database.TransactionDAO
 import com.android.budgetbuddy.data.database.User
@@ -79,4 +81,14 @@ class CurrencyRepository(private val dataStore: DataStore<Preferences>, private 
         Log.d("Pippo", "Chiamata: ${ratesDataSource.getExchangeRates().rates[currency.first().toString()]}")
         return ratesDataSource.getExchangeRates().rates[currency.first().toString()]
     }
+}
+
+class RegularTransactionRepository(private val regularTransactionDAO: RegularTransactionDAO) {
+    val transactions: Flow<List<RegularTransaction>> = regularTransactionDAO.getAll()
+
+    suspend fun upsert(transaction: RegularTransaction) = regularTransactionDAO.upsert(transaction)
+    suspend fun delete(transaction: RegularTransaction) = regularTransactionDAO.delete(transaction)
+    suspend fun getMostPopularCategories(): List<String> = regularTransactionDAO.getMostPopularCategories()
+    suspend fun getUserTransactions(username: Int): List<RegularTransaction> = regularTransactionDAO.getUserTransactions(username)
+    suspend fun nukeTable() = regularTransactionDAO.nukeTable()
 }

@@ -8,12 +8,14 @@ import androidx.room.TypeConverters
     entities = [
         Transaction::class,
         User::class,
-        Category::class
-    ], version = 8
+        Category::class,
+    RegularTransaction::class
+    ], version = 9
 )
 @TypeConverters(Converters::class)
 abstract class BudgetBuddyDatabase : RoomDatabase() {
     abstract fun transactionDAO(): TransactionDAO
     abstract fun userDAO(): UserDAO
     abstract fun categoryDAO(): CategoryDAO
+    abstract fun regularTransactionDAO(): RegularTransactionDAO
 }

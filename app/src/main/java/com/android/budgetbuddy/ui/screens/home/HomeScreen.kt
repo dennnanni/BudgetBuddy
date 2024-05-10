@@ -32,7 +32,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,7 +67,6 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
-import io.ktor.client.network.sockets.ConnectTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -98,7 +96,7 @@ fun HomeScreen(
 
     Log.d("Pippo", "upToDateRate: $upToDateRate")
 
-    if (!upToDateRate) {
+    /*if (!upToDateRate) {
         Log.d("Pippo", "Devo aggiornare")
         if (isOnline(context)) {
             LaunchedEffect(Unit) {
@@ -116,7 +114,7 @@ fun HomeScreen(
             showInternetRequiredSnackBar = true
         }
 
-    }
+    }*/
 
     if (showInternetRequiredSnackBar) {
         LaunchedEffect(snackbarHostState) {

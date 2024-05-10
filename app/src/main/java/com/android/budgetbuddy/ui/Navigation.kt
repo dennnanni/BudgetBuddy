@@ -1,10 +1,8 @@
 package com.android.budgetbuddy.ui
 
-import android.app.Activity
 import android.content.Context
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,7 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.android.budgetbuddy.data.remote.RatesDataSource
+import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
@@ -26,12 +24,13 @@ import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.screens.settings.SettingsScreen
 import com.android.budgetbuddy.ui.screens.settings.ThemeState
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
+import com.android.budgetbuddy.ui.screens.viewAll.AllRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
 import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
+import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 
 sealed class BudgetBuddyRoute(
     val route: String,
@@ -40,6 +39,7 @@ sealed class BudgetBuddyRoute(
 ) {
     data object Home : BudgetBuddyRoute("home", "BudgetBuddy")
     data object AddTransaction : BudgetBuddyRoute("transactions/add", "Add Transaction")
+    data object AddRegularTransaction : BudgetBuddyRoute("regular_transactions/add", "Add Regular Transaction")
     data object Profile : BudgetBuddyRoute("profile", "Profile")
     data object TransactionDetails : BudgetBuddyRoute(
         "transactions/{transactionId}",
@@ -63,6 +63,7 @@ sealed class BudgetBuddyRoute(
     data object Login : BudgetBuddyRoute("login", "Login")
 
     data object Transactions : BudgetBuddyRoute("transactions", "All Transactions")
+    data object RegularTransactions : BudgetBuddyRoute("regular_transactions", "All Regular Transactions")
 
 
     // TODO: add other routes here
@@ -105,6 +106,7 @@ fun BudgetBuddyNavGraph(
     val categoryActions = koinViewModel<CategoryViewModel>().actions
 
     val currencyViewModel = koinViewModel<CurrencyViewModel>()
+    val regularTransactionViewModel = koinViewModel<RegularTransactionViewModel>()
 
     val context = LocalContext.current
 
@@ -142,6 +144,12 @@ fun BudgetBuddyNavGraph(
             }
         }
 
+        with(BudgetBuddyRoute.AddRegularTransaction) {
+            composable(route) {
+                AddRegularTransactionScreen(navController, userViewModel, regularTransactionViewModel.actions, categoryActions)
+            }
+        }
+
         with(BudgetBuddyRoute.Register) {
             composable(route) {
                 RegisterScreen(navController, userState, userViewModel.actions)
@@ -171,6 +179,12 @@ fun BudgetBuddyNavGraph(
         with(BudgetBuddyRoute.Transactions) {
             composable(route) {
                 AllTransactionsScreen()
+            }
+        }
+
+        with(BudgetBuddyRoute.RegularTransactions) {
+            composable(route) {
+                AllRegularTransactionScreen(regularTransactionViewModel, navController)
             }
         }
 

@@ -55,6 +55,27 @@ data class Category(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val name: String,
     @ColumnInfo val icon: String,
+    @ColumnInfo val userId: Int,
+
+)
+
+@Entity(tableName = "regular_transaction",
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ])
+data class RegularTransaction(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo val title: String,
+    @ColumnInfo val description: String,
+    @ColumnInfo val type: String,
+    @ColumnInfo val category: String,
+    @ColumnInfo val amount: Double,
+    @ColumnInfo val interval: Long,
     @ColumnInfo val userId: Int
 )
 
