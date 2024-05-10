@@ -65,6 +65,8 @@ class CurrencyViewModel(
 
     private var rate by mutableDoubleStateOf(1.0)
 
+    var defaultRate by mutableStateOf(true)
+
     fun getCurrency(): Currency {
         viewModelScope.launch {
             currency.value = repository.getCurrency()
@@ -78,7 +80,13 @@ class CurrencyViewModel(
         }
 
     fun updateRate() = viewModelScope.launch {
-        rate = repository.getUpdatedRate() ?: rate
+        try {
+            defaultRate = false
+            rate = repository.getUpdatedRate() ?: rate
+        } catch(e: Exception) {
+            Log.e("Pippo", "Error updating rate", e)
+            defaultRate = true
+        }
     }
 
     fun convert(amount: Double): Double {
