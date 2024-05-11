@@ -1,5 +1,7 @@
 package com.android.budgetbuddy.ui.composables
 
+import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,16 +10,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 
@@ -65,20 +64,23 @@ fun ProfileHome(
 }
 
 @Composable
-fun ProfileProfile(name: String, username: String, profilePic: String) {
+fun ProfileProfile(name: String, username: String, profilePic: String, launch: ManagedActivityResultLauncher<String, Uri?>) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box {
             Image(
-                painter = painterResource(id = R.drawable.default_propic),
-                contentDescription = "R.string.profile_picture.toString()",
+                painter = rememberImagePainter(
+                    data  = Uri.parse(profilePic)  // or ht
+                )
+                ,
+                contentDescription = "123",
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(150.dp)
             )
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = { launch.launch("image/*") },
                 modifier = Modifier
                     .offset(x = 110.dp, y = 110.dp)
                     .clip(CircleShape)

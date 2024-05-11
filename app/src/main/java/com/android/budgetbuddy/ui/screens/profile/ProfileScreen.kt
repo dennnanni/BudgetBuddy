@@ -1,6 +1,5 @@
 package com.android.budgetbuddy.ui.screens.profile
 
-import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionsState
@@ -53,17 +51,27 @@ fun ProfileScreen(
     val name = sharedPreferences.getString("name", null) ?: ""
     val username = sharedPreferences.getString("username", null) ?: ""
     val profilePic = sharedPreferences.getString("profilePic", null) ?: ""
+    if(userActions.getLoggedUser() == null){
+        userActions.loadCurrentUser(username)
+    }
     var selectedImageUri by remember {
-        mutableStateOf<Uri?>(null)
+        mutableStateOf<Uri?>(Uri.parse(profilePic))
     }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             uri?.let {
-                val newUri = saveImageToStorage(it, context.contentResolver, "image.jpg")
+                val newUri = saveImageToStorage(it, context.contentResolver)
                 var currentUser = userActions.getLoggedUser()
                 currentUser?.profilePic = newUri.toString()
+
+                with(sharedPreferences.edit()) {
+                    putString("profilePic", newUri.toString())
+                    apply()
+                }
+
+                selectedImageUri = newUri
 
                 userActions.addUser(currentUser!!)
             }
@@ -74,7 +82,7 @@ fun ProfileScreen(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ProfileProfile(name = name, username = username, profilePic = profilePic)
+        ProfileProfile(name = name, username = username, profilePic = selectedImageUri.toString(), photoPickerLauncher)
 
         Spacer(modifier = Modifier.size(20.dp))
 
@@ -123,19 +131,7 @@ fun ProfileScreen(
         }) {
             Text(text = "Change Profile Picture")
         }
-        
-        AsyncImage(model = selectedImageUri, contentDescription = null )
+
     }
 
-}
-
-fun saveImageToInternalStorage(context: Context, uri: Uri) {
-    val inputStream = context.contentResolver.openInputStream(uri)
-    val outputStream = context.openFileOutput("image.jpg", Context.MODE_PRIVATE)
-
-    inputStream?.use { input ->
-        outputStream.use { output ->
-            input.copyTo(output)
-        }
-    }
 }

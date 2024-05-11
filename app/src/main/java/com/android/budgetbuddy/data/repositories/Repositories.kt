@@ -38,6 +38,8 @@ class UserRepository(private val userDAO: UserDAO) {
     suspend fun upsert(user: User) = userDAO.upsert(user)
     suspend fun delete(user: User) = userDAO.delete(user)
     suspend fun login(username: String, password: String): User = userDAO.login(username, password)
+    suspend fun getUserByUsername(username: String): User = userDAO.getUserByUsername(username)
+
 }
 
 class CategoryRepository(private val categoryDAO: CategoryDAO) {

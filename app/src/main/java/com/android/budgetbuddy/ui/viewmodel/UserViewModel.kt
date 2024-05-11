@@ -22,6 +22,7 @@ interface UserActions {
     fun getUserId(): Int?
     fun login(username: String, password: String): Job
     fun getLoggedUser(): User?
+
     fun logout()
     fun loadCurrentUser(username: String): Job
 }
