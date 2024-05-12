@@ -78,7 +78,12 @@ data class RegularTransaction(
     @ColumnInfo val interval: Long,
     @ColumnInfo val userId: Int,
     @ColumnInfo var lastUpdate: Date
-)
+) {
+    val isExpense: Boolean
+        get() {
+            return type == "Expense"
+        }
+}
 
 class Converters {
     @TypeConverter

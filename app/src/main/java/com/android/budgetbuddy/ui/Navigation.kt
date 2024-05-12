@@ -205,7 +205,12 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.RegularTransactions) {
             composable(route) {
-                AllRegularTransactionScreen(regularTransactionViewModel, navController)
+                AllRegularTransactionScreen(
+                    regularTransactionViewModel,
+                    currencyViewModel,
+                    categoryActions,
+                    navController
+                )
             }
         }
 
