@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ interface CategoryActions {
     fun getCategories(): List<Category>
     fun addCategory(category: Category, userId: Int): Job
     fun removeCategory(category: Category): Job
+    fun getCategoryIcon(name: String): String
 }
 
 class CategoryViewModel(private val repository: CategoryRepository) : ViewModel() {
@@ -44,6 +46,18 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
 
         override fun getCategories(): List<Category> {
             return categories.value
+        }
+
+        override fun getCategoryIcon(name: String): String {
+            var icon: String? = "Filled.Add"
+            if (categories.value.isNotEmpty()) {
+                icon = categories.value
+                    .find { category -> category.name == name }?.icon
+            }
+            if (icon == null)
+                icon = "Filled.Add"
+
+            return icon
         }
     }
 }

@@ -179,7 +179,12 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Transactions) {
             composable(route) {
-                AllTransactionsScreen(transactionViewModel, currencyViewModel)
+                AllTransactionsScreen(
+                    navController,
+                    transactionViewModel,
+                    currencyViewModel,
+                    categoryActions
+                )
             }
         }
 
@@ -205,7 +210,7 @@ fun BudgetBuddyNavGraph(
                 val transaction = requireNotNull(transactionsState.transactions.find {
                     it.id == backStackEntry.arguments?.getString("transactionId")?.toInt()
                 })
-                DetailsScreen(transaction)
+                DetailsScreen(transaction, navController, currencyViewModel, transactionViewModel.actions)
             }
         }
 

@@ -294,18 +294,11 @@ fun HomeScreen(
                         .take(TRANSACTION_PREVIEW_COUNT)
 
                     items(orderedList) {
-                        var icon: String? = "Filled.Add"
-                        if (categoryActions.getCategories().isNotEmpty()) {
-                            icon = categoryActions.getCategories()
-                                .find { category -> category.name == it.category }?.icon
-                            categoryActions.getCategories()
-                                .find { category -> category.name == it.category }?.toString()
-                                ?.let { it1 -> Log.d("Home", it1) }
-                            Log.d("Home", "not empty")
-                        }
-                        if (icon == null)
-                            icon = "Filled.Add"
-                        TransactionItem(it, currencyViewModel, icon, navController)
+
+                        TransactionItem(it,
+                            currencyViewModel,
+                            categoryActions.getCategoryIcon(it.category),
+                            navController)
                     }
                 }
             }

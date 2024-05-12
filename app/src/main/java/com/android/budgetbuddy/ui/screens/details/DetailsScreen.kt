@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -18,6 +20,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,12 +34,45 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.ui.composables.AlertDialog
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun DetailsScreen(transaction: Transaction) {
+fun DetailsScreen(
+    transaction: Transaction,
+    navController: NavController,
+    currencyViewModel: CurrencyViewModel,
+    transactionActions: TransactionActions
+) {
     val context = LocalContext.current
+
+    val coroutineScope = rememberCoroutineScope()
+    var openDeleteDialog by remember { mutableStateOf(false) }
+
+    when {
+        openDeleteDialog -> {
+            AlertDialog(
+                onDismissRequest = { openDeleteDialog = false },
+                onConfirmation = {
+                    openDeleteDialog = false
+                    coroutineScope.launch {
+                        transactionActions.deleteTransaction(transaction)
+                        navController.popBackStack()
+                    }
+
+                },
+                dialogTitle = "Alert dialog example",
+                dialogText = "This is an example of an alert dialog with buttons.",
+                icon = Icons.Default.WarningAmber
+            )
+        }
+    }
 
     Column {
         Card(
@@ -80,7 +120,7 @@ fun DetailsScreen(transaction: Transaction) {
                 DetailRow(
                     context = context,
                     key = stringResource(R.string.amount),
-                    value = "${transaction.amount} €"
+                    value = "${currencyViewModel.convert(transaction.amount)} ${currencyViewModel.getCurrency().getSymbol()}"
                 )
                 DetailRow(
                     context = context,
@@ -143,7 +183,9 @@ fun DetailsScreen(transaction: Transaction) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = Modifier.size(150.dp, 40.dp),
-                onClick = { /*TODO*/ }
+                onClick = {
+                    openDeleteDialog = true
+                }
             ) {
                 Text(
                     text = stringResource(R.string.delete),

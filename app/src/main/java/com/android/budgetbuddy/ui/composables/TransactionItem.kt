@@ -42,13 +42,14 @@ fun TransactionItem(
     transaction: Transaction,
     currencyViewModel: CurrencyViewModel,
     icon: String,
-    navController: NavHostController) {
+    navController: NavHostController,
+    modifier: Modifier = Modifier.padding(10.dp)
+) {
 
     val currency = currencyViewModel.getCurrency()
 
     Row(
-        modifier = Modifier
-            .padding(10.dp)
+        modifier = modifier
             .fillMaxWidth()
             .clickable {
                 navController.navigate(BudgetBuddyRoute.TransactionDetails.buildRoute(transaction.id.toString()))

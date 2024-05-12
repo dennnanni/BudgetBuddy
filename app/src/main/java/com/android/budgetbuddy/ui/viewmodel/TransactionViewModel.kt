@@ -25,6 +25,7 @@ interface TransactionActions {
     fun loadMostPopularCategories(): Job
     fun getMostPopularCategories(): List<String>
 
+    fun deleteTransaction(transaction: Transaction): Job
     fun nukeTable(): Job
 
 }
@@ -67,6 +68,10 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
 
         override fun nukeTable(): Job = viewModelScope.launch {
             repository.nukeTable()
+        }
+
+        override fun deleteTransaction(transaction: Transaction): Job {
+            TODO("Not yet implemented")
         }
     }
 }

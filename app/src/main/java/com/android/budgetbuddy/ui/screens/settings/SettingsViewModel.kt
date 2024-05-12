@@ -84,12 +84,11 @@ class CurrencyViewModel(
             defaultRate = false
             rate = repository.getUpdatedRate() ?: rate
         } catch(e: Exception) {
-            Log.e("Pippo", "Error updating rate", e)
             defaultRate = true
         }
     }
 
     fun convert(amount: Double): Double {
-        return  amount * rate
+        return  String.format("%.2f", amount * rate).toDouble()
     }
 }
