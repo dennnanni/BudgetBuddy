@@ -47,6 +47,7 @@ import com.android.budgetbuddy.data.database.RegularTransaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDropDown
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
@@ -61,7 +62,8 @@ fun AddRegularTransactionScreen(
     navController: NavHostController,
     userViewModel: UserViewModel,
     actions: RegularTransactionActions,
-    categoryActions: CategoryActions
+    categoryActions: CategoryActions,
+    currencyViewModel: CurrencyViewModel
 ) {
     val options =
         listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
@@ -234,7 +236,7 @@ fun AddRegularTransactionScreen(
                             description = description.value,
                             type = selectedOption,
                             category = selectedOptionText,
-                            amount = amount.value,
+                            amount = currencyViewModel.convertToUSD(amount.value),
                             interval = (periods[selectedOptionPeriod]!!*periodAmount.value).toLong(),
                             userId = userId,
                             lastUpdate = Date.from(

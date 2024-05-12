@@ -44,4 +44,8 @@
     <string name="unknown_communication_error">An error occurred in connecting to server.</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
+    <string name="delete_transaction">Deleting %1$s</string>
+    <string name="delete_transaction_message">Are you sure? This operation cannot be undone</string>
+    <string name="most_expenses_in">Most expenses in</string>
+    <string name="title">Title</string>
 </resources>

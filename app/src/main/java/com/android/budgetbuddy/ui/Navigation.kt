@@ -1,6 +1,7 @@
 package com.android.budgetbuddy.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,7 +47,7 @@ sealed class BudgetBuddyRoute(
     data object Profile : BudgetBuddyRoute("profile", "Profile")
     data object TransactionDetails : BudgetBuddyRoute(
         "transactions/{transactionId}",
-        "Transaction Details",
+        "Transaction details",
         listOf(navArgument("transactionId") { type = NavType.StringType })
     ) {
         fun buildRoute(transactionId: String) = "transactions/$transactionId"
@@ -65,9 +66,9 @@ sealed class BudgetBuddyRoute(
 
     data object Login : BudgetBuddyRoute("login", "Login")
 
-    data object Transactions : BudgetBuddyRoute("transactions", "All Transactions")
+    data object Transactions : BudgetBuddyRoute("transactions", "All transactions")
     data object RegularTransactions :
-        BudgetBuddyRoute("regular_transactions", "All Regular Transactions")
+        BudgetBuddyRoute("regular_transactions", "Regular transactions")
 
 
     // TODO: add other routes here
@@ -83,7 +84,9 @@ sealed class BudgetBuddyRoute(
             TransactionDetails,
             EditTransaction,
             Settings,
-            Transactions
+            Transactions,
+            RegularTransactions,
+            AddRegularTransaction
         )
         val bottomBarRoutes = setOf(
             Home,
@@ -150,7 +153,8 @@ fun BudgetBuddyNavGraph(
                     navController,
                     userViewModel,
                     transactionViewModel.actions,
-                    categoryActions
+                    categoryActions,
+                    currencyViewModel
                 )
             }
         }
@@ -161,7 +165,8 @@ fun BudgetBuddyNavGraph(
                     navController,
                     userViewModel,
                     regularTransactionViewModel.actions,
-                    categoryActions
+                    categoryActions,
+                    currencyViewModel
                 )
             }
         }
@@ -227,9 +232,9 @@ fun BudgetBuddyNavGraph(
         }
         with(BudgetBuddyRoute.TransactionDetails) {
             composable(route, args) { backStackEntry ->
-                val transaction = requireNotNull(transactionsState.transactions.find {
+                val transaction = transactionsState.transactions.find {
                     it.id == backStackEntry.arguments?.getString("transactionId")?.toInt()
-                })
+                }
                 DetailsScreen(
                     transaction,
                     navController,

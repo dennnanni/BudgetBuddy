@@ -91,4 +91,8 @@ class CurrencyViewModel(
     fun convert(amount: Double): Double {
         return  String.format("%.2f", amount * rate).toDouble()
     }
+
+    fun convertToUSD(amount: Double): Double {
+        return String.format("%.2f", amount / rate).toDouble()
+    }
 }

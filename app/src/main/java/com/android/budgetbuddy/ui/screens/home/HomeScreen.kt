@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -78,7 +79,6 @@ import java.util.Date
 
 const val TRANSACTION_PREVIEW_COUNT = 10
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -150,7 +150,12 @@ fun HomeScreen(
     val currency = currencyViewModel.getCurrency()
 
     userActions.loadCurrentUser(username)
-    val userId = userActions.getUserId() ?: return
+    //val userId = userActions.getUserId() ?: return
+    val userId = userActions.getUserId()
+    if (userId == null) {
+        Log.d("HomeScreen", "User ID is null")
+        return
+    }
     transactionActions.loadUserTransactions(userId)
     val transactions = transactionActions.getUserTransactions(userId)
 

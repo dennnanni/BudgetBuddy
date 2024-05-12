@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.User
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.android.budgetbuddy.ui.viewmodel.UserState
 import kotlinx.coroutines.launch
@@ -50,14 +51,14 @@ fun RegisterScreen(navController: NavHostController,
     val password = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", Context.MODE_PRIVATE)
+    val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, Context.MODE_PRIVATE)
     val coroutineScope = rememberCoroutineScope()
 
     if (actions.getLoggedUser() != null) {
         with(sharedPreferences.edit()) {
-            putString("username", username.value)
-            putString("name", actions.getLoggedUser()?.name)
-            putString("profilePic", actions.getLoggedUser()?.profilePic)
+            putString(SPConstants.USERNAME, username.value)
+            putString(SPConstants.NAME, actions.getLoggedUser()?.name)
+            putString(SPConstants.PROFILE_PIC, actions.getLoggedUser()?.profilePic)
             apply()
         }
         navController.navigate(BudgetBuddyRoute.Home.route) {
@@ -125,13 +126,6 @@ fun RegisterScreen(navController: NavHostController,
                             )
                         ).join()
                         actions.loadCurrentUser(username.value).join()
-                        with(sharedPreferences.edit()) {
-                            putString("username", username.value)
-                            putString("name", actions.getLoggedUser()?.name)
-                            putString("profilePic", actions.getLoggedUser()?.profilePic)
-                            apply()
-                        }
-                        navController.navigate(BudgetBuddyRoute.Home.route)
                     }
                 }
             ) {
@@ -140,7 +134,9 @@ fun RegisterScreen(navController: NavHostController,
 
             Spacer(modifier = Modifier.height(5.dp))
 
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Text(
                     text = stringResource(R.string.already_registered),
                     style = MaterialTheme.typography.bodySmall

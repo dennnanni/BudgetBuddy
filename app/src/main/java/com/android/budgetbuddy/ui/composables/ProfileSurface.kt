@@ -24,9 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
@@ -46,11 +49,13 @@ fun ProfileHome(
         }
     ) {
         Image(
-            painter = painterResource(id = R.drawable.default_propic),
-            contentDescription = "R.string.profile_picture.toString()",
+            painter = if (profilePic.isNotEmpty()) rememberAsyncImagePainter(
+                model = Uri.parse(profilePic)) else painterResource(id = R.drawable.default_propic),
+            contentDescription = stringResource(id = R.string.profile_picture),
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
                 .size(50.dp)
+                .clip(RoundedCornerShape(10.dp))
         )
         Spacer(modifier = Modifier.size(16.dp))
         Column {
@@ -70,11 +75,11 @@ fun ProfileProfile(name: String, username: String, profilePic: String, launch: M
     ) {
         Box {
             Image(
-                painter = rememberImagePainter(
-                    data  = Uri.parse(profilePic)  // or ht
-                )
-                ,
-                contentDescription = "123",
+                painter = rememberAsyncImagePainter(
+                    model = Uri.parse(profilePic)  // or ht
+                ),
+                contentScale = ContentScale.Crop,
+                contentDescription = stringResource(id = R.string.profile_picture),
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(150.dp)

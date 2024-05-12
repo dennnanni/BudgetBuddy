@@ -46,6 +46,7 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import com.android.budgetbuddy.ui.composables.CustomDropDown
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
@@ -59,7 +60,8 @@ fun AddTransactionScreen(
     navController: NavHostController,
     userViewModel: UserViewModel,
     actions: TransactionActions,
-    categoryActions: CategoryActions
+    categoryActions: CategoryActions,
+    currencyViewModel: CurrencyViewModel
 ) {
     val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
@@ -109,7 +111,7 @@ fun AddTransactionScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
-                    label = { Text("Title") },
+                    label = { Text(stringResource(id = R.string.title)) },
                     value = title.value,
                     onValueChange = { title.value = it }, modifier = Modifier
                         .fillMaxWidth()
@@ -144,7 +146,7 @@ fun AddTransactionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = if (amount.value == 0.0) "" else amount.value.toString(),
                     onValueChange = { amount.value = it.toDoubleOrNull() ?: 0.0 },
-                    label = { Text(text = "Amount") },
+                    label = { Text(text = stringResource(id = R.string.amount)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
@@ -204,7 +206,7 @@ fun AddTransactionScreen(
                             description = description.value,
                             type = selectedOption,
                             category = selectedOptionText,
-                            amount = amount.value,
+                            amount = currencyViewModel.convertToUSD(amount.value, ),
                             date = Date.from(
                                 date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
                             ),

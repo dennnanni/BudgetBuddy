@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionsState
 import com.android.budgetbuddy.ui.composables.ProfileProfile
+import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.saveImageToStorage
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.android.budgetbuddy.ui.viewmodel.UserState
@@ -47,10 +49,10 @@ fun ProfileScreen(
     userActions: UserActions
 ) {
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
-    val name = sharedPreferences.getString("name", null) ?: ""
-    val username = sharedPreferences.getString("username", null) ?: ""
-    val profilePic = sharedPreferences.getString("profilePic", null) ?: ""
+    val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, 0)
+    val name = sharedPreferences.getString(SPConstants.NAME, null) ?: ""
+    val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: ""
+    val profilePic = sharedPreferences.getString(SPConstants.PROFILE_PIC, null) ?: ""
     if(userActions.getLoggedUser() == null){
         userActions.loadCurrentUser(username)
     }
@@ -63,7 +65,7 @@ fun ProfileScreen(
         onResult = { uri ->
             uri?.let {
                 val newUri = saveImageToStorage(it, context.contentResolver)
-                var currentUser = userActions.getLoggedUser()
+                val currentUser = userActions.getLoggedUser()
                 currentUser?.profilePic = newUri.toString()
 
                 with(sharedPreferences.edit()) {
@@ -92,7 +94,7 @@ fun ProfileScreen(
                 .padding(25.dp),
         ) {
             Text(
-                text = "Most expenses in", style = TextStyle(
+                text = stringResource(id = R.string.most_expenses_in) + ":", style = TextStyle(
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
