@@ -10,7 +10,7 @@ import androidx.room.TypeConverters
         User::class,
         Category::class,
     RegularTransaction::class
-    ], version = 9
+    ], version = 10
 )
 @TypeConverters(Converters::class)
 abstract class BudgetBuddyDatabase : RoomDatabase() {

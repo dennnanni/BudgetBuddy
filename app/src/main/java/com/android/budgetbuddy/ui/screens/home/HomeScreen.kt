@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.provider.Settings
-import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,12 +44,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
+import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserActions
@@ -70,10 +73,12 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 
 const val TRANSACTION_PREVIEW_COUNT = 10
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -82,7 +87,8 @@ fun HomeScreen(
     categoryActions: CategoryActions,
     transactionActions: TransactionActions,
     userActions: UserActions,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    regularTransactionViewModel: RegularTransactionViewModel
 ) {
     val context = LocalContext.current
     var totalBalance = 0.0
@@ -144,9 +150,34 @@ fun HomeScreen(
     val currency = currencyViewModel.getCurrency()
 
     userActions.loadCurrentUser(username)
-    val userId = userActions.getUserId() ?: return /* TODO: handle */
+    val userId = userActions.getUserId() ?: return
     transactionActions.loadUserTransactions(userId)
     val transactions = transactionActions.getUserTransactions(userId)
+
+    regularTransactionViewModel.actions.loadUserTransactions(userId)
+    val regularTransactions = regularTransactionViewModel.actions.getUserTransactions(userId)
+
+    for (transaction in regularTransactions) {
+        if (System.currentTimeMillis()
+            > transaction.lastUpdate.time + transaction.interval
+        ) {
+            transactionActions.addTransaction(
+                Transaction(
+                    title = transaction.title,
+                    description = transaction.description,
+                    type = transaction.type,
+                    category = transaction.category,
+                    amount = transaction.amount,
+                    periodic = true,
+                    date = Date(transaction.lastUpdate.time + transaction.interval),
+                    userId = userId
+                )
+            )
+
+            transaction.lastUpdate = Date(transaction.lastUpdate.time + transaction.interval)
+            regularTransactionViewModel.actions.addTransaction(transaction)
+        }
+    }
 
     val data = mutableMapOf<Float, Float>()
     categoryActions.loadCategories(userActions.getUserId()!!)
@@ -295,10 +326,12 @@ fun HomeScreen(
 
                     items(orderedList) {
 
-                        TransactionItem(it,
+                        TransactionItem(
+                            it,
                             currencyViewModel,
                             categoryActions.getCategoryIcon(it.category),
-                            navController)
+                            navController
+                        )
                     }
                 }
             }
@@ -307,16 +340,17 @@ fun HomeScreen(
 }
 
 fun isOnline(ctx: Context): Boolean {
-    val connectivityManager = ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val connectivityManager =
+        ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-    return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||capabilities?.hasTransport(
-        NetworkCapabilities.TRANSPORT_WIFI) == true
+    return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true || capabilities?.hasTransport(
+        NetworkCapabilities.TRANSPORT_WIFI
+    ) == true
 }
 
 fun openWirelessSettings(ctx: Context) {
     val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS).apply {
-        flags = Intent.
-        FLAG_ACTIVITY_NEW_TASK
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
     if (intent.resolveActivity(ctx.applicationContext.packageManager) != null) {
         ctx.applicationContext.startActivity(intent)

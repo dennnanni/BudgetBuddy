@@ -76,7 +76,8 @@ data class RegularTransaction(
     @ColumnInfo val category: String,
     @ColumnInfo val amount: Double,
     @ColumnInfo val interval: Long,
-    @ColumnInfo val userId: Int
+    @ColumnInfo val userId: Int,
+    @ColumnInfo var lastUpdate: Date
 )
 
 class Converters {

@@ -52,6 +52,8 @@ import com.android.budgetbuddy.ui.viewmodel.RegularTransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 import kotlin.math.pow
 
 @Composable
@@ -234,7 +236,10 @@ fun AddRegularTransactionScreen(
                             category = selectedOptionText,
                             amount = amount.value,
                             interval = (periods[selectedOptionPeriod]!!*periodAmount.value).toLong(),
-                            userId = userId
+                            userId = userId,
+                            lastUpdate = Date.from(
+                                date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                            ),
                         )
                     ).join()
                     actions.loadUserTransactions(userId).join()

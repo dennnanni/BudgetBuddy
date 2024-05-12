@@ -40,7 +40,9 @@ sealed class BudgetBuddyRoute(
 ) {
     data object Home : BudgetBuddyRoute("home", "BudgetBuddy")
     data object AddTransaction : BudgetBuddyRoute("transactions/add", "Add Transaction")
-    data object AddRegularTransaction : BudgetBuddyRoute("regular_transactions/add", "Add Regular Transaction")
+    data object AddRegularTransaction :
+        BudgetBuddyRoute("regular_transactions/add", "Add Regular Transaction")
+
     data object Profile : BudgetBuddyRoute("profile", "Profile")
     data object TransactionDetails : BudgetBuddyRoute(
         "transactions/{transactionId}",
@@ -64,7 +66,8 @@ sealed class BudgetBuddyRoute(
     data object Login : BudgetBuddyRoute("login", "Login")
 
     data object Transactions : BudgetBuddyRoute("transactions", "All Transactions")
-    data object RegularTransactions : BudgetBuddyRoute("regular_transactions", "All Regular Transactions")
+    data object RegularTransactions :
+        BudgetBuddyRoute("regular_transactions", "All Regular Transactions")
 
 
     // TODO: add other routes here
@@ -135,19 +138,31 @@ fun BudgetBuddyNavGraph(
                     categoryActions,
                     transactionViewModel.actions,
                     userViewModel.actions,
-                    snackbarHostState)
+                    snackbarHostState,
+                    regularTransactionViewModel
+                )
             }
         }
 
         with(BudgetBuddyRoute.AddTransaction) {
             composable(route) {
-                AddTransactionScreen(navController, userViewModel, transactionViewModel.actions, categoryActions)
+                AddTransactionScreen(
+                    navController,
+                    userViewModel,
+                    transactionViewModel.actions,
+                    categoryActions
+                )
             }
         }
 
         with(BudgetBuddyRoute.AddRegularTransaction) {
             composable(route) {
-                AddRegularTransactionScreen(navController, userViewModel, regularTransactionViewModel.actions, categoryActions)
+                AddRegularTransactionScreen(
+                    navController,
+                    userViewModel,
+                    regularTransactionViewModel.actions,
+                    categoryActions
+                )
             }
         }
 
@@ -210,7 +225,12 @@ fun BudgetBuddyNavGraph(
                 val transaction = requireNotNull(transactionsState.transactions.find {
                     it.id == backStackEntry.arguments?.getString("transactionId")?.toInt()
                 })
-                DetailsScreen(transaction, navController, currencyViewModel, transactionViewModel.actions)
+                DetailsScreen(
+                    transaction,
+                    navController,
+                    currencyViewModel,
+                    transactionViewModel.actions
+                )
             }
         }
 
