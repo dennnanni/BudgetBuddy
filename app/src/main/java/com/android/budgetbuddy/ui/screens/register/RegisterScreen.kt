@@ -2,6 +2,7 @@ package com.android.budgetbuddy.ui.screens.register
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,10 +20,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -53,6 +57,12 @@ fun RegisterScreen(navController: NavHostController,
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, Context.MODE_PRIVATE)
     val coroutineScope = rememberCoroutineScope()
+    var error by remember { mutableStateOf<String?>(null) }
+
+    if (error != null) {
+        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+        error = null
+    }
 
     if (actions.getLoggedUser() != null) {
         with(sharedPreferences.edit()) {
@@ -117,15 +127,31 @@ fun RegisterScreen(navController: NavHostController,
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
                 onClick = {
-                    coroutineScope.launch {
-                        actions.addUser(
-                            User(
-                                name = fullName.value,
-                                username = username.value,
-                                password = password.value
+
+                    error = registrationChecks(
+                        context,
+                        fullName.value,
+                        username.value,
+                        password.value,
+                        confirmPassword.value
+                    )
+
+                    if (error == null) {
+                        coroutineScope.launch {
+                            actions.getUserByUsername(username.value)?.let {
+                                error = context.getString(R.string.username_already_exists)
+                                return@launch
+                            }
+
+                            actions.addUser(
+                                User(
+                                    name = fullName.value,
+                                    username = username.value,
+                                    password = password.value
+                                )
                             )
-                        ).join()
-                        actions.loadCurrentUser(username.value).join()
+                            actions.loadCurrentUser(username.value)
+                        }
                     }
                 }
             ) {
@@ -162,4 +188,30 @@ fun RegisterScreen(navController: NavHostController,
         }
     }
 
+}
+
+fun registrationChecks(
+    context: Context,
+    fullName: String,
+    username: String,
+    password: String,
+    confirmPassword: String
+): String? {
+    if (fullName.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        return context.getString(R.string.fields_cannot_be_empty)
+    }
+    if (username.length < 4) {
+        return context.getString(R.string.username_must_be_at_least_4_characters_long)
+    }
+
+    if (password.length < 6) {
+        return context.getString(R.string.password_must_be_at_least_6_characters_long)
+
+    }
+
+    if (password != confirmPassword) {
+        return context.getString(R.string.passwords_do_not_match)
+    }
+
+    return null
 }
