@@ -261,7 +261,7 @@ fun BudgetBuddyNavGraph(
         }
         with(BudgetBuddyRoute.Map) {
             composable(route) {
-                MapContent()
+                MapContent(transactionViewModel.actions, locationService, snackbarHostState)
             }
         }
         with(BudgetBuddyRoute.Test) {

@@ -67,6 +67,8 @@ import com.android.budgetbuddy.ui.composables.CustomDropDown
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.LocationService
 import com.android.budgetbuddy.ui.utils.PermissionStatus
+import com.android.budgetbuddy.ui.utils.isOnline
+import com.android.budgetbuddy.ui.utils.openWirelessSettings
 import com.android.budgetbuddy.ui.utils.rememberPermission
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
@@ -143,30 +145,9 @@ fun AddTransactionScreen(
         showLocationDisabledAlert = locationService.isLocationEnabled == false
     }
 
-    // HTTP
-
-    fun isOnline(): Boolean {
-        val connectivityManager = context
-            .applicationContext
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-        return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
-                capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-    }
-
-    fun openWirelessSettings() {
-        val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        if (intent.resolveActivity(context.applicationContext.packageManager) != null) {
-            context.applicationContext.startActivity(intent)
-        }
-    }
-
     LaunchedEffect(locationService.coordinates) {
         if (locationService.coordinates == null) return@LaunchedEffect
-        if (!isOnline()) {
+        if (!isOnline(context)) {
             return@LaunchedEffect
         }
         place = osmDataSource.getPlace(locationService.coordinates!!)
@@ -331,19 +312,19 @@ fun AddTransactionScreen(
 
     if (showLocationDisabledAlert) {
         AlertDialog(
-            title = { Text("Location disabled") },
-            text = { Text("Location must be enabled to get your current location in the app.") },
+            title = { Text(stringResource(id = R.string.location_disabled)) },
+            text = { Text(stringResource(id = R.string.location_permission_is_required_to_locate_on_map)) },
             confirmButton = {
                 TextButton(onClick = {
                     locationService.openLocationSettings()
                     showLocationDisabledAlert = false
                 }) {
-                    Text("Enable")
+                    Text(stringResource(id = R.string.enable))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLocationDisabledAlert = false }) {
-                    Text("Dismiss")
+                    Text(stringResource(id = R.string.dismiss))
                 }
             },
             onDismissRequest = { showLocationDisabledAlert = false }
@@ -352,19 +333,19 @@ fun AddTransactionScreen(
 
     if (showPermissionDeniedAlert) {
         AlertDialog(
-            title = { Text("Location permission denied") },
-            text = { Text("Location permission is required to get your current location in the app.") },
+            title = { Text(stringResource(id = R.string.permission_denied)) },
+            text = { Text(stringResource(id = R.string.location_permission_is_required_to_locate_on_map)) },
             confirmButton = {
                 TextButton(onClick = {
                     locationPermission.launchPermissionRequest()
                     showPermissionDeniedAlert = false
                 }) {
-                    Text("Grant")
+                    Text(stringResource(id = R.string.grant))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPermissionDeniedAlert = false }) {
-                    Text("Dismiss")
+                    Text(stringResource(id = R.string.dismiss))
                 }
             },
             onDismissRequest = { showPermissionDeniedAlert = false }
@@ -374,8 +355,8 @@ fun AddTransactionScreen(
     if (showPermissionPermanentlyDeniedSnackbar) {
         LaunchedEffect(snackbarHostState) {
             val res = snackbarHostState.showSnackbar(
-                "Location permission is required.",
-                "Go to Settings",
+                context.getString(R.string.location_permission_is_required_to_locate_on_map),
+                context.getString(R.string.go_to_settings),
                 duration = SnackbarDuration.Long
             )
             if (res == SnackbarResult.ActionPerformed) {
@@ -393,12 +374,12 @@ fun AddTransactionScreen(
     if (showNoInternetConnectivitySnackbar) {
         LaunchedEffect(snackbarHostState) {
             val res = snackbarHostState.showSnackbar(
-                message = "No Internet connectivity",
-                actionLabel = "Go to Settings",
+                message = context.getString(R.string.no_internet_connectivity),
+                actionLabel = context.getString(R.string.go_to_settings),
                 duration = SnackbarDuration.Long
             )
             if (res == SnackbarResult.ActionPerformed) {
-                openWirelessSettings()
+                openWirelessSettings(context)
             }
             showNoInternetConnectivitySnackbar = false
         }

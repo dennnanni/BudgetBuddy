@@ -54,4 +54,12 @@
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="username_already_exists">Username already exists</string>
     <string name="add_location">Add location</string>
+    <string name="location_disabled">Location disabled</string>
+    <string name="location_must_be_enabled_to_get_current_location">Location must be enabled to get your current location in the app.</string>
+    <string name="location_permission_is_required_to_locate_on_map">Location permission is required to show your current location in the map.</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="enable">Enable</string>
+    <string name="grant">Grant</string>
+    <string name="no_internet_connectivity">No internet connectivity</string>
 </resources>
