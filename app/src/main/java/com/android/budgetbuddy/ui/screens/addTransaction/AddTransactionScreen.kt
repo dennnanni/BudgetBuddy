@@ -1,6 +1,14 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +24,21 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddLocation
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -35,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -42,15 +58,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.data.remote.OSMDataSource
+import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import com.android.budgetbuddy.ui.composables.CustomDropDown
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
+import com.android.budgetbuddy.ui.utils.LocationService
+import com.android.budgetbuddy.ui.utils.PermissionStatus
+import com.android.budgetbuddy.ui.utils.rememberPermission
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -61,8 +83,12 @@ fun AddTransactionScreen(
     userViewModel: UserViewModel,
     actions: TransactionActions,
     categoryActions: CategoryActions,
-    currencyViewModel: CurrencyViewModel
+    currencyViewModel: CurrencyViewModel,
+    locationService: LocationService,
+    snackbarHostState: SnackbarHostState,
+    osmDataSource: OSMDataSource
 ) {
+    val context = LocalContext.current
     val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
@@ -81,6 +107,72 @@ fun AddTransactionScreen(
     val description = rememberSaveable { mutableStateOf("") }
     val title = rememberSaveable { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+
+    var showLocationDisabledAlert by remember { mutableStateOf(false) }
+    var showPermissionDeniedAlert by remember { mutableStateOf(false) }
+    var showPermissionPermanentlyDeniedSnackbar by remember { mutableStateOf(false) }
+    var showNoInternetConnectivitySnackbar by remember { mutableStateOf(false) }
+    var place: OSMPlace? by remember { mutableStateOf(null) }
+
+    val locationPermission = rememberPermission(
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) { status ->
+        when (status) {
+            PermissionStatus.Granted ->
+                locationService.requestCurrentLocation()
+
+            PermissionStatus.Denied ->
+                showPermissionDeniedAlert = true
+
+            PermissionStatus.PermanentlyDenied ->
+                showPermissionPermanentlyDeniedSnackbar = true
+
+            PermissionStatus.Unknown -> {}
+        }
+    }
+
+    fun requestLocation() {
+        if (locationPermission.status.isGranted) {
+            locationService.requestCurrentLocation()
+        } else {
+            locationPermission.launchPermissionRequest()
+        }
+    }
+
+    LaunchedEffect(locationService.isLocationEnabled) {
+        showLocationDisabledAlert = locationService.isLocationEnabled == false
+    }
+
+    // HTTP
+
+    fun isOnline(): Boolean {
+        val connectivityManager = context
+            .applicationContext
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
+                capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+    }
+
+    fun openWirelessSettings() {
+        val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        if (intent.resolveActivity(context.applicationContext.packageManager) != null) {
+            context.applicationContext.startActivity(intent)
+        }
+    }
+
+    LaunchedEffect(locationService.coordinates) {
+        if (locationService.coordinates == null) return@LaunchedEffect
+        if (!isOnline()) {
+            return@LaunchedEffect
+        }
+        place = osmDataSource.getPlace(locationService.coordinates!!)
+        // set transaction location
+        // actions.setDestination(place.displayName)
+    }
 
 
     if (showDialog.value) {
@@ -186,8 +278,18 @@ fun AddTransactionScreen(
                         .fillMaxWidth()
                         .height(100.dp)
                 )
-            }
 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.clickable { requestLocation() }
+                ) {
+                    Icon(Icons.Filled.AddLocation, contentDescription = null)
+                    Text(
+                        text = place?.displayName ?: stringResource(id = R.string.add_location)
+                    )
+                }
+            }
 
         }
 
@@ -224,6 +326,81 @@ fun AddTransactionScreen(
             }
         ) {
             Text(text = stringResource(id = R.string.add_transaction), fontSize = 20.sp)
+        }
+    }
+
+    if (showLocationDisabledAlert) {
+        AlertDialog(
+            title = { Text("Location disabled") },
+            text = { Text("Location must be enabled to get your current location in the app.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    locationService.openLocationSettings()
+                    showLocationDisabledAlert = false
+                }) {
+                    Text("Enable")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationDisabledAlert = false }) {
+                    Text("Dismiss")
+                }
+            },
+            onDismissRequest = { showLocationDisabledAlert = false }
+        )
+    }
+
+    if (showPermissionDeniedAlert) {
+        AlertDialog(
+            title = { Text("Location permission denied") },
+            text = { Text("Location permission is required to get your current location in the app.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    locationPermission.launchPermissionRequest()
+                    showPermissionDeniedAlert = false
+                }) {
+                    Text("Grant")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDeniedAlert = false }) {
+                    Text("Dismiss")
+                }
+            },
+            onDismissRequest = { showPermissionDeniedAlert = false }
+        )
+    }
+
+    if (showPermissionPermanentlyDeniedSnackbar) {
+        LaunchedEffect(snackbarHostState) {
+            val res = snackbarHostState.showSnackbar(
+                "Location permission is required.",
+                "Go to Settings",
+                duration = SnackbarDuration.Long
+            )
+            if (res == SnackbarResult.ActionPerformed) {
+                context.startActivity(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+            showPermissionPermanentlyDeniedSnackbar = false
+        }
+    }
+
+    if (showNoInternetConnectivitySnackbar) {
+        LaunchedEffect(snackbarHostState) {
+            val res = snackbarHostState.showSnackbar(
+                message = "No Internet connectivity",
+                actionLabel = "Go to Settings",
+                duration = SnackbarDuration.Long
+            )
+            if (res == SnackbarResult.ActionPerformed) {
+                openWirelessSettings()
+            }
+            showNoInternetConnectivitySnackbar = false
         }
     }
 }

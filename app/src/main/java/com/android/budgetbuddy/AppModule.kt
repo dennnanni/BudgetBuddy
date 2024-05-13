@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.android.budgetbuddy.data.database.BudgetBuddyDatabase
+import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.data.remote.RatesDataSource
 import com.android.budgetbuddy.data.repositories.CategoryRepository
 import com.android.budgetbuddy.data.repositories.CurrencyRepository
@@ -17,6 +18,7 @@ import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
+import com.android.budgetbuddy.ui.utils.LocationService
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -48,6 +50,8 @@ val appModule = module {
             }
         }
     }
+    single { LocationService(get()) }
+    single { OSMDataSource(get()) }
     single { RatesDataSource(get()) }
 
     single { TransactionRepository(get<BudgetBuddyDatabase>().transactionDAO()) }

@@ -14,8 +14,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.android.budgetbuddy.data.remote.OSMDataSource
+import com.android.budgetbuddy.ui.screens.MapContent
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
+import com.android.budgetbuddy.ui.screens.addTransaction.TestScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
@@ -27,12 +30,14 @@ import com.android.budgetbuddy.ui.screens.settings.ThemeState
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.screens.viewAll.AllRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
+import com.android.budgetbuddy.ui.utils.LocationService
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 sealed class BudgetBuddyRoute(
     val route: String,
@@ -70,6 +75,9 @@ sealed class BudgetBuddyRoute(
     data object RegularTransactions :
         BudgetBuddyRoute("regular_transactions", "Regular transactions")
 
+    data object Map : BudgetBuddyRoute("map", "Map")
+    data object Test : BudgetBuddyRoute("test", "Test")
+
 
     // TODO: add other routes here
 
@@ -86,7 +94,9 @@ sealed class BudgetBuddyRoute(
             Settings,
             Transactions,
             RegularTransactions,
-            AddRegularTransaction
+            AddRegularTransaction,
+            Map,
+            Test
         )
         val bottomBarRoutes = setOf(
             Home,
@@ -114,6 +124,9 @@ fun BudgetBuddyNavGraph(
 
     val currencyViewModel = koinViewModel<CurrencyViewModel>()
     val regularTransactionViewModel = koinViewModel<RegularTransactionViewModel>()
+
+    val locationService = koinInject<LocationService>()
+    val osmDataSource = koinInject<OSMDataSource>()
 
     val context = LocalContext.current
 
@@ -154,7 +167,10 @@ fun BudgetBuddyNavGraph(
                     userViewModel,
                     transactionViewModel.actions,
                     categoryActions,
-                    currencyViewModel
+                    currencyViewModel,
+                    locationService,
+                    snackbarHostState,
+                    osmDataSource
                 )
             }
         }
@@ -241,6 +257,16 @@ fun BudgetBuddyNavGraph(
                     currencyViewModel,
                     transactionViewModel.actions
                 )
+            }
+        }
+        with(BudgetBuddyRoute.Map) {
+            composable(route) {
+                MapContent()
+            }
+        }
+        with(BudgetBuddyRoute.Test) {
+            composable(route) {
+                TestScreen(locationService, snackbarHostState)
             }
         }
 

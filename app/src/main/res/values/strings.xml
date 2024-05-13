@@ -53,4 +53,5 @@
     <string name="password_must_be_at_least_6_characters_long">Password must be at least 6 characters long</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="username_already_exists">Username already exists</string>
+    <string name="add_location">Add location</string>
 </resources>
