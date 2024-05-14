@@ -22,6 +22,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddLocation
+import androidx.compose.material.icons.filled.AddLocationAlt
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -257,9 +259,15 @@ fun AddTransactionScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.clickable { requestLocation() }
+                    modifier = Modifier.clickable {
+                        if (place == null) requestLocation()
+                        else {
+                            place = null
+                            locationService.resetLocation()
+                        }
+                    }
                 ) {
-                    Icon(Icons.Filled.AddLocation, contentDescription = null)
+                    Icon(if (place == null) Icons.Filled.AddLocationAlt else Icons.Filled.Close, contentDescription = null)
                     Text(
                         text = place?.displayName ?: stringResource(id = R.string.add_location)
                     )

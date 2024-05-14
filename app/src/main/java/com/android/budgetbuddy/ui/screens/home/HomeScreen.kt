@@ -329,6 +329,7 @@ fun HomeScreen(
                 ) {
                     val orderedList = transactionViewModel.userTransactions
                         .sortedByDescending { it.date }
+                        .sortedByDescending { it.id }
                         .take(TRANSACTION_PREVIEW_COUNT)
 
                     items(orderedList) {
