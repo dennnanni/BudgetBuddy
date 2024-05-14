@@ -9,6 +9,7 @@ import androidx.room.TypeConverters
         Transaction::class,
         User::class,
         Category::class,
+    RegularTransaction::class,
         RegularTransaction::class,
         EarnedBadge::class
     ], version = 11

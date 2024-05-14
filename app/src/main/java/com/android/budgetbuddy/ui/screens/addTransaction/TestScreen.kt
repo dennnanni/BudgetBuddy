@@ -1,12 +1,15 @@
-package com.android.budgetbuddy.ui.screens
+package com.android.budgetbuddy.ui.screens.addTransaction
 
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -15,44 +18,30 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavHostController
-import com.android.budgetbuddy.R
-import com.android.budgetbuddy.data.database.Transaction
-import com.android.budgetbuddy.ui.BudgetBuddyRoute
-import com.android.budgetbuddy.ui.utils.Coordinates
-import com.android.budgetbuddy.ui.utils.LocationService
+import com.android.budgetbuddy.data.remote.OSMDataSource
+import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.utils.PermissionStatus
 import com.android.budgetbuddy.ui.utils.rememberPermission
-import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
-import com.utsman.osmandcompose.rememberMapViewWithLifecycle
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.Marker
-
-val LATITUDE = 44.13
-val LONGITUDE = 12.23
+import com.android.budgetbuddy.ui.utils.LocationService
+import org.koin.compose.koinInject
 
 @Composable
-fun MapScreen(
-    navController: NavHostController,
-    transactionViewModel: TransactionViewModel,
+fun TestScreen(
     locationService: LocationService,
-    snackbarHostState: SnackbarHostState
-) {
+    snackbarHostState: SnackbarHostState) {
+
     val context = LocalContext.current
 
-    var locationAlreadyRequested by remember { mutableStateOf(false) }
     var showLocationDisabledAlert by remember { mutableStateOf(false) }
     var showPermissionDeniedAlert by remember { mutableStateOf(false) }
     var showPermissionPermanentlyDeniedSnackbar by remember { mutableStateOf(false) }
-    var latitude by remember { mutableDoubleStateOf(0.0) }
-    var longitude by remember { mutableDoubleStateOf(0.0) }
+    var showNoInternetConnectivitySnackbar by remember { mutableStateOf(false) }
+    var place: OSMPlace? by remember { mutableStateOf(null) }
 
     val locationPermission = rememberPermission(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -71,14 +60,11 @@ fun MapScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (!locationAlreadyRequested) {
-            if (locationPermission.status.isGranted) {
-                locationService.requestCurrentLocation()
-            } else {
-                locationPermission.launchPermissionRequest()
-            }
-            locationAlreadyRequested = true
+    fun requestLocation() {
+        if (locationPermission.status.isGranted) {
+            locationService.requestCurrentLocation()
+        } else {
+            locationPermission.launchPermissionRequest()
         }
     }
 
@@ -86,35 +72,70 @@ fun MapScreen(
         showLocationDisabledAlert = locationService.isLocationEnabled == false
     }
 
+    // HTTP
+
+    val osmDataSource = koinInject<OSMDataSource>()
+
+    fun isOnline(): Boolean {
+        val connectivityManager = context
+            .applicationContext
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
+                capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+    }
+
+    fun openWirelessSettings() {
+        val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        if (intent.resolveActivity(context.applicationContext.packageManager) != null) {
+            context.applicationContext.startActivity(intent)
+        }
+    }
+
     LaunchedEffect(locationService.coordinates) {
         if (locationService.coordinates == null) return@LaunchedEffect
-        latitude = locationService.coordinates!!.latitude
-        longitude = locationService.coordinates!!.longitude
+        if (!isOnline()) {
+            showNoInternetConnectivitySnackbar = true
+            return@LaunchedEffect
+        }
+        place = osmDataSource.getPlace(locationService.coordinates!!)
+        // set transaction location
+        // actions.setDestination(place.displayName)
     }
 
-    if (latitude != 0.0 || longitude != 0.0) {
-        MapViewComposable(navController = navController,
-            transactions = transactionViewModel.userTransactions,
-            center = Coordinates(latitude, longitude)
-        )
+    Button(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = {
+            // Get position
+            // launchGPS
+            requestLocation()
+        }
+    ) {
+        Text(text = "Get position")
     }
 
+    if (place != null) {
+        Text("Posizione: ${locationService.coordinates}")
+    }
 
     if (showLocationDisabledAlert) {
         AlertDialog(
-            title = { Text(stringResource(id = R.string.location_disabled)) },
-            text = { Text(stringResource(id = R.string.location_permission_is_required_to_locate_on_map)) },
+            title = { Text("Location disabled") },
+            text = { Text("Location must be enabled to get your current location in the app.") },
             confirmButton = {
                 TextButton(onClick = {
                     locationService.openLocationSettings()
                     showLocationDisabledAlert = false
                 }) {
-                    Text(stringResource(id = R.string.enable))
+                    Text("Enable")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLocationDisabledAlert = false }) {
-                    Text(stringResource(id = R.string.dismiss))
+                    Text("Dismiss")
                 }
             },
             onDismissRequest = { showLocationDisabledAlert = false }
@@ -123,19 +144,19 @@ fun MapScreen(
 
     if (showPermissionDeniedAlert) {
         AlertDialog(
-            title = { Text(stringResource(id = R.string.permission_denied)) },
-            text = { Text(stringResource(id = R.string.location_permission_is_required_to_locate_on_map)) },
+            title = { Text("Location permission denied") },
+            text = { Text("Location permission is required to get your current location in the app.") },
             confirmButton = {
                 TextButton(onClick = {
                     locationPermission.launchPermissionRequest()
                     showPermissionDeniedAlert = false
                 }) {
-                    Text(stringResource(id = R.string.grant))
+                    Text("Grant")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPermissionDeniedAlert = false }) {
-                    Text(stringResource(id = R.string.dismiss))
+                    Text("Dismiss")
                 }
             },
             onDismissRequest = { showPermissionDeniedAlert = false }
@@ -145,8 +166,8 @@ fun MapScreen(
     if (showPermissionPermanentlyDeniedSnackbar) {
         LaunchedEffect(snackbarHostState) {
             val res = snackbarHostState.showSnackbar(
-                context.getString(R.string.location_permission_is_required_to_locate_on_map),
-                context.getString(R.string.go_to_settings),
+                "Location permission is required.",
+                "Go to Settings",
                 duration = SnackbarDuration.Long
             )
             if (res == SnackbarResult.ActionPerformed) {
@@ -160,35 +181,18 @@ fun MapScreen(
             showPermissionPermanentlyDeniedSnackbar = false
         }
     }
-}
 
-@Composable
-fun MapViewComposable(
-    transactions: List<Transaction>,
-    navController: NavHostController,
-    center: Coordinates = Coordinates(LATITUDE, LONGITUDE),
-) {
-    val mapView = rememberMapViewWithLifecycle()
-
-    val markers = transactions.map { transaction ->
-        Marker(mapView).apply {
-            position = GeoPoint(transaction.latitude, transaction.longitude)
-            setOnMarkerClickListener { _, _ ->
-                navController.navigate(BudgetBuddyRoute.TransactionDetails.buildRoute(transaction.id.toString()))
-                true
+    if (showNoInternetConnectivitySnackbar) {
+        LaunchedEffect(snackbarHostState) {
+            val res = snackbarHostState.showSnackbar(
+                message = "No Internet connectivity",
+                actionLabel = "Go to Settings",
+                duration = SnackbarDuration.Long
+            )
+            if (res == SnackbarResult.ActionPerformed) {
+                openWirelessSettings()
             }
-            title = transaction.title
+            showNoInternetConnectivitySnackbar = false
         }
     }
-
-    AndroidView(
-        factory = { mapView },
-        update = { view ->
-            // Update your MapView here
-            view.setMultiTouchControls(true)
-            view.controller.setZoom(15.0)
-            view.controller.setCenter(GeoPoint(center.latitude, center.longitude))
-            view.overlays.addAll(markers)
-        }
-    )
 }

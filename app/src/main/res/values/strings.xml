@@ -44,4 +44,22 @@
     <string name="unknown_communication_error">An error occurred in connecting to server.</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
+    <string name="delete_transaction">Deleting %1$s</string>
+    <string name="delete_transaction_message">Are you sure? This operation cannot be undone</string>
+    <string name="most_expenses_in">Most expenses in</string>
+    <string name="title">Title</string>
+    <string name="fields_cannot_be_empty">Fields cannot be empty</string>
+    <string name="username_must_be_at_least_4_characters_long">Username must be at least 4 characters long</string>
+    <string name="password_must_be_at_least_6_characters_long">Password must be at least 6 characters long</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="username_already_exists">Username already exists</string>
+    <string name="add_location">Add location</string>
+    <string name="location_disabled">Location disabled</string>
+    <string name="location_must_be_enabled_to_get_current_location">Location must be enabled to get your current location in the app.</string>
+    <string name="location_permission_is_required_to_locate_on_map">Location permission is required to show your current location in the map.</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="enable">Enable</string>
+    <string name="grant">Grant</string>
+    <string name="no_internet_connectivity">No internet connectivity</string>
 </resources>

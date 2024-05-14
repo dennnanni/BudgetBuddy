@@ -1,6 +1,7 @@
 package com.android.budgetbuddy.ui.screens.details
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,38 +39,43 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
-import com.android.budgetbuddy.ui.composables.AlertDialog
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.TransactionAlertDialog
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
-import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun DetailsScreen(
-    transaction: Transaction,
+    transaction: Transaction?,
     navController: NavController,
     currencyViewModel: CurrencyViewModel,
     transactionActions: TransactionActions
 ) {
+    if (transaction == null) return
     val context = LocalContext.current
 
-    val coroutineScope = rememberCoroutineScope()
     var openDeleteDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     when {
         openDeleteDialog -> {
-            AlertDialog(
+            TransactionAlertDialog(
                 onDismissRequest = { openDeleteDialog = false },
                 onConfirmation = {
                     openDeleteDialog = false
                     coroutineScope.launch {
-                        transactionActions.deleteTransaction(transaction)
-                        navController.popBackStack()
-                    }
+                        transactionActions.removeTransaction(transaction).join()
 
+                        navController.navigate(BudgetBuddyRoute.Home.route) {
+                            popUpTo(BudgetBuddyRoute.Home.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
                 },
-                dialogTitle = "Alert dialog example",
-                dialogText = "This is an example of an alert dialog with buttons.",
+                dialogTitle = context.getString(R.string.delete_transaction, transaction.title),
+                dialogText = context.getString(R.string.delete_transaction_message),
                 icon = Icons.Default.WarningAmber
             )
         }

@@ -1,16 +1,20 @@
 package com.android.budgetbuddy.ui.composables
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.database.Transaction
 
 @Composable
-fun AlertDialog(
+fun TransactionAlertDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     dialogTitle: String,
@@ -18,14 +22,18 @@ fun AlertDialog(
     icon: ImageVector,
 ) {
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.background,
         icon = {
             Icon(icon, null)
         },
+        iconContentColor = MaterialTheme.colorScheme.primary,
         title = {
             Text(text = dialogTitle)
         },
         text = {
-            Text(text = dialogText)
+            Row(horizontalArrangement = Arrangement.Center) {
+                Text(text = dialogText)
+            }
         },
         onDismissRequest = {
             onDismissRequest()

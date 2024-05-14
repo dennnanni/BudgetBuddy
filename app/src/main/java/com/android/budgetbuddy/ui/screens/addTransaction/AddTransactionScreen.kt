@@ -1,6 +1,5 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,23 +35,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.data.badges.AllBadges
-import com.android.budgetbuddy.data.database.EarnedBadge
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import com.android.budgetbuddy.ui.composables.CustomDropDown
-import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
-import com.android.budgetbuddy.ui.viewmodel.EarnedBadgeViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -66,12 +60,16 @@ fun AddTransactionScreen(
     userViewModel: UserViewModel,
     actions: TransactionActions,
     categoryActions: CategoryActions,
+    currencyViewModel: CurrencyViewModel,
+    snackbarHostState: SnackbarHostState,
+    osmDataSource: OSMDataSource,
     earnedBadgeViewModel: EarnedBadgeViewModel
 ) {
-    val options =
-        listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
+    val context = LocalContext.current
+    val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
+    val locationService = remember { LocationService(context) }
 
     var selectedOptionText by remember { mutableStateOf(String()) }
 
@@ -87,6 +85,49 @@ fun AddTransactionScreen(
     val description = rememberSaveable { mutableStateOf("") }
     val title = rememberSaveable { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+
+    var showLocationDisabledAlert by remember { mutableStateOf(false) }
+    var showPermissionDeniedAlert by remember { mutableStateOf(false) }
+    var showPermissionPermanentlyDeniedSnackbar by remember { mutableStateOf(false) }
+    var showNoInternetConnectivitySnackbar by remember { mutableStateOf(false) }
+    var place: OSMPlace? by remember { mutableStateOf(null) }
+
+    val locationPermission = rememberPermission(
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) { status ->
+        when (status) {
+            PermissionStatus.Granted ->
+                locationService.requestCurrentLocation()
+
+            PermissionStatus.Denied ->
+                showPermissionDeniedAlert = true
+
+            PermissionStatus.PermanentlyDenied ->
+                showPermissionPermanentlyDeniedSnackbar = true
+
+            PermissionStatus.Unknown -> {}
+        }
+    }
+
+    fun requestLocation() {
+        if (locationPermission.status.isGranted) {
+            locationService.requestCurrentLocation()
+        } else {
+            locationPermission.launchPermissionRequest()
+        }
+    }
+
+    LaunchedEffect(locationService.isLocationEnabled) {
+        showLocationDisabledAlert = locationService.isLocationEnabled == false
+    }
+
+    LaunchedEffect(locationService.coordinates) {
+        if (locationService.coordinates == null) return@LaunchedEffect
+        if (!isOnline(context)) {
+            return@LaunchedEffect
+        }
+        place = osmDataSource.getPlace(locationService.coordinates!!)
+    }
 
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, Context.MODE_PRIVATE)
@@ -120,7 +161,7 @@ fun AddTransactionScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
-                    label = { Text("Title") },
+                    label = { Text(stringResource(id = R.string.title)) },
                     value = title.value,
                     onValueChange = { title.value = it }, modifier = Modifier
                         .fillMaxWidth()
@@ -155,7 +196,7 @@ fun AddTransactionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = if (amount.value == 0.0) "" else amount.value.toString(),
                     onValueChange = { amount.value = it.toDoubleOrNull() ?: 0.0 },
-                    label = { Text(text = "Amount") },
+                    label = { Text(text = stringResource(id = R.string.amount)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
@@ -197,8 +238,24 @@ fun AddTransactionScreen(
                         .fillMaxWidth()
                         .height(100.dp)
                 )
-            }
 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.clickable {
+                        if (place == null) requestLocation()
+                        else {
+                            place = null
+                            locationService.resetLocation()
+                        }
+                    }
+                ) {
+                    Icon(if (place == null) Icons.Filled.AddLocationAlt else Icons.Filled.Close, contentDescription = null)
+                    Text(
+                        text = place?.displayName ?: stringResource(id = R.string.add_location)
+                    )
+                }
+            }
 
         }
 
@@ -217,11 +274,13 @@ fun AddTransactionScreen(
                             description = description.value,
                             type = selectedOption,
                             category = selectedOptionText,
-                            amount = amount.value,
+                            amount = currencyViewModel.convertToUSD(amount.value, ),
                             date = Date.from(
                                 date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
                             ),
                             periodic = false,
+                            latitude = locationService.coordinates?.latitude ?: 0.0,
+                            longitude = locationService.coordinates?.longitude ?: 0.0,
                             userId = userId
                         )
                     ).join()
@@ -252,6 +311,81 @@ fun AddTransactionScreen(
             }
         ) {
             Text(text = stringResource(id = R.string.add_transaction), fontSize = 20.sp)
+        }
+    }
+
+    if (showLocationDisabledAlert) {
+        AlertDialog(
+            title = { Text(stringResource(id = R.string.location_disabled)) },
+            text = { Text(stringResource(id = R.string.location_permission_is_required_to_locate_on_map)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    locationService.openLocationSettings()
+                    showLocationDisabledAlert = false
+                }) {
+                    Text(stringResource(id = R.string.enable))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationDisabledAlert = false }) {
+                    Text(stringResource(id = R.string.dismiss))
+                }
+            },
+            onDismissRequest = { showLocationDisabledAlert = false }
+        )
+    }
+
+    if (showPermissionDeniedAlert) {
+        AlertDialog(
+            title = { Text(stringResource(id = R.string.permission_denied)) },
+            text = { Text(stringResource(id = R.string.location_permission_is_required_to_locate_on_map)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    locationPermission.launchPermissionRequest()
+                    showPermissionDeniedAlert = false
+                }) {
+                    Text(stringResource(id = R.string.grant))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDeniedAlert = false }) {
+                    Text(stringResource(id = R.string.dismiss))
+                }
+            },
+            onDismissRequest = { showPermissionDeniedAlert = false }
+        )
+    }
+
+    if (showPermissionPermanentlyDeniedSnackbar) {
+        LaunchedEffect(snackbarHostState) {
+            val res = snackbarHostState.showSnackbar(
+                context.getString(R.string.location_permission_is_required_to_locate_on_map),
+                context.getString(R.string.go_to_settings),
+                duration = SnackbarDuration.Long
+            )
+            if (res == SnackbarResult.ActionPerformed) {
+                context.startActivity(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+            showPermissionPermanentlyDeniedSnackbar = false
+        }
+    }
+
+    if (showNoInternetConnectivitySnackbar) {
+        LaunchedEffect(snackbarHostState) {
+            val res = snackbarHostState.showSnackbar(
+                message = context.getString(R.string.no_internet_connectivity),
+                actionLabel = context.getString(R.string.go_to_settings),
+                duration = SnackbarDuration.Long
+            )
+            if (res == SnackbarResult.ActionPerformed) {
+                openWirelessSettings(context)
+            }
+            showNoInternetConnectivitySnackbar = false
         }
     }
 }

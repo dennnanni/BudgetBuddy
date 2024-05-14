@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.composables
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -52,6 +53,7 @@ fun TopBar(
         ),
         title = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
+                Log.d("Pippo", currentRoute.route)
                 ProfileHome(name = name, username = username, profilePic = profilePic, navController = navController)
             } else {
                 val title: String = currentRoute.title
@@ -61,7 +63,7 @@ fun TopBar(
                 ) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.headlineLarge,
+                        style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -78,6 +80,8 @@ fun TopBar(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
+            } else {
+                Log.d("Pippo", "No backstack")
             }
         },
         actions = {
@@ -98,7 +102,6 @@ fun BottomBar(
     navController: NavHostController,
     menuClick: () -> Unit,
 ) {
-    val context = LocalContext.current
 
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -125,14 +128,18 @@ fun BottomBar(
                     .clip(CircleShape)
             ) {
                 IconButton(
-                    onClick = { navController.navigate(BudgetBuddyRoute.AddTransaction.route) },
+                    onClick = {
+                        navController.navigate(BudgetBuddyRoute.AddTransaction.route) {
+                            launchSingleTop = true
+                        }
+                    },
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
                 ) {
                     Icon(
                         Icons.Filled.Add,
-                        "Add transaction",
+                        null,
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(40.dp)
                     )

@@ -139,7 +139,7 @@ fun NavigationDrawer(
                         coroutineScope.launch {
                             drawerState.close()
                         }
-                        //navController.navigate(BudgetBuddyRoute.Map.route)
+                        navController.navigate(BudgetBuddyRoute.Map.route)
                     }
                 )
 
@@ -153,6 +153,18 @@ fun NavigationDrawer(
                             drawerState.close()
                         }
                         //navController.navigate(BudgetBuddyRoute.Badges.route)
+                    }
+                )
+                NavigationDrawerItem(
+                    colors = colors,
+                    label = { Text("Test") },
+                    selected = false,
+                    icon = { Icon(Icons.Outlined.EmojiEvents, stringResource(R.string.badges)) },
+                    onClick = {
+                        coroutineScope.launch {
+                            drawerState.close()
+                        }
+                        navController.navigate(BudgetBuddyRoute.Test.route)
                     }
                 )
 

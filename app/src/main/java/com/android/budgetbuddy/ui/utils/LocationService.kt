@@ -51,6 +51,10 @@ class LocationService(private val ctx: Context) {
         }
     }
 
+    fun resetLocation() {
+        coordinates = null
+    }
+
     fun openLocationSettings() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK

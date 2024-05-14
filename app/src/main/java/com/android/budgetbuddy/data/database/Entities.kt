@@ -26,7 +26,9 @@ data class Transaction (
     @ColumnInfo val amount: Double,
     @ColumnInfo val date: Date,
     @ColumnInfo val periodic: Boolean,
-    @ColumnInfo val userId: Int
+    @ColumnInfo val userId: Int,
+    @ColumnInfo val latitude: Double = 0.0,
+    @ColumnInfo val longitude: Double = 0.0
 ) {
     val isExpense: Boolean
         get() {

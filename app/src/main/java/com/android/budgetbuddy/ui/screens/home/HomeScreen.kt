@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,6 +53,8 @@ import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
+import com.android.budgetbuddy.ui.utils.isOnline
+import com.android.budgetbuddy.ui.utils.openWirelessSettings
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
@@ -80,7 +83,6 @@ import java.util.Date
 
 const val TRANSACTION_PREVIEW_COUNT = 10
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -167,7 +169,12 @@ fun HomeScreen(
     val currency = currencyViewModel.getCurrency()
 
     userActions.loadCurrentUser(username)
-    val userId = userActions.getUserId() ?: return
+    //val userId = userActions.getUserId() ?: return
+    val userId = userActions.getUserId()
+    if (userId == null) {
+        Log.d("HomeScreen", "User ID is null")
+        return
+    }
     transactionActions.loadUserTransactions(userId)
     val transactions = transactionActions.getUserTransactions(userId)
 
@@ -339,6 +346,7 @@ fun HomeScreen(
                 ) {
                     val orderedList = transactionViewModel.userTransactions
                         .sortedByDescending { it.date }
+                        .sortedByDescending { it.id }
                         .take(TRANSACTION_PREVIEW_COUNT)
 
                     items(orderedList) {
@@ -353,23 +361,5 @@ fun HomeScreen(
                 }
             }
         }
-    }
-}
-
-fun isOnline(ctx: Context): Boolean {
-    val connectivityManager =
-        ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-    return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true || capabilities?.hasTransport(
-        NetworkCapabilities.TRANSPORT_WIFI
-    ) == true
-}
-
-fun openWirelessSettings(ctx: Context) {
-    val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    }
-    if (intent.resolveActivity(ctx.applicationContext.packageManager) != null) {
-        ctx.applicationContext.startActivity(intent)
     }
 }

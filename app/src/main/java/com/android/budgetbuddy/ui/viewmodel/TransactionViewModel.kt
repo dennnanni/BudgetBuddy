@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.repositories.TransactionRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -25,7 +24,6 @@ interface TransactionActions {
     fun loadMostPopularCategories(): Job
     fun getMostPopularCategories(): List<String>
 
-    fun deleteTransaction(transaction: Transaction): Job
     fun nukeTable(): Job
 
 }
@@ -68,10 +66,6 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
 
         override fun nukeTable(): Job = viewModelScope.launch {
             repository.nukeTable()
-        }
-
-        override fun deleteTransaction(transaction: Transaction): Job {
-            TODO("Not yet implemented")
         }
     }
 }

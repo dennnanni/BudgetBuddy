@@ -40,9 +40,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 
@@ -265,9 +267,9 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
             with(sharedPreferences.edit()) {
-                remove("username")
-                remove("name")
-                remove("profilePic")
+                remove(SPConstants.USERNAME)
+                remove(SPConstants.NAME)
+                remove(SPConstants.PROFILE_PIC)
                 apply()
             }
 
@@ -282,7 +284,7 @@ fun SettingsScreen(
             Text(
                 text = stringResource(id = R.string.logout),
                 style = TextStyle(
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onPrimary
                 )

@@ -22,7 +22,7 @@ interface UserActions {
     fun getUserId(): Int?
     fun login(username: String, password: String): Job
     fun getLoggedUser(): User?
-
+    suspend fun getUserByUsername(username: String): User?
     fun logout()
     fun loadCurrentUser(username: String): Job
 }
@@ -55,6 +55,10 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
         override fun getLoggedUser(): User? {
             return user.value
+        }
+
+        override suspend fun getUserByUsername(username: String): User? {
+            return repository.getUserByUsername(username)
         }
 
         override fun logout() {
