@@ -85,6 +85,21 @@ data class RegularTransaction(
         }
 }
 
+@Entity(tableName = "earned_badge",
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ])
+data class EarnedBadge(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo val userId: Int,
+    @ColumnInfo val badgeName: String,
+)
+
 class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {

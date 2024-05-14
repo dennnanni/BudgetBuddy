@@ -1,12 +1,13 @@
 package com.android.budgetbuddy.data.repositories
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.android.budgetbuddy.data.database.Category
 import com.android.budgetbuddy.data.database.CategoryDAO
+import com.android.budgetbuddy.data.database.EarnedBadge
+import com.android.budgetbuddy.data.database.EarnedBadgeDAO
 import com.android.budgetbuddy.data.database.RegularTransaction
 import com.android.budgetbuddy.data.database.RegularTransactionDAO
 import com.android.budgetbuddy.data.database.Transaction
@@ -92,4 +93,11 @@ class RegularTransactionRepository(private val regularTransactionDAO: RegularTra
     suspend fun getMostPopularCategories(): List<String> = regularTransactionDAO.getMostPopularCategories()
     suspend fun getUserTransactions(username: Int): List<RegularTransaction> = regularTransactionDAO.getUserTransactions(username)
     suspend fun nukeTable() = regularTransactionDAO.nukeTable()
+}
+
+class EarnedBadgeRepository(private val earnedBadgeDAO: EarnedBadgeDAO) {
+
+    suspend fun getUserBadges(userId: Int): List<EarnedBadge> = earnedBadgeDAO.getUserBadges(userId)
+    suspend fun upsert(badge: EarnedBadge) = earnedBadgeDAO.upsert(badge)
+    suspend fun delete(badge: EarnedBadge) = earnedBadgeDAO.delete(badge)
 }

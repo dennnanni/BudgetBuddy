@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,18 +36,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.badges.AllBadges
+import com.android.budgetbuddy.data.database.EarnedBadge
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import com.android.budgetbuddy.ui.composables.CustomDropDown
+import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
+import com.android.budgetbuddy.ui.viewmodel.EarnedBadgeViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -59,15 +65,17 @@ fun AddTransactionScreen(
     navController: NavHostController,
     userViewModel: UserViewModel,
     actions: TransactionActions,
-    categoryActions: CategoryActions
+    categoryActions: CategoryActions,
+    earnedBadgeViewModel: EarnedBadgeViewModel
 ) {
-    val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
+    val options =
+        listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
 
     var selectedOptionText by remember { mutableStateOf(String()) }
 
-    if(categoryActions.getCategories().isNotEmpty()){
+    if (categoryActions.getCategories().isNotEmpty()) {
         selectedOptionText = categoryActions.getCategories()[0].name
     } else {
         showDialog.value = true
@@ -80,16 +88,19 @@ fun AddTransactionScreen(
     val title = rememberSaveable { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, Context.MODE_PRIVATE)
+
 
     if (showDialog.value) {
-         AddCategory(
-             categoryActions,
-             onDismissRequest = {
-                 showDialog.value = false
-                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
-             },
-             userViewModel
-         )
+        AddCategory(
+            categoryActions,
+            onDismissRequest = {
+                showDialog.value = false
+                categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
+            },
+            userViewModel
+        )
     }
 
     // UI
@@ -159,11 +170,13 @@ fun AddTransactionScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if(categoryActions.getCategories().isNotEmpty()) {
-                        CustomDropDown(options = categoryActions.getCategories().map { it.name }, fun (it: String) {selectedOptionText = it})
+                    if (categoryActions.getCategories().isNotEmpty()) {
+                        CustomDropDown(
+                            options = categoryActions.getCategories().map { it.name },
+                            fun(it: String) { selectedOptionText = it })
                     }
                     IconButton(
-                        onClick = { showDialog.value = true},
+                        onClick = { showDialog.value = true },
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary),
@@ -213,6 +226,23 @@ fun AddTransactionScreen(
                         )
                     ).join()
                     actions.loadUserTransactions(userId).join()
+                    earnedBadgeViewModel.actions.loadEarnedBadges(userId).join()
+                    for (badge in AllBadges.badges) {
+                        if (earnedBadgeViewModel.earnedBadges.value.none { it.badgeName == badge.badgeName } &&
+                            badge.badgeLambda(actions.getUserTransactions(userId))
+                        ) {
+                            earnedBadgeViewModel.actions.addEarnedBadge(
+                                EarnedBadge(
+                                    badgeName = badge.badgeName,
+                                    userId = userId
+                                )
+                            ).join()
+                            with(sharedPreferences.edit()) {
+                                putString("badgeEarned", badge.badgeName)
+                                apply()
+                            }
+                        }
+                    }
                     navController.navigate(BudgetBuddyRoute.Home.route) {
                         popUpTo(BudgetBuddyRoute.Home.route) {
                             inclusive = true

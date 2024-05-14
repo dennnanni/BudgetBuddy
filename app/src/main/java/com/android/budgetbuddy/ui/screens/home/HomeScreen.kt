@@ -44,8 +44,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.badges.AllBadges
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.BadgePopup
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
@@ -100,6 +102,21 @@ fun HomeScreen(
     val alreadyTriedConnection = sharedPreferences.getBoolean(SPConstants.TRIED_CONNECTION, false)
     var showInternetRequiredSnackBar by remember { mutableStateOf(false) }
     var showConnectionIssuesSnackBar by remember { mutableStateOf(false) }
+
+    val showDialog = remember { mutableStateOf(sharedPreferences.getString("badgeEarned", "") != "") }
+
+    if (showDialog.value) {
+        BadgePopup(
+            AllBadges.badges.filter { it.badgeName == sharedPreferences.getString("badgeEarned", "") }[0],
+            onDismissRequest = {
+                showDialog.value = false
+                with(sharedPreferences.edit()) {
+                    remove("badgeEarned")
+                    apply()
+                }
+            }
+        )
+    }
 
     /* Gestione dell'aggiornamento dei tassi di cambio in modo che venga
     visualizzata la snackbar una sola volta */

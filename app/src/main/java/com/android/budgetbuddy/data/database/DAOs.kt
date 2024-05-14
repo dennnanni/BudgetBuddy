@@ -96,3 +96,16 @@ interface RegularTransactionDAO {
     @Query("DELETE FROM `regular_transaction`")
     suspend fun nukeTable()
 }
+
+@Dao
+interface EarnedBadgeDAO {
+
+    @Query("SELECT * FROM `earned_badge` WHERE userId = :userId")
+    suspend fun getUserBadges(userId: Int): List<EarnedBadge>
+
+    @Upsert
+    suspend fun upsert(earnedBadge: EarnedBadge)
+
+    @Delete
+    suspend fun delete(earnedBadge: EarnedBadge)
+}

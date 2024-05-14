@@ -28,6 +28,7 @@ import com.android.budgetbuddy.ui.screens.viewAll.AllRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.viewAll.AllTransactionsScreen
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.viewmodel.CategoryViewModel
+import com.android.budgetbuddy.ui.viewmodel.EarnedBadgeViewModel
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
@@ -109,6 +110,8 @@ fun BudgetBuddyNavGraph(
 
     val categoryActions = koinViewModel<CategoryViewModel>().actions
 
+    val earnedBadgeViewModel = koinViewModel<EarnedBadgeViewModel>()
+
     val currencyViewModel = koinViewModel<CurrencyViewModel>()
     val regularTransactionViewModel = koinViewModel<RegularTransactionViewModel>()
 
@@ -150,7 +153,8 @@ fun BudgetBuddyNavGraph(
                     navController,
                     userViewModel,
                     transactionViewModel.actions,
-                    categoryActions
+                    categoryActions,
+                    earnedBadgeViewModel
                 )
             }
         }
