@@ -1,7 +1,6 @@
 package com.android.budgetbuddy.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,7 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.budgetbuddy.data.remote.OSMDataSource
-import com.android.budgetbuddy.ui.screens.MapContent
+import com.android.budgetbuddy.ui.screens.MapScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.TestScreen
@@ -168,7 +167,6 @@ fun BudgetBuddyNavGraph(
                     transactionViewModel.actions,
                     categoryActions,
                     currencyViewModel,
-                    locationService,
                     snackbarHostState,
                     osmDataSource
                 )
@@ -261,7 +259,12 @@ fun BudgetBuddyNavGraph(
         }
         with(BudgetBuddyRoute.Map) {
             composable(route) {
-                MapContent(transactionViewModel.actions, locationService, snackbarHostState)
+                MapScreen(
+                    navController,
+                    transactionViewModel,
+                    locationService,
+                    snackbarHostState
+                )
             }
         }
         with(BudgetBuddyRoute.Test) {
@@ -269,7 +272,5 @@ fun BudgetBuddyNavGraph(
                 TestScreen(locationService, snackbarHostState)
             }
         }
-
-        // TODO: add other screens here
     }
 }

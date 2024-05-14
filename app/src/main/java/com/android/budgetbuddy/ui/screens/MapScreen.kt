@@ -1,11 +1,11 @@
 package com.android.budgetbuddy.ui.screens
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -15,30 +15,33 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.data.remote.OSMDataSource
+import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.utils.Coordinates
 import com.android.budgetbuddy.ui.utils.LocationService
 import com.android.budgetbuddy.ui.utils.PermissionStatus
-import com.android.budgetbuddy.ui.utils.openWirelessSettings
 import com.android.budgetbuddy.ui.utils.rememberPermission
-import com.android.budgetbuddy.ui.viewmodel.TransactionActions
-import com.utsman.osmandcompose.OpenStreetMap
-import com.utsman.osmandcompose.rememberCameraState
+import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
+import com.utsman.osmandcompose.rememberMapViewWithLifecycle
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
 
 val LATITUDE = 44.13
 val LONGITUDE = 12.23
 
 @Composable
-fun MapContent(
-    transactionActions: TransactionActions,
+fun MapScreen(
+    navController: NavHostController,
+    transactionViewModel: TransactionViewModel,
     locationService: LocationService,
     snackbarHostState: SnackbarHostState
 ) {
@@ -48,7 +51,8 @@ fun MapContent(
     var showLocationDisabledAlert by remember { mutableStateOf(false) }
     var showPermissionDeniedAlert by remember { mutableStateOf(false) }
     var showPermissionPermanentlyDeniedSnackbar by remember { mutableStateOf(false) }
-    var place: Coordinates? by remember { mutableStateOf(null) }
+    var latitude by remember { mutableDoubleStateOf(0.0) }
+    var longitude by remember { mutableDoubleStateOf(0.0) }
 
     val locationPermission = rememberPermission(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -84,23 +88,14 @@ fun MapContent(
 
     LaunchedEffect(locationService.coordinates) {
         if (locationService.coordinates == null) return@LaunchedEffect
-        place = locationService.coordinates ?: Coordinates(LATITUDE, LONGITUDE)
+        latitude = locationService.coordinates!!.latitude
+        longitude = locationService.coordinates!!.longitude
     }
 
-    // Creazione markers
-
-    if (place != null) {
-        val cameraState = rememberCameraState {
-            geoPoint = GeoPoint(place?.latitude ?: LATITUDE, place?.longitude ?: LONGITUDE)
-            zoom = 16.0 // optional, default is 5.0
-        }
-
-        Log.d("Pippo", "place: $place")
-
-        // add node
-        OpenStreetMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraState = cameraState
+    if (latitude != 0.0 || longitude != 0.0) {
+        MapViewComposable(navController = navController,
+            transactions = transactionViewModel.userTransactions,
+            center = Coordinates(latitude, longitude)
         )
     }
 
@@ -165,4 +160,35 @@ fun MapContent(
             showPermissionPermanentlyDeniedSnackbar = false
         }
     }
+}
+
+@Composable
+fun MapViewComposable(
+    transactions: List<Transaction>,
+    navController: NavHostController,
+    center: Coordinates = Coordinates(LATITUDE, LONGITUDE),
+) {
+    val mapView = rememberMapViewWithLifecycle()
+
+    val markers = transactions.map { transaction ->
+        Marker(mapView).apply {
+            position = GeoPoint(transaction.latitude, transaction.longitude)
+            setOnMarkerClickListener { _, _ ->
+                navController.navigate(BudgetBuddyRoute.TransactionDetails.buildRoute(transaction.id.toString()))
+                true
+            }
+            title = transaction.title
+        }
+    }
+
+    AndroidView(
+        factory = { mapView },
+        update = { view ->
+            // Update your MapView here
+            view.setMultiTouchControls(true)
+            view.controller.setZoom(15.0)
+            view.controller.setCenter(GeoPoint(center.latitude, center.longitude))
+            view.overlays.addAll(markers)
+        }
+    )
 }

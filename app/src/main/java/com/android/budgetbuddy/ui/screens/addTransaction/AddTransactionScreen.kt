@@ -1,10 +1,7 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.background
@@ -74,7 +71,6 @@ import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -86,7 +82,6 @@ fun AddTransactionScreen(
     actions: TransactionActions,
     categoryActions: CategoryActions,
     currencyViewModel: CurrencyViewModel,
-    locationService: LocationService,
     snackbarHostState: SnackbarHostState,
     osmDataSource: OSMDataSource
 ) {
@@ -94,6 +89,7 @@ fun AddTransactionScreen(
     val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
+    val locationService = remember { LocationService(context) }
 
     var selectedOptionText by remember { mutableStateOf(String()) }
 
@@ -151,8 +147,6 @@ fun AddTransactionScreen(
             return@LaunchedEffect
         }
         place = osmDataSource.getPlace(locationService.coordinates!!)
-        // set transaction location
-        // actions.setDestination(place.displayName)
     }
 
 
@@ -294,6 +288,8 @@ fun AddTransactionScreen(
                                 date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
                             ),
                             periodic = false,
+                            latitude = locationService.coordinates?.latitude ?: 0.0,
+                            longitude = locationService.coordinates?.longitude ?: 0.0,
                             userId = userId
                         )
                     ).join()
