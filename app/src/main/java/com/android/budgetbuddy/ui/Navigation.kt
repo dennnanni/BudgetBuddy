@@ -207,7 +207,7 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Login) {
             composable(route) {
-                LoginScreen(navController, userState, userViewModel.actions)
+                LoginScreen(navController, userViewModel.actions)
             }
         }
 

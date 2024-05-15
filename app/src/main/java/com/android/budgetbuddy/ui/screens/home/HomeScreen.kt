@@ -152,8 +152,7 @@ fun HomeScreen(
     val currency = currencyViewModel.getCurrency()
 
     userActions.loadCurrentUser(username)
-    //val userId = userActions.getUserId() ?: return
-    val userId = userActions.getUserId()
+    val userId = userActions.getLoggedUser()?.id
     if (userId == null) {
         Log.d("HomeScreen", "User ID is null")
         return

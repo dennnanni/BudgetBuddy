@@ -66,11 +66,12 @@ fun RegisterScreen(navController: NavHostController,
 
     if (actions.getLoggedUser() != null) {
         with(sharedPreferences.edit()) {
-            putString(SPConstants.USERNAME, username.value)
+            putString(SPConstants.USERNAME, username.value.trim())
             putString(SPConstants.NAME, actions.getLoggedUser()?.name)
             putString(SPConstants.PROFILE_PIC, actions.getLoggedUser()?.profilePic)
             apply()
         }
+
         navController.navigate(BudgetBuddyRoute.Home.route) {
             popUpTo(navController.graph.id) {
                 inclusive = true
@@ -145,12 +146,13 @@ fun RegisterScreen(navController: NavHostController,
 
                             actions.addUser(
                                 User(
-                                    name = fullName.value,
-                                    username = username.value,
-                                    password = password.value
+                                    name = fullName.value.trim(),
+                                    username = username.value.trim(),
+                                    password = password.value.trim()
                                 )
                             )
                             actions.loadCurrentUser(username.value)
+
                         }
                     }
                 }

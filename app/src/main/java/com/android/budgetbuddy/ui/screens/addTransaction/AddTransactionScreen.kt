@@ -297,8 +297,8 @@ fun AddTransactionScreen(
                     if (transaction == null) {
                         actions.addTransaction(
                             Transaction(
-                                title = title.value,
-                                description = description.value,
+                                title = title.value.trim(),
+                                description = description.value.trim(),
                                 type = selectedOption,
                                 category = selectedOptionText,
                                 amount = currencyViewModel.convertToUSD(amount.value),
@@ -312,8 +312,8 @@ fun AddTransactionScreen(
                             )
                         ).join()
                     } else {
-                        transaction.title = title.value
-                        transaction.description = description.value
+                        transaction.title = title.value.trim()
+                        transaction.description = description.value.trim()
                         transaction.type = selectedOption
                         transaction.category = selectedOptionText
                         transaction.amount = currencyViewModel.convertToUSD(amount.value)
