@@ -1,9 +1,12 @@
 package com.android.budgetbuddy.ui.screens.map
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.graphics.drawable.DrawableWrapperCompat
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -28,6 +31,7 @@ import com.android.budgetbuddy.ui.utils.Coordinates
 import com.android.budgetbuddy.ui.utils.LocationService
 import com.android.budgetbuddy.ui.utils.PermissionStatus
 import com.android.budgetbuddy.ui.utils.rememberPermission
+import com.android.budgetbuddy.ui.utils.resizeDrawable
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.utsman.osmandcompose.rememberMapViewWithLifecycle
 import org.osmdroid.util.GeoPoint
@@ -91,7 +95,9 @@ fun MapScreen(
     }
 
     if (latitude != 0.0 || longitude != 0.0) {
-        MapViewComposable(navController = navController,
+        MapViewComposable(
+            context = context,
+            navController = navController,
             transactions = transactionViewModel.userTransactions,
             center = Coordinates(latitude, longitude)
         )
@@ -162,6 +168,7 @@ fun MapScreen(
 
 @Composable
 fun MapViewComposable(
+    context: Context,
     transactions: List<Transaction>,
     navController: NavHostController,
     center: Coordinates = Coordinates(LATITUDE, LONGITUDE),
@@ -176,8 +183,10 @@ fun MapViewComposable(
                 true
             }
             title = transaction.title
+            icon = resizeDrawable(context, R.drawable.location_marker, 30, 30)
         }
     }
+
 
     AndroidView(
         factory = { mapView },
