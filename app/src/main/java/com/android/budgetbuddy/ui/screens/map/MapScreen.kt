@@ -183,7 +183,7 @@ fun MapViewComposable(
                 true
             }
             title = transaction.title
-            icon = resizeDrawable(context, R.drawable.location_marker, 30, 30)
+            icon = resizeDrawable(context, R.drawable.location_pin, 80, 101)
         }
     }
 
