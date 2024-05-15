@@ -267,7 +267,9 @@ fun BudgetBuddyNavGraph(
                     transaction,
                     navController,
                     currencyViewModel,
-                    transactionViewModel.actions
+                    transactionViewModel.actions,
+                    osmDataSource,
+                    userViewModel.actions.getUserId()
                 )
             }
         }

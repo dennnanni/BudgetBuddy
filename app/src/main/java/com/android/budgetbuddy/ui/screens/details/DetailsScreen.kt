@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -35,13 +37,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.data.remote.OSMDataSource
+import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.TransactionAlertDialog
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
+import com.android.budgetbuddy.ui.utils.Coordinates
+import com.android.budgetbuddy.ui.utils.isOnline
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import kotlinx.coroutines.launch
 
@@ -50,13 +57,25 @@ fun DetailsScreen(
     transaction: Transaction?,
     navController: NavController,
     currencyViewModel: CurrencyViewModel,
-    transactionActions: TransactionActions
+    transactionActions: TransactionActions,
+    osmDataSource: OSMDataSource,
+    userId: Int? = 0
 ) {
     if (transaction == null) return
     val context = LocalContext.current
 
     var openDeleteDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var place: OSMPlace? by remember { mutableStateOf(null) }
+    val coordinates by remember {mutableStateOf(Coordinates(transaction.latitude, transaction.longitude))}
+
+    LaunchedEffect(coordinates) {
+        if (coordinates.latitude == 0.0 && coordinates.longitude == 0.0) return@LaunchedEffect
+        if (!isOnline(context)) {
+            return@LaunchedEffect
+        }
+        place = osmDataSource.getPlace(coordinates)
+    }
 
     when {
         openDeleteDialog -> {
@@ -66,6 +85,7 @@ fun DetailsScreen(
                     openDeleteDialog = false
                     coroutineScope.launch {
                         transactionActions.removeTransaction(transaction).join()
+                        transactionActions.loadUserTransactions(userId!!).join()
 
                         navController.navigate(BudgetBuddyRoute.Home.route) {
                             popUpTo(BudgetBuddyRoute.Home.route) {
@@ -120,27 +140,44 @@ fun DetailsScreen(
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 DetailRow(
-                    context = context,
                     key = stringResource(R.string.type),
                     value = transaction.type
                 )
                 DetailRow(
-                    context = context,
                     key = stringResource(R.string.amount),
                     value = "${currencyViewModel.convert(transaction.amount)} ${currencyViewModel.getCurrency().getSymbol()}"
                 )
                 DetailRow(
-                    context = context,
                     key = stringResource(R.string.date),
                     value = transaction.date.toString()
                 )
                 DetailRow(
-                    context = context,
                     key = stringResource(R.string.category),
                     value = transaction.category
                 )
 
                 Spacer(modifier = Modifier.padding(5.dp))
+
+                if (transaction.latitude != 0.0 && transaction.longitude != 0.0) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.location),
+                            style = TextStyle(
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                            )
+                        )
+                        Text(
+                            text = if (place == null) {
+                                "(${transaction.latitude}, ${transaction.longitude})"
+                            } else {
+                                place!!.displayName
+                            },
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
                 if (transaction.description.isNotEmpty()) {
                     Column {
@@ -209,7 +246,7 @@ fun DetailsScreen(
 }
 
 @Composable
-fun DetailRow(context: Context, key: String, value: String) {
+fun DetailRow(key: String, value: String) {
     Row(
         modifier = Modifier
             .padding(0.dp, 5.dp)
@@ -225,8 +262,11 @@ fun DetailRow(context: Context, key: String, value: String) {
             )
         )
 
+        Spacer(modifier = Modifier.width(10.dp))
+
         Text(
             text = value,
+            textAlign = TextAlign.End,
             style = MaterialTheme.typography.bodyMedium
         )
     }
