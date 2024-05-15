@@ -39,6 +39,7 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.utils.SPConstants
+import com.android.budgetbuddy.ui.utils.hashPassword
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.android.budgetbuddy.ui.viewmodel.UserState
 import kotlinx.coroutines.launch
@@ -107,7 +108,7 @@ fun LoginScreen(navController: NavHostController, actions: UserActions) {
                 ),
                 onClick = {
                     coroutineScope.launch {
-                        actions.login(username.value.trim(), password.value.trim()).join()
+                        actions.login(username.value.trim(), hashPassword(password.value.trim())).join()
                         if (actions.getLoggedUser() == null) {
                             invalidCredentials = true
                         }
