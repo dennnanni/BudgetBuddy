@@ -159,7 +159,7 @@ fun HomeScreen(
         return
     }
     transactionActions.loadUserTransactions(userId)
-    val transactions = transactionActions.getUserTransactions(userId)
+    val transactions = transactionActions.getUserTransactions()
 
     regularTransactionViewModel.actions.loadUserTransactions(userId)
     val regularTransactions = regularTransactionViewModel.actions.getUserTransactions(userId)

@@ -20,7 +20,7 @@ interface TransactionActions {
     fun removeTransaction(transaction: Transaction): Job
 
     fun loadUserTransactions(userId: Int): Job
-    fun getUserTransactions(userId: Int): List<Transaction>
+    fun getUserTransactions(): List<Transaction>
     fun loadMostPopularCategories(): Job
     fun getMostPopularCategories(): List<String>
 
@@ -52,7 +52,7 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
             userTransactions = repository.getUserTransactions(userId)
         }
 
-        override fun getUserTransactions(userId: Int): List<Transaction> {
+        override fun getUserTransactions(): List<Transaction> {
             return userTransactions
         }
 

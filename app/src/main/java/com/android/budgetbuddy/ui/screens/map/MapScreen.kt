@@ -1,11 +1,9 @@
-package com.android.budgetbuddy.ui.screens
+package com.android.budgetbuddy.ui.screens.map
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState

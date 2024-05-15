@@ -55,6 +55,10 @@ class LocationService(private val ctx: Context) {
         coordinates = null
     }
 
+    fun setLocation(latitude: Double, longitude: Double) {
+        coordinates = Coordinates(latitude, longitude)
+    }
+
     fun openLocationSettings() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK

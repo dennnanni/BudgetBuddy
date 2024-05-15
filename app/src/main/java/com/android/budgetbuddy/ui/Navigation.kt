@@ -14,7 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.budgetbuddy.data.remote.OSMDataSource
-import com.android.budgetbuddy.ui.screens.MapScreen
+import com.android.budgetbuddy.ui.screens.map.MapScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.TestScreen
@@ -75,10 +75,7 @@ sealed class BudgetBuddyRoute(
         BudgetBuddyRoute("regular_transactions", "Regular transactions")
 
     data object Map : BudgetBuddyRoute("map", "Map")
-    data object Test : BudgetBuddyRoute("test", "Test")
 
-
-    // TODO: add other routes here
 
     companion object {
         // TODO: add other routes here
@@ -95,7 +92,6 @@ sealed class BudgetBuddyRoute(
             RegularTransactions,
             AddRegularTransaction,
             Map,
-            Test
         )
         val bottomBarRoutes = setOf(
             Home,
@@ -169,6 +165,24 @@ fun BudgetBuddyNavGraph(
                     currencyViewModel,
                     snackbarHostState,
                     osmDataSource
+                )
+            }
+        }
+
+        with(BudgetBuddyRoute.EditTransaction) {
+            composable(route, args) { backStackEntry ->
+                val transaction = transactionsState.transactions.find {
+                    it.id == backStackEntry.arguments?.getString("transactionId")?.toInt()
+                }
+                AddTransactionScreen(
+                    navController,
+                    userViewModel,
+                    transactionViewModel.actions,
+                    categoryActions,
+                    currencyViewModel,
+                    snackbarHostState,
+                    osmDataSource,
+                    transaction
                 )
             }
         }
@@ -265,11 +279,6 @@ fun BudgetBuddyNavGraph(
                     locationService,
                     snackbarHostState
                 )
-            }
-        }
-        with(BudgetBuddyRoute.Test) {
-            composable(route) {
-                TestScreen(locationService, snackbarHostState)
             }
         }
     }

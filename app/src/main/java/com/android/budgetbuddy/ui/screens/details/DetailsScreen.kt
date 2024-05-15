@@ -173,7 +173,9 @@ fun DetailsScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = Modifier.size(150.dp, 40.dp),
-                onClick = { /*TODO*/ }
+                onClick = {
+                    navController.navigate(BudgetBuddyRoute.EditTransaction.buildRoute(transaction.id.toString()))
+                }
             ) {
                 Text(
                     text = stringResource(R.string.edit),

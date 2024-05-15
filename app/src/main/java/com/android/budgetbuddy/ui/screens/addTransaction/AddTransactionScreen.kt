@@ -85,7 +85,8 @@ fun AddTransactionScreen(
     categoryActions: CategoryActions,
     currencyViewModel: CurrencyViewModel,
     snackbarHostState: SnackbarHostState,
-    osmDataSource: OSMDataSource
+    osmDataSource: OSMDataSource,
+    transaction: Transaction? = null
 ) {
     val context = LocalContext.current
     val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
@@ -101,11 +102,19 @@ fun AddTransactionScreen(
         showDialog.value = true
     }
 
-    val amount: MutableState<Double> = remember { mutableDoubleStateOf(0.0) }
-    val date = remember { mutableStateOf(LocalDate.now()) }
-    var expanded by remember { mutableStateOf(false) }
-    val description = rememberSaveable { mutableStateOf("") }
-    val title = rememberSaveable { mutableStateOf("") }
+    val amount: MutableState<Double> = remember { mutableDoubleStateOf(transaction?.amount ?: 0.0) }
+    val tmp = if (transaction?.date == null) {
+        LocalDate.now()
+    } else {
+        transaction.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+    if (transaction != null && transaction.latitude != 0.0) {
+        locationService.setLocation(transaction.latitude, transaction.longitude)
+    }
+    val date: MutableState<LocalDate> = remember { mutableStateOf(tmp) }
+    val description = rememberSaveable { mutableStateOf(transaction?.description ?: "") }
+    val title = rememberSaveable { mutableStateOf(transaction?.title ?: "") }
+
     val coroutineScope = rememberCoroutineScope()
 
     var showLocationDisabledAlert by remember { mutableStateOf(false) }
@@ -220,7 +229,7 @@ fun AddTransactionScreen(
                 )
 
                 CustomDatePicker(
-                    value = date.value,
+                    value = LocalDate.from(date.value),
                     onValueChange = { date.value = it },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -285,22 +294,36 @@ fun AddTransactionScreen(
                 val userId = userViewModel.actions.getUserId() ?: return@Button
 
                 coroutineScope.launch {
-                    actions.addTransaction(
-                        Transaction(
-                            title = title.value,
-                            description = description.value,
-                            type = selectedOption,
-                            category = selectedOptionText,
-                            amount = currencyViewModel.convertToUSD(amount.value, ),
-                            date = Date.from(
-                                date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
-                            ),
-                            periodic = false,
-                            latitude = locationService.coordinates?.latitude ?: 0.0,
-                            longitude = locationService.coordinates?.longitude ?: 0.0,
-                            userId = userId
+                    if (transaction == null) {
+                        actions.addTransaction(
+                            Transaction(
+                                title = title.value,
+                                description = description.value,
+                                type = selectedOption,
+                                category = selectedOptionText,
+                                amount = currencyViewModel.convertToUSD(amount.value),
+                                date = Date.from(
+                                    date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                                ),
+                                periodic = false,
+                                latitude = locationService.coordinates?.latitude ?: 0.0,
+                                longitude = locationService.coordinates?.longitude ?: 0.0,
+                                userId = userId
+                            )
+                        ).join()
+                    } else {
+                        transaction.title = title.value
+                        transaction.description = description.value
+                        transaction.type = selectedOption
+                        transaction.category = selectedOptionText
+                        transaction.amount = currencyViewModel.convertToUSD(amount.value)
+                        transaction.date = Date.from(
+                            date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
                         )
-                    ).join()
+                        transaction.latitude = locationService.coordinates?.latitude ?: 0.0
+                        transaction.longitude = locationService.coordinates?.longitude ?: 0.0
+                        actions.addTransaction(transaction).join()
+                    }
                     actions.loadUserTransactions(userId).join()
                     navController.navigate(BudgetBuddyRoute.Home.route) {
                         popUpTo(BudgetBuddyRoute.Home.route) {
@@ -310,7 +333,10 @@ fun AddTransactionScreen(
                 }
             }
         ) {
-            Text(text = stringResource(id = R.string.add_transaction), fontSize = 20.sp)
+            Text(text = stringResource(id =
+                if (transaction == null) R.string.add_transaction
+                else R.string.edit_transaction
+            ), fontSize = 20.sp)
         }
     }
 
