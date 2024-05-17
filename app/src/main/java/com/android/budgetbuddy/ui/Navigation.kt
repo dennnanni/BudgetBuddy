@@ -17,7 +17,6 @@ import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.ui.screens.map.MapScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
-import com.android.budgetbuddy.ui.screens.addTransaction.TestScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
@@ -78,7 +77,6 @@ sealed class BudgetBuddyRoute(
 
 
     companion object {
-        // TODO: add other routes here
         val routes = setOf(
             Register,
             Login,

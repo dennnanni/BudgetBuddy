@@ -25,7 +25,9 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = BrightPink,
     secondary = LightPink,
+    onSecondary = Color.Black,
     surface = LightGreen,
+    onSurface = Color.Black,
     tertiaryContainer = Sand,
     background = Color(0xFFFFFBFE),
 

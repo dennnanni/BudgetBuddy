@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -94,12 +95,12 @@ fun AddTransactionScreen(
     var selectedOption by remember { mutableStateOf(options[0]) }
     val locationService = remember { LocationService(context) }
 
-    var selectedOptionText by remember { mutableStateOf(String()) }
+    var selectedOptionText by remember { mutableStateOf("") }
 
-    if(categoryActions.getCategories().isNotEmpty()){
-        selectedOptionText = categoryActions.getCategories()[0].name
-    } else {
+    if (categoryActions.getCategories().isEmpty()) {
         showDialog.value = true
+    } else if (selectedOptionText == "") {
+        selectedOptionText = categoryActions.getCategories()[0].name
     }
 
     val amount: MutableState<Double> = remember { mutableDoubleStateOf(transaction?.amount ?: 0.0) }
@@ -295,6 +296,7 @@ fun AddTransactionScreen(
 
                 coroutineScope.launch {
                     if (transaction == null) {
+                        Log.d("Pippo", "selectedOptionText: $selectedOptionText")
                         actions.addTransaction(
                             Transaction(
                                 title = title.value.trim(),

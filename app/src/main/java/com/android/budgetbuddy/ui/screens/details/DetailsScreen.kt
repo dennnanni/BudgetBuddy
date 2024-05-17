@@ -86,7 +86,6 @@ fun DetailsScreen(
                     coroutineScope.launch {
                         transactionActions.removeTransaction(transaction).join()
                         transactionActions.loadUserTransactions(userId!!).join()
-
                         navController.navigate(BudgetBuddyRoute.Home.route) {
                             popUpTo(BudgetBuddyRoute.Home.route) {
                                 inclusive = true

@@ -65,4 +65,7 @@
     <string name="edit_transaction">Edit transaction</string>
     <string name="location">Location</string>
     <string name="invalid_credentials">Invalid credentials</string>
+    <string name="filters">Filters</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
 </resources>
