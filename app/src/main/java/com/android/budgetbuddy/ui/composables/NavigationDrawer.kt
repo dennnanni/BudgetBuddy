@@ -55,7 +55,7 @@ fun NavigationDrawer(
     val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, 0)
 
     val colors = NavigationDrawerItemDefaults.colors(
-        unselectedContainerColor = MaterialTheme.colorScheme.onPrimary,
+        unselectedContainerColor = MaterialTheme.colorScheme.background,
         selectedContainerColor = MaterialTheme.colorScheme.secondary,
         unselectedTextColor = MaterialTheme.colorScheme.onBackground,
         selectedTextColor = MaterialTheme.colorScheme.onSecondary,
@@ -70,7 +70,7 @@ fun NavigationDrawer(
             ModalDrawerSheet(
                 modifier = Modifier.width(250.dp),
                 drawerShape = RectangleShape,
-                drawerContainerColor = MaterialTheme.colorScheme.onPrimary,
+                drawerContainerColor = MaterialTheme.colorScheme.background,
             ) {
                 val name = sharedPreferences.getString(SPConstants.NAME, null) ?: ""
                 val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: ""

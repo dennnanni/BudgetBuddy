@@ -64,11 +64,13 @@ fun ExpandableSectionContainer(
             Text(
                 text,
                 style = textStyle,
+                color = MaterialTheme.colorScheme.onSecondary,
                 modifier = Modifier.padding(10.dp)
             )
             Icon(
                 if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondary,
                 modifier = Modifier.padding(10.dp)
             )
         }

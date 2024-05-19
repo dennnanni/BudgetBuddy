@@ -116,7 +116,10 @@ fun BottomBar(
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                Icon(Icons.Filled.Menu, stringResource(R.string.menu))
+                Icon(
+                    Icons.Filled.Menu, stringResource(R.string.menu),
+                    tint = MaterialTheme.colorScheme.onSecondary
+                )
             }
 
             Surface(
@@ -145,17 +148,17 @@ fun BottomBar(
 
             IconButton(
                 onClick = {
-                    /*with(sharedPreferences.edit()) {
-                        remove("username")
-                        apply()
-                    }*/
                     navController.navigate(BudgetBuddyRoute.Profile.route)
                 },
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.secondary)
             ) {
-                Icon(Icons.Filled.Person, stringResource(R.string.profile))
+                Icon(
+                    Icons.Filled.Person,
+                    stringResource(R.string.profile),
+                    tint = MaterialTheme.colorScheme.onSecondary
+                )
             }
 
         }
