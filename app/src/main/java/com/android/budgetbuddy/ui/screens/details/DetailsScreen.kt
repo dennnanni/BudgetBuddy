@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.LoadingAnimation
 import com.android.budgetbuddy.ui.composables.TransactionAlertDialog
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.Coordinates
@@ -61,185 +64,200 @@ fun DetailsScreen(
     osmDataSource: OSMDataSource,
     userId: Int? = 0
 ) {
-    if (transaction == null) return
     val context = LocalContext.current
 
     var openDeleteDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     var place: OSMPlace? by remember { mutableStateOf(null) }
-    val coordinates by remember {mutableStateOf(Coordinates(transaction.latitude, transaction.longitude))}
 
-    LaunchedEffect(coordinates) {
-        if (coordinates.latitude == 0.0 && coordinates.longitude == 0.0) return@LaunchedEffect
-        if (!isOnline(context)) {
-            return@LaunchedEffect
+    if (transaction != null) {
+        val coordinates by remember {mutableStateOf(Coordinates(transaction.latitude, transaction.longitude))}
+
+        LaunchedEffect(coordinates) {
+            if (coordinates.latitude == 0.0 && coordinates.longitude == 0.0) return@LaunchedEffect
+            if (!isOnline(context)) {
+                return@LaunchedEffect
+            }
+            place = osmDataSource.getPlace(coordinates)
         }
-        place = osmDataSource.getPlace(coordinates)
-    }
 
-    when {
-        openDeleteDialog -> {
-            TransactionAlertDialog(
-                onDismissRequest = { openDeleteDialog = false },
-                onConfirmation = {
-                    openDeleteDialog = false
-                    coroutineScope.launch {
-                        transactionActions.removeTransaction(transaction).join()
-                        transactionActions.loadUserTransactions(userId!!).join()
-                        navController.navigate(BudgetBuddyRoute.Home.route) {
-                            popUpTo(BudgetBuddyRoute.Home.route) {
-                                inclusive = true
-                            }
+        when {
+            openDeleteDialog -> {
+                TransactionAlertDialog(
+                    onDismissRequest = { openDeleteDialog = false },
+                    onConfirmation = {
+                        openDeleteDialog = false
+                        coroutineScope.launch {
+                            transactionActions.removeTransaction(transaction).join()
+                            transactionActions.loadUserTransactions(userId!!).join()
+                            navController.popBackStack()
+                        }
+                    },
+                    dialogTitle = context.getString(R.string.delete_transaction, transaction.title),
+                    dialogText = context.getString(R.string.delete_transaction_message),
+                    icon = Icons.Default.WarningAmber
+                )
+            }
+        }
+
+
+        Column {
+            Card(
+                shape = RoundedCornerShape(30.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.default_propic),
+                            contentDescription = stringResource(R.string.category_icon),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .size(50.dp)
+                        )
+
+                        Text(
+                            text = transaction.title,
+                            style = TextStyle(
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.padding(10.dp))
+
+                    DetailRow(
+                        key = stringResource(R.string.type),
+                        value = transaction.type
+                    )
+                    DetailRow(
+                        key = stringResource(R.string.amount),
+                        value = "${currencyViewModel.convert(transaction.amount)} ${
+                            currencyViewModel.getCurrency().getSymbol()
+                        }"
+                    )
+                    DetailRow(
+                        key = stringResource(R.string.date),
+                        value = transaction.date.toString()
+                    )
+                    DetailRow(
+                        key = stringResource(R.string.category),
+                        value = transaction.category
+                    )
+
+                    Spacer(modifier = Modifier.padding(5.dp))
+
+                    if (transaction.latitude != 0.0 && transaction.longitude != 0.0) {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.location),
+                                style = TextStyle(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                )
+                            )
+                            Text(
+                                text = if (place == null) {
+                                    "(${transaction.latitude}, ${transaction.longitude})"
+                                } else {
+                                    place!!.displayName
+                                },
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+                    if (transaction.description.isNotEmpty()) {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.description),
+                                style = TextStyle(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                                )
+                            )
+
+                            Text(
+                                text = transaction.description,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
-                },
-                dialogTitle = context.getString(R.string.delete_transaction, transaction.title),
-                dialogText = context.getString(R.string.delete_transaction_message),
-                icon = Icons.Default.WarningAmber
-            )
-        }
-    }
+                }
+            }
 
-    Column {
-        Card(
-            shape = RoundedCornerShape(30.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .wrapContentHeight()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+            Row(
+                modifier = Modifier
+                    .padding(16.dp, 0.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
-                    modifier = Modifier.fillMaxWidth()
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    modifier = Modifier.size(150.dp, 40.dp),
+                    onClick = {
+                        navController.navigate(
+                            BudgetBuddyRoute.EditTransaction.buildRoute(
+                                transaction.id.toString()
+                            )
+                        )
+                    }
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.default_propic),
-                        contentDescription = stringResource(R.string.category_icon),
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .size(50.dp)
-                    )
-
                     Text(
-                        text = transaction.title,
+                        text = stringResource(R.string.edit),
                         style = TextStyle(
                             fontWeight = FontWeight.ExtraBold,
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
                         )
                     )
                 }
 
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                DetailRow(
-                    key = stringResource(R.string.type),
-                    value = transaction.type
-                )
-                DetailRow(
-                    key = stringResource(R.string.amount),
-                    value = "${currencyViewModel.convert(transaction.amount)} ${currencyViewModel.getCurrency().getSymbol()}"
-                )
-                DetailRow(
-                    key = stringResource(R.string.date),
-                    value = transaction.date.toString()
-                )
-                DetailRow(
-                    key = stringResource(R.string.category),
-                    value = transaction.category
-                )
-
-                Spacer(modifier = Modifier.padding(5.dp))
-
-                if (transaction.latitude != 0.0 && transaction.longitude != 0.0) {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.location),
-                            style = TextStyle(
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                            )
-                        )
-                        Text(
-                            text = if (place == null) {
-                                "(${transaction.latitude}, ${transaction.longitude})"
-                            } else {
-                                place!!.displayName
-                            },
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    modifier = Modifier.size(150.dp, 40.dp),
+                    onClick = {
+                        openDeleteDialog = true
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-
-                if (transaction.description.isNotEmpty()) {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.description),
-                            style = TextStyle(
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                            )
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete),
+                        style = TextStyle(
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
                         )
-
-                        Text(
-                            text = transaction.description,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    )
                 }
             }
         }
-
-        Row(
-            modifier = Modifier
-                .padding(16.dp, 0.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                modifier = Modifier.size(150.dp, 40.dp),
-                onClick = {
-                    navController.navigate(BudgetBuddyRoute.EditTransaction.buildRoute(transaction.id.toString()))
-                }
-            ) {
-                Text(
-                    text = stringResource(R.string.edit),
-                    style = TextStyle(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                    )
-                )
-            }
-
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                modifier = Modifier.size(150.dp, 40.dp),
-                onClick = {
-                    openDeleteDialog = true
-                }
-            ) {
-                Text(
-                    text = stringResource(R.string.delete),
-                    style = TextStyle(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                    )
-                )
-            }
+            LoadingAnimation()
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(stringResource(id = R.string.deleting_transaction))
         }
     }
 }

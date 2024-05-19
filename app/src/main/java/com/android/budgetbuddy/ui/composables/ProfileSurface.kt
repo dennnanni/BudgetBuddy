@@ -75,9 +75,8 @@ fun ProfileProfile(name: String, username: String, profilePic: String, launch: M
     ) {
         Box {
             Image(
-                painter = rememberAsyncImagePainter(
-                    model = Uri.parse(profilePic)  // or ht
-                ),
+                painter = if (profilePic.isNotEmpty()) rememberAsyncImagePainter(
+                    model = Uri.parse(profilePic)) else painterResource(id = R.drawable.default_propic),
                 contentScale = ContentScale.Crop,
                 contentDescription = stringResource(id = R.string.profile_picture),
                 modifier = Modifier

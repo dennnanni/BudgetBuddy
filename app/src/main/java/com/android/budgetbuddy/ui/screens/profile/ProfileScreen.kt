@@ -53,6 +53,9 @@ fun ProfileScreen(
     val name = sharedPreferences.getString(SPConstants.NAME, null) ?: ""
     val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: ""
     val profilePic = sharedPreferences.getString(SPConstants.PROFILE_PIC, null) ?: ""
+
+    transactionActions.loadMostPopularCategories()
+
     if(userActions.getLoggedUser() == null){
         userActions.loadCurrentUser(username)
     }
@@ -88,44 +91,44 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.size(20.dp))
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(25.dp),
-        ) {
-            Text(
-                text = stringResource(id = R.string.most_expenses_in) + ":", style = TextStyle(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(30.dp)
+        if (transactionActions.getMostPopularCategories().isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(25.dp),
             ) {
-                transactionActions.loadMostPopularCategories()
-                for (transaction in transactionActions.getMostPopularCategories()) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                Text(
+                    text = stringResource(id = R.string.most_expenses_in) + ":", style = TextStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
 
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.default_propic),
-                            contentDescription = R.string.category_icon.toString(),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .size(50.dp)
-                        )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(30.dp)
+                ) {
+                    for (transaction in transactionActions.getMostPopularCategories()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
 
-                        Text(text = transaction, fontWeight = FontWeight.Bold)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.default_propic),
+                                contentDescription = R.string.category_icon.toString(),
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .size(50.dp)
+                            )
+
+                            Text(text = transaction, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
         }
-
         Spacer(modifier = Modifier.size(20.dp))
 
         Button(onClick = {

@@ -296,7 +296,6 @@ fun AddTransactionScreen(
 
                 coroutineScope.launch {
                     if (transaction == null) {
-                        Log.d("Pippo", "selectedOptionText: $selectedOptionText")
                         actions.addTransaction(
                             Transaction(
                                 title = title.value.trim(),
