@@ -76,4 +76,7 @@
     <string name="category_name">Category name</string>
     <string name="add_category">Add a category</string>
     <string name="deleting_transaction">Deleting transaction</string>
+    <string name="choose_an_option">Choose an option</string>
+    <string name="take_picture">Take a picture</string>
+    <string name="choose_from_files">Choose from files</string>
 </resources>

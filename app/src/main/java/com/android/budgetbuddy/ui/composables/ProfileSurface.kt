@@ -69,7 +69,8 @@ fun ProfileHome(
 }
 
 @Composable
-fun ProfileProfile(name: String, username: String, profilePic: String, launch: ManagedActivityResultLauncher<String, Uri?>) {
+fun ProfileProfile(name: String, username: String, profilePic: String, onEditClick: () -> Unit) {
+// launch: ManagedActivityResultLauncher<String, Uri?>) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -84,7 +85,7 @@ fun ProfileProfile(name: String, username: String, profilePic: String, launch: M
                     .size(150.dp)
             )
             IconButton(
-                onClick = { launch.launch("image/*") },
+                onClick = { onEditClick() },
                 modifier = Modifier
                     .offset(x = 110.dp, y = 110.dp)
                     .clip(CircleShape)
