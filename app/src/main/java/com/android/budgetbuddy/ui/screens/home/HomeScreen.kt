@@ -73,6 +73,7 @@ import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -233,6 +234,7 @@ fun HomeScreen(
             label = null,
             guideline = null
         ),
+        persistentMarkers = if (transactionViewModel.userTransactions.size == 1) mapOf(0f to marker) else null,
     )
     val scrollState = rememberVicoScrollState(
         initialScroll = Scroll.Absolute.End,

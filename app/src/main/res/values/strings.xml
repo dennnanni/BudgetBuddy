@@ -65,7 +65,14 @@
     <string name="edit_transaction">Edit transaction</string>
     <string name="location">Location</string>
     <string name="invalid_credentials">Invalid credentials</string>
-    <string name="filters">Filters</string>
+    <string name="filter">Filter</string>
     <string name="from">From</string>
     <string name="to">To</string>
+    <string name="apply">Apply</string>
+    <string name="clear">Clear</string>
+    <string name="by_date">By date</string>
+    <string name="by_type">By type</string>
+    <string name="by_category">By category</string>
+    <string name="category_name">Category name</string>
+    <string name="add_category">Add a category</string>
 </resources>

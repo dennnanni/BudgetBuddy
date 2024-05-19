@@ -43,7 +43,7 @@ import java.time.LocalDate
 fun ExpandableSectionContainer(
     expanded: Boolean,
     onExpandedChange: () -> Unit,
-    text: String = stringResource(id = R.string.filters),
+    text: String = stringResource(id = R.string.filter),
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     content: @Composable () -> Unit = { Spacer(modifier = Modifier.height(20.dp)) }
 ) {
@@ -137,16 +137,40 @@ fun RangeDateFilter(
 }
 
 @Composable
-fun TypeFilter() {
-
+fun TypeFilter(
+    types: List<String>,
+    selectedTypes: List<String>,
+    onTypeSelected: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+    ) {
+        types.forEach { type ->
+            val selected = selectedTypes.contains(type)
+            FilterChip(
+                selected = selected,
+                onClick = { onTypeSelected(type) },
+                label = { Text(type) },
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    labelColor = MaterialTheme.colorScheme.onBackground,
+                    selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSecondary
+                ),
+                modifier = Modifier.padding(end = 5.dp)
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CategoryFilter(
-    categories: List<String>,
-    selectedCategories: List<String>,
-    onCategorySelected: (String) -> Unit
+    categories: List<Pair<Int, String>>,
+    selectedCategories: List<Pair<Int, String>>,
+    onCategorySelected: (Pair<Int, String>) -> Unit
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.Start,
@@ -157,14 +181,14 @@ fun CategoryFilter(
             FilterChip(
                 selected = selected,
                 onClick = { onCategorySelected(category) },
-                label = { Text(category) },
+                label = { Text(category.second) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     labelColor = MaterialTheme.colorScheme.onBackground,
                     selectedContainerColor = MaterialTheme.colorScheme.secondary,
                     selectedLabelColor = MaterialTheme.colorScheme.onSecondary
                 ),
-                modifier = Modifier.then( if(categories.last() == category) Modifier.padding(end = 0.dp) else Modifier.padding(end = 5.dp))
+                modifier = Modifier.padding(end = 5.dp)
             )
         }
     }
