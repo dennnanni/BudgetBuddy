@@ -127,7 +127,7 @@ fun NavigationDrawer(
                         coroutineScope.launch {
                             drawerState.close()
                         }
-                        //navController.navigate(BudgetBuddyRoute.Charts.route)
+                        navController.navigate(BudgetBuddyRoute.Charts.route)
                     }
                 )
 

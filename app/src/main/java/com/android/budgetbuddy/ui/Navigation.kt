@@ -17,6 +17,10 @@ import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.ui.screens.map.MapScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
+import com.android.budgetbuddy.ui.screens.changeInfo.ChangeName
+import com.android.budgetbuddy.ui.screens.changeInfo.ChangePassword
+import com.android.budgetbuddy.ui.screens.changeInfo.ChangeUsername
+import com.android.budgetbuddy.ui.screens.charts.ChartsScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
@@ -74,6 +78,10 @@ sealed class BudgetBuddyRoute(
         BudgetBuddyRoute("regular_transactions", "Regular transactions")
 
     data object Map : BudgetBuddyRoute("map", "Map")
+    data object Charts : BudgetBuddyRoute("charts", "Charts")
+    data object ChangeName : BudgetBuddyRoute("change/name", "Change name")
+    data object ChangeUsername : BudgetBuddyRoute("change/username", "Change username")
+    data object ChangePassword : BudgetBuddyRoute("change/password", "Change password")
 
 
     companion object {
@@ -90,6 +98,10 @@ sealed class BudgetBuddyRoute(
             RegularTransactions,
             AddRegularTransaction,
             Map,
+            Charts,
+            ChangeName,
+            ChangeUsername,
+            ChangePassword
         )
         val bottomBarRoutes = setOf(
             Home,
@@ -281,5 +293,35 @@ fun BudgetBuddyNavGraph(
                 )
             }
         }
+        with(BudgetBuddyRoute.Charts) {
+            composable(route) {
+                ChartsScreen(
+                    navController,
+                    transactionViewModel,
+                )
+            }
+        }
+        with(BudgetBuddyRoute.ChangeName) {
+            composable(route) {
+                ChangeName(
+                    userViewModel.actions
+                )
+            }
+        }
+        with(BudgetBuddyRoute.ChangeUsername) {
+            composable(route) {
+                ChangeUsername(
+                    userViewModel.actions
+                )
+            }
+        }
+        with(BudgetBuddyRoute.ChangePassword) {
+            composable(route) {
+                ChangePassword(
+                    userViewModel.actions
+                )
+            }
+        }
+
     }
 }
