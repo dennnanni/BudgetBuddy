@@ -255,7 +255,7 @@ fun DetailsScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LoadingAnimation()
+            //LoadingAnimation()
             Spacer(modifier = Modifier.height(10.dp))
             Text(stringResource(id = R.string.deleting_transaction))
         }

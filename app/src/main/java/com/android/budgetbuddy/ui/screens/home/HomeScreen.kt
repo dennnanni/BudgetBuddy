@@ -47,6 +47,7 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.CartesianChart
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
@@ -72,11 +73,15 @@ import com.patrykandpatrick.vico.compose.common.shader.color
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 
@@ -186,60 +191,30 @@ fun HomeScreen(
         }
     }
 
-    val data = mutableMapOf<Float, Float>()
     categoryActions.loadCategories(userActions.getUserId()!!)
 
-    var i = 0f
-    for (transaction in transactionViewModel.userTransactions) {
-        if (transaction.type == "Expense") {
-            totalBalance -= transaction.amount
-        } else {
-            totalBalance += transaction.amount
+    val sortedTransactions = transactions.sortedBy { it.date }
+    val dateList = transactions.map {
+        it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    }.distinct().mapIndexed { index, date -> date to index }.toMap()
+
+    // Create a map where each index is mapped to the sum of the balance for the corresponding date
+    val indexToBalanceMap = mutableMapOf<Float, Float>()
+
+    var currentIndex = 0
+
+    sortedTransactions.groupBy { it.date }.forEach { (date, transactionsOnDate) ->
+        val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        currentIndex = dateList[localDate] ?: 0
+        transactionsOnDate.forEach { transaction ->
+            totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
         }
-        data[i++] = totalBalance.toFloat()
+        indexToBalanceMap[currentIndex.toFloat()] = totalBalance.toFloat()
     }
 
-    // Chart settings
-    val modelProducer = remember { CartesianChartModelProducer.build() }
-    if (data.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            withContext(Dispatchers.Default) {
-                modelProducer.tryRunTransaction {
-                    lineSeries { series(data.keys, data.values) }
-                }
-            }
-        }
+    val dateValueFormatter = CartesianValueFormatter { x, _, _ ->
+        dateList.filter { it.value == x.toInt() }.keys.firstOrNull()?.format(DateTimeFormatter.ofPattern("dd/MM")).toString()
     }
-
-    val marker = rememberMarker()
-    val cartesianChart = rememberCartesianChart(
-        rememberLineCartesianLayer(
-            listOf(
-                rememberLineSpec(
-                    DynamicShader.color(MaterialTheme.colorScheme.primary),
-                    backgroundShader = null
-                )
-            )
-        ),
-        startAxis = rememberStartAxis(
-            label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onSurface),
-            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
-            horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
-            guideline = rememberAxisGuidelineComponent(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-            )
-        ),
-        bottomAxis = rememberBottomAxis(
-            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
-            label = null,
-            guideline = null
-        ),
-        persistentMarkers = if (transactionViewModel.userTransactions.size == 1) mapOf(0f to marker) else null,
-    )
-    val scrollState = rememberVicoScrollState(
-        initialScroll = Scroll.Absolute.End,
-        scrollEnabled = true,
-    )
 
     Column(
         modifier = Modifier.padding(10.dp)
@@ -282,14 +257,9 @@ fun HomeScreen(
                         .padding(10.dp)
                         .background(color = MaterialTheme.colorScheme.surface)
                 ) {
-                    CartesianChartHost(
-                        chart = cartesianChart,
-                        scrollState = scrollState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 20.dp),
-                        modelProducer = modelProducer,
-                        marker = marker
+                    CartesianChart(indexToBalanceMap,
+                        transactionViewModel.userTransactions.size == 1,
+                        dateValueFormatter
                     )
                 }
             }
