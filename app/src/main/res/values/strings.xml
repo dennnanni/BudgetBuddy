@@ -80,4 +80,6 @@
     <string name="take_picture">Take a picture</string>
     <string name="choose_from_files">Choose from files</string>
     <string name="change_name">Change name</string>
+    <string name="balance_progression">Balance progression</string>
+    <string name="transactions_by_category">Transactions by category</string>
 </resources>

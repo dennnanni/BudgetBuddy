@@ -3,6 +3,7 @@ package com.android.budgetbuddy.ui.screens.home
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +44,7 @@ import com.android.budgetbuddy.data.badges.AllBadges
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.BadgePopup
-import com.android.budgetbuddy.ui.composables.CartesianChart
+import com.android.budgetbuddy.ui.composables.LineChart
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
@@ -248,13 +249,14 @@ fun HomeScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(10.dp)
-                        .background(color = MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 10.dp)
+                        .then(if (indexToBalanceMap.size < 20) Modifier.padding(bottom = 10.dp) else Modifier)
+
                 ) {
-                    CartesianChart(
-                        indexToBalanceMap,
+                    LineChart(indexToBalanceMap,
                         transactionViewModel.userTransactions.size == 1,
-                        dateValueFormatter
+                        dateValueFormatter,
+                        indexToBalanceMap.size > 20
                     )
                 }
             }

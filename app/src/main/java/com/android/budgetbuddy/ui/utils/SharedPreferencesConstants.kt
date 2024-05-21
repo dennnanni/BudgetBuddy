@@ -8,4 +8,5 @@ object SPConstants {
     const val NAME = "name"
     const val UP_TO_DATE_RATE = "upToDateRate"
     const val TRIED_CONNECTION = "triedConnection"
+    const val BADGE_EARNED = "badgeEarned"
 }

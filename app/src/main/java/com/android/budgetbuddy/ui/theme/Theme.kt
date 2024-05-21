@@ -33,6 +33,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color.Black,
     tertiaryContainer = Sand,
     background = Color(0xFFFFFBFE),
+    surfaceTint = LightGreen,
 
     /* Other default colors to override
     onPrimary = Color.White,

@@ -97,10 +97,11 @@ fun AddTransactionScreen(
     val options =
         listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options[0]) }
+    var selectedOption by remember { mutableStateOf(transaction?.type ?: options[0]) }
     val locationService = remember { LocationService(context) }
 
-    var selectedOptionText by remember { mutableStateOf("") }
+    var selectedOptionText by remember { mutableStateOf(transaction?.category ?: "")
+    }
     categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
 
     if (categoryActions.getCategories().isEmpty()) {

@@ -303,8 +303,8 @@ fun BudgetBuddyNavGraph(
         with(BudgetBuddyRoute.Charts) {
             composable(route) {
                 ChartsScreen(
-                    navController,
                     transactionViewModel,
+                    categoryActions
                 )
             }
         }
