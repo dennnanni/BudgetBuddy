@@ -75,7 +75,8 @@ fun TransactionItem(
                         it.name
                             .lowercase()
                             .contains(icon.lowercase())
-                    }[0], null
+                    }[0], null,
+                    tint = MaterialTheme.colorScheme.onSecondary
                 )
             }
 

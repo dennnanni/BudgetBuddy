@@ -106,6 +106,27 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
+                        stringResource(id = R.string.change_name),
+                        style = TextStyle(
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                    IconButton(onClick = {
+                        navController.navigate(BudgetBuddyRoute.ChangeName.route)
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, null)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
                         stringResource(id = R.string.change_username),
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -113,7 +134,9 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     )
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        navController.navigate(BudgetBuddyRoute.ChangeUsername.route)
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, null)
                     }
                 }
@@ -132,7 +155,9 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     )
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        navController.navigate(BudgetBuddyRoute.ChangePassword.route)
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, null)
                     }
                 }
@@ -212,20 +237,15 @@ fun SettingsScreen(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text(Currency.EUR.toString()) },
-                                onClick = {
-                                    selected = Currency.EUR
-                                    onCurrencyChange(selected)
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(Currency.USD.toString()) },
-                                onClick = {
-                                    selected = Currency.USD
-                                    onCurrencyChange(selected)
-                                },
-                            )
+                            for (currency in Currency.entries) {
+                                DropdownMenuItem(
+                                    text = { Text(currency.toString()) },
+                                    onClick = {
+                                        selected = currency
+                                        onCurrencyChange(selected)
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -263,6 +283,7 @@ fun SettingsScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {

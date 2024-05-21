@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,9 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Category
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
@@ -33,12 +37,15 @@ fun AddCategory(categoryActions: CategoryActions, onDismissRequest: () -> Unit, 
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            ),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column {
                 // from to add a category
                 Text(
-                    text = "Add a category",
+                    text = stringResource(id = R.string.add_category),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
@@ -49,7 +56,7 @@ fun AddCategory(categoryActions: CategoryActions, onDismissRequest: () -> Unit, 
                 OutlinedTextField(
                     value = categoryName.value,
                     onValueChange = { categoryName.value = it },
-                    label = { Text("Category Name") },
+                    label = { Text(stringResource(R.string.category_name)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
@@ -62,6 +69,12 @@ fun AddCategory(categoryActions: CategoryActions, onDismissRequest: () -> Unit, 
                 // add category button
                 Button(
                     onClick = {
+
+                        if (categoryActions.getCategories().any { it.name == categoryName.value }) {
+
+                            return@Button
+                        }
+
                         categoryActions.addCategory(
                             Category(
                                 name = categoryName.value,
@@ -76,7 +89,7 @@ fun AddCategory(categoryActions: CategoryActions, onDismissRequest: () -> Unit, 
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    Text("Add Category")
+                    Text(stringResource(id = R.string.add_category))
                 }
             }
         }

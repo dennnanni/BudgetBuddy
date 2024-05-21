@@ -1,7 +1,6 @@
 package com.android.budgetbuddy.ui.screens.register
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,14 +39,14 @@ import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.User
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.utils.SPConstants
+import com.android.budgetbuddy.ui.utils.hashPassword
 import com.android.budgetbuddy.ui.viewmodel.UserActions
-import com.android.budgetbuddy.ui.viewmodel.UserState
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
+import java.util.Base64
 
 @Composable
-fun RegisterScreen(navController: NavHostController,
-                   userState: UserState,
-                   actions: UserActions) {
+fun RegisterScreen(navController: NavHostController, actions: UserActions) {
 
     val fullName = rememberSaveable { mutableStateOf("") }
     val username = rememberSaveable { mutableStateOf("") }
@@ -66,11 +64,12 @@ fun RegisterScreen(navController: NavHostController,
 
     if (actions.getLoggedUser() != null) {
         with(sharedPreferences.edit()) {
-            putString(SPConstants.USERNAME, username.value)
+            putString(SPConstants.USERNAME, username.value.trim())
             putString(SPConstants.NAME, actions.getLoggedUser()?.name)
             putString(SPConstants.PROFILE_PIC, actions.getLoggedUser()?.profilePic)
             apply()
         }
+
         navController.navigate(BudgetBuddyRoute.Home.route) {
             popUpTo(navController.graph.id) {
                 inclusive = true
@@ -145,12 +144,13 @@ fun RegisterScreen(navController: NavHostController,
 
                             actions.addUser(
                                 User(
-                                    name = fullName.value,
-                                    username = username.value,
-                                    password = password.value
+                                    name = fullName.value.trim(),
+                                    username = username.value.trim(),
+                                    password = hashPassword(password.value.trim())
                                 )
-                            )
-                            actions.loadCurrentUser(username.value)
+                            ).join()
+                            actions.loadCurrentUser(username.value).join()
+
                         }
                     }
                 }

@@ -39,6 +39,7 @@ import com.android.budgetbuddy.ui.BudgetBuddyNavGraph
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.screens.settings.ThemeState
 import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
+import com.android.budgetbuddy.ui.utils.SPConstants
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,10 +52,10 @@ fun NavigationDrawer(
     val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
+    val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, 0)
 
     val colors = NavigationDrawerItemDefaults.colors(
-        unselectedContainerColor = MaterialTheme.colorScheme.onPrimary,
+        unselectedContainerColor = MaterialTheme.colorScheme.background,
         selectedContainerColor = MaterialTheme.colorScheme.secondary,
         unselectedTextColor = MaterialTheme.colorScheme.onBackground,
         selectedTextColor = MaterialTheme.colorScheme.onSecondary,
@@ -69,11 +70,11 @@ fun NavigationDrawer(
             ModalDrawerSheet(
                 modifier = Modifier.width(250.dp),
                 drawerShape = RectangleShape,
-                drawerContainerColor = MaterialTheme.colorScheme.onPrimary,
+                drawerContainerColor = MaterialTheme.colorScheme.background,
             ) {
-                val name = sharedPreferences.getString("name", null) ?: ""
-                val username = sharedPreferences.getString("username", null) ?: ""
-                val profilePic = sharedPreferences.getString("profilePic", null) ?: ""
+                val name = sharedPreferences.getString(SPConstants.NAME, null) ?: ""
+                val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: ""
+                val profilePic = sharedPreferences.getString(SPConstants.PROFILE_PIC, null) ?: ""
 
                 Row(
                     modifier = Modifier
@@ -126,7 +127,7 @@ fun NavigationDrawer(
                         coroutineScope.launch {
                             drawerState.close()
                         }
-                        //navController.navigate(BudgetBuddyRoute.Charts.route)
+                        navController.navigate(BudgetBuddyRoute.Charts.route)
                     }
                 )
 
@@ -155,18 +156,6 @@ fun NavigationDrawer(
                         //navController.navigate(BudgetBuddyRoute.Badges.route)
                     }
                 )
-                NavigationDrawerItem(
-                    colors = colors,
-                    label = { Text("Test") },
-                    selected = false,
-                    icon = { Icon(Icons.Outlined.EmojiEvents, stringResource(R.string.badges)) },
-                    onClick = {
-                        coroutineScope.launch {
-                            drawerState.close()
-                        }
-                        navController.navigate(BudgetBuddyRoute.Test.route)
-                    }
-                )
 
                 NavigationDrawerItem(
                     colors = colors,
@@ -190,9 +179,9 @@ fun NavigationDrawer(
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
-                val name = sharedPreferences.getString("name", null) ?: ""
-                val username = sharedPreferences.getString("username", null) ?: ""
-                val profilePic = sharedPreferences.getString("profilePic", null) ?: ""
+                val name = sharedPreferences.getString(SPConstants.NAME, null) ?: ""
+                val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: ""
+                val profilePic = sharedPreferences.getString(SPConstants.PROFILE_PIC, null) ?: ""
                 TopBar(
                     navController = navController,
                     currentRoute = currentRoute,

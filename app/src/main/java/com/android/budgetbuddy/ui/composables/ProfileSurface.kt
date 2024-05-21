@@ -69,15 +69,15 @@ fun ProfileHome(
 }
 
 @Composable
-fun ProfileProfile(name: String, username: String, profilePic: String, launch: ManagedActivityResultLauncher<String, Uri?>) {
+fun ProfileProfile(name: String, username: String, profilePic: String, onEditClick: () -> Unit) {
+// launch: ManagedActivityResultLauncher<String, Uri?>) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box {
             Image(
-                painter = rememberAsyncImagePainter(
-                    model = Uri.parse(profilePic)  // or ht
-                ),
+                painter = if (profilePic.isNotEmpty()) rememberAsyncImagePainter(
+                    model = Uri.parse(profilePic)) else painterResource(id = R.drawable.default_propic),
                 contentScale = ContentScale.Crop,
                 contentDescription = stringResource(id = R.string.profile_picture),
                 modifier = Modifier
@@ -85,7 +85,7 @@ fun ProfileProfile(name: String, username: String, profilePic: String, launch: M
                     .size(150.dp)
             )
             IconButton(
-                onClick = { launch.launch("image/*") },
+                onClick = { onEditClick() },
                 modifier = Modifier
                     .offset(x = 110.dp, y = 110.dp)
                     .clip(CircleShape)

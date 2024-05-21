@@ -60,7 +60,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.datastore.core.android)
-    //implementation(libs.firebase.crashlytics.buildtools)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -103,5 +102,8 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose-m3:2.0.0-alpha.19")
     implementation("com.patrykandpatrick.vico:core:2.0.0-alpha.19")
     implementation("com.patrykandpatrick.vico:views:2.0.0-alpha.19")
+
+    // Flow row
+    implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
 
 }

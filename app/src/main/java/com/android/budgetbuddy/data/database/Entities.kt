@@ -19,16 +19,16 @@ import java.util.Date
     ])
 data class Transaction (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo val title: String,
-    @ColumnInfo val description: String,
-    @ColumnInfo val type: String,
-    @ColumnInfo val category: String,
-    @ColumnInfo val amount: Double,
-    @ColumnInfo val date: Date,
+    @ColumnInfo var title: String,
+    @ColumnInfo var description: String,
+    @ColumnInfo var type: String,
+    @ColumnInfo var category: String,
+    @ColumnInfo var amount: Double,
+    @ColumnInfo var date: Date,
     @ColumnInfo val periodic: Boolean,
     @ColumnInfo val userId: Int,
-    @ColumnInfo val latitude: Double = 0.0,
-    @ColumnInfo val longitude: Double = 0.0
+    @ColumnInfo var latitude: Double = 0.0,
+    @ColumnInfo var longitude: Double = 0.0
 ) {
     val isExpense: Boolean
         get() {

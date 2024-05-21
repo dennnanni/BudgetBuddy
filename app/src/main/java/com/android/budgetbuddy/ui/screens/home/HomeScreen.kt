@@ -1,13 +1,7 @@
 package com.android.budgetbuddy.ui.screens.home
 
 import android.content.Context
-import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
-import android.provider.Settings
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,10 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.data.badges.AllBadges
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
-import com.android.budgetbuddy.ui.composables.BadgePopup
 import com.android.budgetbuddy.ui.composables.TransactionItem
 import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
@@ -169,14 +161,13 @@ fun HomeScreen(
     val currency = currencyViewModel.getCurrency()
 
     userActions.loadCurrentUser(username)
-    //val userId = userActions.getUserId() ?: return
-    val userId = userActions.getUserId()
+    val userId = userActions.getLoggedUser()?.id
     if (userId == null) {
         Log.d("HomeScreen", "User ID is null")
         return
     }
     transactionActions.loadUserTransactions(userId)
-    val transactions = transactionActions.getUserTransactions(userId)
+    val transactions = transactionActions.getUserTransactions()
 
     regularTransactionViewModel.actions.loadUserTransactions(userId)
     val regularTransactions = regularTransactionViewModel.actions.getUserTransactions(userId)
@@ -203,59 +194,30 @@ fun HomeScreen(
         }
     }
 
-    val data = mutableMapOf<Float, Float>()
     categoryActions.loadCategories(userActions.getUserId()!!)
 
-    var i = 0f
-    for (transaction in transactionViewModel.userTransactions) {
-        if (transaction.type == "Expense") {
-            totalBalance -= transaction.amount
-        } else {
-            totalBalance += transaction.amount
+    val sortedTransactions = transactions.sortedBy { it.date }
+    val dateList = transactions.map {
+        it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    }.distinct().mapIndexed { index, date -> date to index }.toMap()
+
+    // Create a map where each index is mapped to the sum of the balance for the corresponding date
+    val indexToBalanceMap = mutableMapOf<Float, Float>()
+
+    var currentIndex = 0
+
+    sortedTransactions.groupBy { it.date }.forEach { (date, transactionsOnDate) ->
+        val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        currentIndex = dateList[localDate] ?: 0
+        transactionsOnDate.forEach { transaction ->
+            totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
         }
-        data[i++] = totalBalance.toFloat()
+        indexToBalanceMap[currentIndex.toFloat()] = totalBalance.toFloat()
     }
 
-    // Chart settings
-    val modelProducer = remember { CartesianChartModelProducer.build() }
-    if (data.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            withContext(Dispatchers.Default) {
-                modelProducer.tryRunTransaction {
-                    lineSeries { series(data.keys, data.values) }
-                }
-            }
-        }
+    val dateValueFormatter = CartesianValueFormatter { x, _, _ ->
+        dateList.filter { it.value == x.toInt() }.keys.firstOrNull()?.format(DateTimeFormatter.ofPattern("dd/MM")).toString()
     }
-
-    val marker = rememberMarker()
-    val cartesianChart = rememberCartesianChart(
-        rememberLineCartesianLayer(
-            listOf(
-                rememberLineSpec(
-                    DynamicShader.color(MaterialTheme.colorScheme.primary),
-                    backgroundShader = null
-                )
-            )
-        ),
-        startAxis = rememberStartAxis(
-            label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onSurface),
-            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
-            horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
-            guideline = rememberAxisGuidelineComponent(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-            )
-        ),
-        bottomAxis = rememberBottomAxis(
-            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
-            label = null,
-            guideline = null
-        ),
-    )
-    val scrollState = rememberVicoScrollState(
-        initialScroll = Scroll.Absolute.End,
-        scrollEnabled = true,
-    )
 
     Column(
         modifier = Modifier.padding(10.dp)
@@ -298,14 +260,9 @@ fun HomeScreen(
                         .padding(10.dp)
                         .background(color = MaterialTheme.colorScheme.surface)
                 ) {
-                    CartesianChartHost(
-                        chart = cartesianChart,
-                        scrollState = scrollState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 20.dp),
-                        modelProducer = modelProducer,
-                        marker = marker
+                    CartesianChart(indexToBalanceMap,
+                        transactionViewModel.userTransactions.size == 1,
+                        dateValueFormatter
                     )
                 }
             }
@@ -345,7 +302,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(10.dp, 0.dp)
                 ) {
                     val orderedList = transactionViewModel.userTransactions
-                        .sortedByDescending { it.date }
+                        .sortedBy { it.date }
                         .sortedByDescending { it.id }
                         .take(TRANSACTION_PREVIEW_COUNT)
 

@@ -1,28 +1,53 @@
 package com.android.budgetbuddy.ui.composables
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.text.Layout
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.android.budgetbuddy.data.database.Transaction
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLineComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineSpec
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.component.fixed
 import com.patrykandpatrick.vico.compose.common.component.rememberLayeredComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.of
+import com.patrykandpatrick.vico.compose.common.shader.color
 import com.patrykandpatrick.vico.compose.common.shape.markerCornered
 import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalDimensions
 import com.patrykandpatrick.vico.core.cartesian.Insets
+import com.patrykandpatrick.vico.core.cartesian.Scroll
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.copyColor
+import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import com.patrykandpatrick.vico.core.common.shape.Corner
 import com.patrykandpatrick.vico.core.common.shape.Shape
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 @Composable
 internal fun rememberMarker(
@@ -62,6 +87,7 @@ internal fun rememberMarker(
         )
     val guideline = rememberAxisGuidelineComponent()
     return remember(label, labelPosition, indicator, showIndicator, guideline) {
+        @SuppressLint("RestrictedApi")
         object : DefaultCartesianMarker(
             label = label,
             labelPosition = labelPosition,
@@ -102,3 +128,65 @@ internal fun rememberMarker(
 private const val LABEL_BACKGROUND_SHADOW_RADIUS_DP = 4f
 private const val LABEL_BACKGROUND_SHADOW_DY_DP = 2f
 private const val CLIPPING_FREE_SHADOW_RADIUS_MULTIPLIER = 1.4f
+
+
+@Composable
+fun CartesianChart(
+    data: Map<Float, Float>,
+    singleTransaction: Boolean = false,
+    bottomAxisValueFormatter: CartesianValueFormatter = CartesianValueFormatter.decimal(),
+) {
+
+    val modelProducer = remember { CartesianChartModelProducer.build() }
+    if (data.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            withContext(Dispatchers.Default) {
+                modelProducer.tryRunTransaction {
+                    lineSeries { series(data.keys, data.values) }
+                }
+            }
+        }
+    }
+
+    val marker = rememberMarker()
+    val cartesianChart = rememberCartesianChart(
+        rememberLineCartesianLayer(
+            listOf(
+                rememberLineSpec(
+                    DynamicShader.color(MaterialTheme.colorScheme.primary),
+                    backgroundShader = null
+                )
+            )
+        ),
+        startAxis = rememberStartAxis(
+            label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onSurface),
+            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
+            horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
+            guideline = rememberAxisGuidelineComponent(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+            )
+        ),
+        bottomAxis = rememberBottomAxis(
+            axis = rememberAxisLineComponent(color = MaterialTheme.colorScheme.onSurface),
+            guideline = null,
+            valueFormatter = bottomAxisValueFormatter,
+        ),
+        persistentMarkers = if (singleTransaction) mapOf(0f to marker) else null,
+    )
+    val scrollState = rememberVicoScrollState(
+        initialScroll = Scroll.Absolute.End,
+        scrollEnabled = true,
+    )
+
+    CartesianChartHost(
+        chart = cartesianChart,
+        scrollState = scrollState,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 20.dp),
+        modelProducer = modelProducer,
+        marker = marker
+    )
+
+}
+

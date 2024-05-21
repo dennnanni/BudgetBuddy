@@ -14,10 +14,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.budgetbuddy.data.remote.OSMDataSource
-import com.android.budgetbuddy.ui.screens.MapScreen
+import com.android.budgetbuddy.ui.screens.map.MapScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
-import com.android.budgetbuddy.ui.screens.addTransaction.TestScreen
+import com.android.budgetbuddy.ui.screens.changeInfo.ChangeName
+import com.android.budgetbuddy.ui.screens.changeInfo.ChangePassword
+import com.android.budgetbuddy.ui.screens.changeInfo.ChangeUsername
+import com.android.budgetbuddy.ui.screens.charts.ChartsScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
@@ -76,13 +79,13 @@ sealed class BudgetBuddyRoute(
         BudgetBuddyRoute("regular_transactions", "Regular transactions")
 
     data object Map : BudgetBuddyRoute("map", "Map")
-    data object Test : BudgetBuddyRoute("test", "Test")
+    data object Charts : BudgetBuddyRoute("charts", "Charts")
+    data object ChangeName : BudgetBuddyRoute("change/name", "Change name")
+    data object ChangeUsername : BudgetBuddyRoute("change/username", "Change username")
+    data object ChangePassword : BudgetBuddyRoute("change/password", "Change password")
 
-
-    // TODO: add other routes here
 
     companion object {
-        // TODO: add other routes here
         val routes = setOf(
             Register,
             Login,
@@ -96,7 +99,10 @@ sealed class BudgetBuddyRoute(
             RegularTransactions,
             AddRegularTransaction,
             Map,
-            Test
+            Charts,
+            ChangeName,
+            ChangeUsername,
+            ChangePassword
         )
         val bottomBarRoutes = setOf(
             Home,
@@ -177,6 +183,24 @@ fun BudgetBuddyNavGraph(
             }
         }
 
+        with(BudgetBuddyRoute.EditTransaction) {
+            composable(route, args) { backStackEntry ->
+                val transaction = transactionsState.transactions.find {
+                    it.id == backStackEntry.arguments?.getString("transactionId")?.toInt()
+                }
+                AddTransactionScreen(
+                    navController,
+                    userViewModel,
+                    transactionViewModel.actions,
+                    categoryActions,
+                    currencyViewModel,
+                    snackbarHostState,
+                    osmDataSource,
+                    transaction
+                )
+            }
+        }
+
         with(BudgetBuddyRoute.AddRegularTransaction) {
             composable(route) {
                 AddRegularTransactionScreen(
@@ -191,13 +215,13 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Register) {
             composable(route) {
-                RegisterScreen(navController, userState, userViewModel.actions)
+                RegisterScreen(navController, userViewModel.actions)
             }
         }
 
         with(BudgetBuddyRoute.Login) {
             composable(route) {
-                LoginScreen(navController, userState, userViewModel.actions)
+                LoginScreen(navController, userViewModel.actions)
             }
         }
 
@@ -257,7 +281,9 @@ fun BudgetBuddyNavGraph(
                     transaction,
                     navController,
                     currencyViewModel,
-                    transactionViewModel.actions
+                    transactionViewModel.actions,
+                    osmDataSource,
+                    userViewModel.actions.getUserId()
                 )
             }
         }
@@ -271,10 +297,35 @@ fun BudgetBuddyNavGraph(
                 )
             }
         }
-        with(BudgetBuddyRoute.Test) {
+        with(BudgetBuddyRoute.Charts) {
             composable(route) {
-                TestScreen(locationService, snackbarHostState)
+                ChartsScreen(
+                    navController,
+                    transactionViewModel,
+                )
             }
         }
+        with(BudgetBuddyRoute.ChangeName) {
+            composable(route) {
+                ChangeName(
+                    userViewModel.actions
+                )
+            }
+        }
+        with(BudgetBuddyRoute.ChangeUsername) {
+            composable(route) {
+                ChangeUsername(
+                    userViewModel.actions
+                )
+            }
+        }
+        with(BudgetBuddyRoute.ChangePassword) {
+            composable(route) {
+                ChangePassword(
+                    userViewModel.actions
+                )
+            }
+        }
+
     }
 }

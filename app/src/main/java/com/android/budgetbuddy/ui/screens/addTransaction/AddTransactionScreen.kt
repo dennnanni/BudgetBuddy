@@ -1,5 +1,10 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +68,7 @@ fun AddTransactionScreen(
     currencyViewModel: CurrencyViewModel,
     snackbarHostState: SnackbarHostState,
     osmDataSource: OSMDataSource,
+    transaction: Transaction? = null,
     earnedBadgeViewModel: EarnedBadgeViewModel
 ) {
     val context = LocalContext.current
@@ -71,19 +77,27 @@ fun AddTransactionScreen(
     var selectedOption by remember { mutableStateOf(options[0]) }
     val locationService = remember { LocationService(context) }
 
-    var selectedOptionText by remember { mutableStateOf(String()) }
+    var selectedOptionText by remember { mutableStateOf("") }
 
-    if (categoryActions.getCategories().isNotEmpty()) {
-        selectedOptionText = categoryActions.getCategories()[0].name
-    } else {
+    if (categoryActions.getCategories().isEmpty()) {
         showDialog.value = true
+    } else if (selectedOptionText == "") {
+        selectedOptionText = categoryActions.getCategories()[0].name
     }
 
-    val amount: MutableState<Double> = remember { mutableDoubleStateOf(0.0) }
-    val date = remember { mutableStateOf(LocalDate.now()) }
-    var expanded by remember { mutableStateOf(false) }
-    val description = rememberSaveable { mutableStateOf("") }
-    val title = rememberSaveable { mutableStateOf("") }
+    val amount: MutableState<Double> = remember { mutableDoubleStateOf(transaction?.amount ?: 0.0) }
+    val tmp = if (transaction?.date == null) {
+        LocalDate.now()
+    } else {
+        transaction.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+    if (transaction != null && transaction.latitude != 0.0) {
+        locationService.setLocation(transaction.latitude, transaction.longitude)
+    }
+    val date: MutableState<LocalDate> = remember { mutableStateOf(tmp) }
+    val description = rememberSaveable { mutableStateOf(transaction?.description ?: "") }
+    val title = rememberSaveable { mutableStateOf(transaction?.title ?: "") }
+
     val coroutineScope = rememberCoroutineScope()
 
     var showLocationDisabledAlert by remember { mutableStateOf(false) }
@@ -201,7 +215,7 @@ fun AddTransactionScreen(
                 )
 
                 CustomDatePicker(
-                    value = date.value,
+                    value = LocalDate.from(date.value),
                     onValueChange = { date.value = it },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -268,22 +282,36 @@ fun AddTransactionScreen(
                 val userId = userViewModel.actions.getUserId() ?: return@Button
 
                 coroutineScope.launch {
-                    actions.addTransaction(
-                        Transaction(
-                            title = title.value,
-                            description = description.value,
-                            type = selectedOption,
-                            category = selectedOptionText,
-                            amount = currencyViewModel.convertToUSD(amount.value, ),
-                            date = Date.from(
-                                date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
-                            ),
-                            periodic = false,
-                            latitude = locationService.coordinates?.latitude ?: 0.0,
-                            longitude = locationService.coordinates?.longitude ?: 0.0,
-                            userId = userId
+                    if (transaction == null) {
+                        actions.addTransaction(
+                            Transaction(
+                                title = title.value.trim(),
+                                description = description.value.trim(),
+                                type = selectedOption,
+                                category = selectedOptionText,
+                                amount = currencyViewModel.convertToUSD(amount.value),
+                                date = Date.from(
+                                    date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                                ),
+                                periodic = false,
+                                latitude = locationService.coordinates?.latitude ?: 0.0,
+                                longitude = locationService.coordinates?.longitude ?: 0.0,
+                                userId = userId
+                            )
+                        ).join()
+                    } else {
+                        transaction.title = title.value.trim()
+                        transaction.description = description.value.trim()
+                        transaction.type = selectedOption
+                        transaction.category = selectedOptionText
+                        transaction.amount = currencyViewModel.convertToUSD(amount.value)
+                        transaction.date = Date.from(
+                            date.value.atStartOfDay(ZoneId.systemDefault()).toInstant()
                         )
-                    ).join()
+                        transaction.latitude = locationService.coordinates?.latitude ?: 0.0
+                        transaction.longitude = locationService.coordinates?.longitude ?: 0.0
+                        actions.addTransaction(transaction).join()
+                    }
                     actions.loadUserTransactions(userId).join()
                     earnedBadgeViewModel.actions.loadEarnedBadges(userId).join()
                     for (badge in AllBadges.badges) {
@@ -310,7 +338,10 @@ fun AddTransactionScreen(
                 }
             }
         ) {
-            Text(text = stringResource(id = R.string.add_transaction), fontSize = 20.sp)
+            Text(text = stringResource(id =
+                if (transaction == null) R.string.add_transaction
+                else R.string.edit_transaction
+            ), fontSize = 20.sp)
         }
     }
 
