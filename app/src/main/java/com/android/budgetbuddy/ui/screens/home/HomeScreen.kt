@@ -84,19 +84,22 @@ fun HomeScreen(
     var showInternetRequiredSnackBar by remember { mutableStateOf(false) }
     var showConnectionIssuesSnackBar by remember { mutableStateOf(false) }
 
-    val showDialog = remember { mutableStateOf(sharedPreferences.getString("badgeEarned", "") != "") }
+    val showDialog =
+        remember { mutableStateOf(sharedPreferences.getString("badgeEarned", "") != "") }
 
     if (showDialog.value) {
-        BadgePopup(
-            AllBadges.badges.filter { it.badgeName == sharedPreferences.getString("badgeEarned", "") }[0],
-            onDismissRequest = {
-                showDialog.value = false
-                with(sharedPreferences.edit()) {
-                    remove("badgeEarned")
-                    apply()
+        AllBadges.badges[sharedPreferences.getString("badgeEarned", "")]?.let {
+            BadgePopup(
+                it,
+                onDismissRequest = {
+                    showDialog.value = false
+                    with(sharedPreferences.edit()) {
+                        remove("badgeEarned")
+                        apply()
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     /* Gestione dell'aggiornamento dei tassi di cambio in modo che venga
@@ -203,7 +206,8 @@ fun HomeScreen(
     }
 
     val dateValueFormatter = CartesianValueFormatter { x, _, _ ->
-        dateList.filter { it.value == x.toInt() }.keys.firstOrNull()?.format(DateTimeFormatter.ofPattern("dd/MM")).toString()
+        dateList.filter { it.value == x.toInt() }.keys.firstOrNull()
+            ?.format(DateTimeFormatter.ofPattern("dd/MM")).toString()
     }
 
     Column(
@@ -247,7 +251,8 @@ fun HomeScreen(
                         .padding(10.dp)
                         .background(color = MaterialTheme.colorScheme.surface)
                 ) {
-                    CartesianChart(indexToBalanceMap,
+                    CartesianChart(
+                        indexToBalanceMap,
                         transactionViewModel.userTransactions.size == 1,
                         dateValueFormatter
                     )

@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.budgetbuddy.data.remote.OSMDataSource
+import com.android.budgetbuddy.ui.screens.achievements.AllBadgesScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.changeInfo.ChangeName
@@ -84,6 +85,7 @@ sealed class BudgetBuddyRoute(
     data object ChangeUsername : BudgetBuddyRoute("change/username", "Change username")
     data object ChangePassword : BudgetBuddyRoute("change/password", "Change password")
 
+    data object AllBadges : BudgetBuddyRoute("badges", "All badges")
 
     companion object {
         val routes = setOf(
@@ -324,6 +326,16 @@ fun BudgetBuddyNavGraph(
             composable(route) {
                 ChangePassword(
                     userViewModel.actions
+                )
+            }
+        }
+
+        with(BudgetBuddyRoute.AllBadges) {
+            composable(route) {
+                AllBadgesScreen(
+                    navController,
+                    earnedBadgeViewModel,
+                    userViewModel
                 )
             }
         }

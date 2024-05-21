@@ -94,12 +94,14 @@ fun AddTransactionScreen(
     transaction: Transaction? = null
 ) {
     val context = LocalContext.current
-    val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
+    val options =
+        listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
     val locationService = remember { LocationService(context) }
 
     var selectedOptionText by remember { mutableStateOf("") }
+    categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
 
     if (categoryActions.getCategories().isEmpty()) {
         showDialog.value = true
@@ -285,7 +287,10 @@ fun AddTransactionScreen(
                         }
                     }
                 ) {
-                    Icon(if (place == null) Icons.Filled.AddLocationAlt else Icons.Filled.Close, contentDescription = null)
+                    Icon(
+                        if (place == null) Icons.Filled.AddLocationAlt else Icons.Filled.Close,
+                        contentDescription = null
+                    )
                     Text(
                         text = place?.displayName ?: stringResource(id = R.string.add_location)
                     )
@@ -336,17 +341,17 @@ fun AddTransactionScreen(
                     actions.loadUserTransactions(userId).join()
                     earnedBadgeViewModel.actions.loadEarnedBadges(userId).join()
                     for (badge in AllBadges.badges) {
-                        if (earnedBadgeViewModel.earnedBadges.value.none { it.badgeName == badge.badgeName } &&
-                            badge.badgeLambda(actions.getUserTransactions())
+                        if (earnedBadgeViewModel.earnedBadges.value.none { it.badgeName == badge.key } &&
+                            badge.value.badgeLambda(actions.getUserTransactions())
                         ) {
                             earnedBadgeViewModel.actions.addEarnedBadge(
                                 EarnedBadge(
-                                    badgeName = badge.badgeName,
+                                    badgeName = badge.value.badgeName,
                                     userId = userId
                                 )
                             ).join()
                             with(sharedPreferences.edit()) {
-                                putString("badgeEarned", badge.badgeName)
+                                putString("badgeEarned", badge.value.badgeName)
                                 apply()
                             }
                         }
@@ -359,10 +364,13 @@ fun AddTransactionScreen(
                 }
             }
         ) {
-            Text(text = stringResource(id =
-                if (transaction == null) R.string.add_transaction
-                else R.string.edit_transaction
-            ), fontSize = 20.sp)
+            Text(
+                text = stringResource(
+                    id =
+                    if (transaction == null) R.string.add_transaction
+                    else R.string.edit_transaction
+                ), fontSize = 20.sp
+            )
         }
     }
 
