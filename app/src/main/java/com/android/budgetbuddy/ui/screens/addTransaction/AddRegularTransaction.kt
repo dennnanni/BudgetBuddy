@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.data.database.RegularTransaction
+import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDropDown
@@ -231,7 +231,7 @@ fun AddRegularTransactionScreen(
 
                 coroutineScope.launch {
                     actions.addTransaction(
-                        RegularTransaction(
+                        RegularTransactions(
                             title = title.value,
                             description = description.value,
                             type = selectedOption,

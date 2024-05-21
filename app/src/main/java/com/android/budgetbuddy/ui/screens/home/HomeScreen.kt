@@ -39,10 +39,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.badges.AllBadges
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.BadgePopup
+import com.android.budgetbuddy.ui.composables.CartesianChart
 import com.android.budgetbuddy.ui.composables.TransactionItem
-import com.android.budgetbuddy.ui.composables.rememberMarker
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.isOnline
@@ -52,24 +54,9 @@ import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserActions
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLineComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineSpec
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.common.shader.color
-import com.patrykandpatrick.vico.core.cartesian.Scroll
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import com.patrykandpatrick.vico.core.common.shader.DynamicShader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 

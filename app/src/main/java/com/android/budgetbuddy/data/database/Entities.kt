@@ -8,7 +8,8 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import java.util.Date
 
-@Entity(tableName = "transaction",
+@Entity(
+    tableName = "transaction",
     foreignKeys = [
         ForeignKey(
             entity = User::class,
@@ -16,8 +17,9 @@ import java.util.Date
             childColumns = ["userId"],
             onDelete = ForeignKey.CASCADE
         )
-    ])
-data class Transaction (
+    ]
+)
+data class Transaction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo var title: String,
     @ColumnInfo var description: String,
@@ -45,23 +47,26 @@ data class User(
     @ColumnInfo(defaultValue = "temp") var profilePic: String? = ""
 )
 
-@Entity(tableName = "category", foreignKeys = [
-    ForeignKey(
-        entity = User::class,
-        parentColumns = ["id"],
-        childColumns = ["userId"],
-        onDelete = ForeignKey.CASCADE
-    )
-])
+@Entity(
+    tableName = "category", foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 data class Category(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val name: String,
     @ColumnInfo val icon: String,
     @ColumnInfo val userId: Int,
 
-)
+    )
 
-@Entity(tableName = "regular_transaction",
+@Entity(
+    tableName = "regular_transaction",
     foreignKeys = [
         ForeignKey(
             entity = User::class,
@@ -69,8 +74,9 @@ data class Category(
             childColumns = ["userId"],
             onDelete = ForeignKey.CASCADE
         )
-    ])
-data class RegularTransaction(
+    ]
+)
+data class RegularTransactions(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val title: String,
     @ColumnInfo val description: String,
@@ -87,7 +93,8 @@ data class RegularTransaction(
         }
 }
 
-@Entity(tableName = "earned_badge",
+@Entity(
+    tableName = "earned_badge",
     foreignKeys = [
         ForeignKey(
             entity = User::class,
@@ -95,7 +102,8 @@ data class RegularTransaction(
             childColumns = ["userId"],
             onDelete = ForeignKey.CASCADE
         )
-    ])
+    ]
+)
 data class EarnedBadge(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val userId: Int,

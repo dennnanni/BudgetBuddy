@@ -1,11 +1,12 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,14 +22,22 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddLocationAlt
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -40,18 +49,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.badges.AllBadges
+import com.android.budgetbuddy.data.database.EarnedBadge
 import com.android.budgetbuddy.data.database.Transaction
+import com.android.budgetbuddy.data.remote.OSMDataSource
+import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
 import com.android.budgetbuddy.ui.composables.CustomDropDown
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
+import com.android.budgetbuddy.ui.utils.LocationService
+import com.android.budgetbuddy.ui.utils.PermissionStatus
+import com.android.budgetbuddy.ui.utils.SPConstants
+import com.android.budgetbuddy.ui.utils.isOnline
+import com.android.budgetbuddy.ui.utils.openWirelessSettings
+import com.android.budgetbuddy.ui.utils.rememberPermission
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
+import com.android.budgetbuddy.ui.viewmodel.EarnedBadgeViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -68,8 +90,8 @@ fun AddTransactionScreen(
     currencyViewModel: CurrencyViewModel,
     snackbarHostState: SnackbarHostState,
     osmDataSource: OSMDataSource,
-    transaction: Transaction? = null,
-    earnedBadgeViewModel: EarnedBadgeViewModel
+    earnedBadgeViewModel: EarnedBadgeViewModel,
+    transaction: Transaction? = null
 ) {
     val context = LocalContext.current
     val options = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
@@ -143,7 +165,6 @@ fun AddTransactionScreen(
         place = osmDataSource.getPlace(locationService.coordinates!!)
     }
 
-    val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, Context.MODE_PRIVATE)
 
 
@@ -316,7 +337,7 @@ fun AddTransactionScreen(
                     earnedBadgeViewModel.actions.loadEarnedBadges(userId).join()
                     for (badge in AllBadges.badges) {
                         if (earnedBadgeViewModel.earnedBadges.value.none { it.badgeName == badge.badgeName } &&
-                            badge.badgeLambda(actions.getUserTransactions(userId))
+                            badge.badgeLambda(actions.getUserTransactions())
                         ) {
                             earnedBadgeViewModel.actions.addEarnedBadge(
                                 EarnedBadge(

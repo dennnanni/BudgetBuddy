@@ -14,7 +14,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.budgetbuddy.data.remote.OSMDataSource
-import com.android.budgetbuddy.ui.screens.map.MapScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddTransactionScreen
 import com.android.budgetbuddy.ui.screens.changeInfo.ChangeName
@@ -24,6 +23,7 @@ import com.android.budgetbuddy.ui.screens.charts.ChartsScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
+import com.android.budgetbuddy.ui.screens.map.MapScreen
 import com.android.budgetbuddy.ui.screens.profile.ProfileScreen
 import com.android.budgetbuddy.ui.screens.register.RegisterScreen
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
@@ -196,6 +196,7 @@ fun BudgetBuddyNavGraph(
                     currencyViewModel,
                     snackbarHostState,
                     osmDataSource,
+                    earnedBadgeViewModel,
                     transaction
                 )
             }

@@ -18,13 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.android.budgetbuddy.data.database.RegularTransaction
+import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 
 @Composable
 fun RegularTransactionItem(
-    transaction: RegularTransaction,
+    transaction: RegularTransactions,
     currencyViewModel: CurrencyViewModel,
     icon: String,
     navController: NavHostController,

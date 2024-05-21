@@ -73,10 +73,10 @@ interface CategoryDAO {
 @Dao
 interface RegularTransactionDAO {
     @Query("SELECT * FROM `regular_transaction`")
-    fun getAll(): Flow<List<RegularTransaction>>
+    fun getAll(): Flow<List<RegularTransactions>>
 
     @Query("SELECT * FROM `regular_transaction` WHERE userId = :userId")
-    suspend fun getUserTransactions(userId: Int): List<RegularTransaction>
+    suspend fun getUserTransactions(userId: Int): List<RegularTransactions>
 
     @Query(
         "SELECT category\n" +
@@ -88,10 +88,10 @@ interface RegularTransactionDAO {
     suspend fun getMostPopularCategories(): List<String>
 
     @Upsert
-    suspend fun upsert(transaction: RegularTransaction)
+    suspend fun upsert(transaction: RegularTransactions)
 
     @Delete
-    suspend fun delete(transaction: RegularTransaction)
+    suspend fun delete(transaction: RegularTransactions)
 
     @Query("DELETE FROM `regular_transaction`")
     suspend fun nukeTable()

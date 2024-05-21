@@ -8,7 +8,7 @@ import com.android.budgetbuddy.data.database.Category
 import com.android.budgetbuddy.data.database.CategoryDAO
 import com.android.budgetbuddy.data.database.EarnedBadge
 import com.android.budgetbuddy.data.database.EarnedBadgeDAO
-import com.android.budgetbuddy.data.database.RegularTransaction
+import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.data.database.RegularTransactionDAO
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.database.TransactionDAO
@@ -86,12 +86,12 @@ class CurrencyRepository(private val dataStore: DataStore<Preferences>, private 
 }
 
 class RegularTransactionRepository(private val regularTransactionDAO: RegularTransactionDAO) {
-    val transactions: Flow<List<RegularTransaction>> = regularTransactionDAO.getAll()
+    val transactions: Flow<List<RegularTransactions>> = regularTransactionDAO.getAll()
 
-    suspend fun upsert(transaction: RegularTransaction) = regularTransactionDAO.upsert(transaction)
-    suspend fun delete(transaction: RegularTransaction) = regularTransactionDAO.delete(transaction)
+    suspend fun upsert(transaction: RegularTransactions) = regularTransactionDAO.upsert(transaction)
+    suspend fun delete(transaction: RegularTransactions) = regularTransactionDAO.delete(transaction)
     suspend fun getMostPopularCategories(): List<String> = regularTransactionDAO.getMostPopularCategories()
-    suspend fun getUserTransactions(username: Int): List<RegularTransaction> = regularTransactionDAO.getUserTransactions(username)
+    suspend fun getUserTransactions(username: Int): List<RegularTransactions> = regularTransactionDAO.getUserTransactions(username)
     suspend fun nukeTable() = regularTransactionDAO.nukeTable()
 }
 

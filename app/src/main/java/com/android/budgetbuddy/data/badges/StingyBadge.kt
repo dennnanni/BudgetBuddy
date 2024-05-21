@@ -1,6 +1,7 @@
 package com.android.budgetbuddy.data.badges
 
 import android.icu.util.Calendar
+import android.util.Log
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
 import java.util.Date
@@ -31,6 +32,7 @@ class StingyBadge : AbstractBadge() {
                 incomeCount += it.amount
             }
         }
+        Log.d("StingyBadge", "Income: $incomeCount, Expense: $expenseCount")
         expenseCount / incomeCount < 0.1
     }
 }
