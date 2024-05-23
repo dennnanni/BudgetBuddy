@@ -180,14 +180,6 @@ fun ProfileScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.size(20.dp))
-
-        Button(onClick = {
-            photoPickerLauncher.launch("image/*")
-        }) {
-            Text(text = "Change Profile Picture")
-        }
-
     }
 
     if (showDialog) {

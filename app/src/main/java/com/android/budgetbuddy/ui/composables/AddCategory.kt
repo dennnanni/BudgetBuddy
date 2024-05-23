@@ -26,7 +26,12 @@ import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 
 @Composable
-fun AddCategory(categoryActions: CategoryActions, onDismissRequest: () -> Unit, userViewModel: UserViewModel) {
+fun AddCategory(
+    categoryActions: CategoryActions,
+    onDismissRequest: () -> Unit,
+    userViewModel: UserViewModel,
+    categoryAlreadyExists: () -> Unit
+) {
 
     val categoryName = remember { mutableStateOf("") }
     var icon by remember { mutableStateOf("Filled.Add") }
@@ -71,13 +76,13 @@ fun AddCategory(categoryActions: CategoryActions, onDismissRequest: () -> Unit, 
                     onClick = {
 
                         if (categoryActions.getCategories().any { it.name == categoryName.value }) {
-
+                            categoryAlreadyExists()
                             return@Button
                         }
 
                         categoryActions.addCategory(
                             Category(
-                                name = categoryName.value,
+                                name = categoryName.value.trim(),
                                 icon = icon,
                                 userId = userViewModel.actions.getUserId()!!
                             ),

@@ -104,7 +104,8 @@ sealed class BudgetBuddyRoute(
             Charts,
             ChangeName,
             ChangeUsername,
-            ChangePassword
+            ChangePassword,
+            AllBadges
         )
         val bottomBarRoutes = setOf(
             Home,
@@ -311,6 +312,7 @@ fun BudgetBuddyNavGraph(
         with(BudgetBuddyRoute.ChangeName) {
             composable(route) {
                 ChangeName(
+                    navController,
                     userViewModel.actions
                 )
             }
@@ -318,6 +320,7 @@ fun BudgetBuddyNavGraph(
         with(BudgetBuddyRoute.ChangeUsername) {
             composable(route) {
                 ChangeUsername(
+                    navController,
                     userViewModel.actions
                 )
             }
@@ -325,6 +328,7 @@ fun BudgetBuddyNavGraph(
         with(BudgetBuddyRoute.ChangePassword) {
             composable(route) {
                 ChangePassword(
+                    navController,
                     userViewModel.actions
                 )
             }

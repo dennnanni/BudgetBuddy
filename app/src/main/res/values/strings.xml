@@ -82,4 +82,14 @@
     <string name="change_name">Change name</string>
     <string name="balance_progression">Balance progression</string>
     <string name="transactions_by_category">Transactions by category</string>
+    <string name="category_already_exists">Category already exists</string>
+    <string name="new_name">New name</string>
+    <string name="your_current_name">Your current name: %1$s</string>
+    <string name="username_changed">Username successfully updated</string>
+    <string name="password_changed">Password successfully changed</string>
+    <string name="new_password">New password</string>
+    <string name="confirm_new_password">Confirm new password</string>
+    <string name="your_current_username">Your current username: %1$s</string>
+    <string name="new_username">New username</string>
+    <string name="name_changed">Name successfully updated</string>
 </resources>

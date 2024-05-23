@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.screens.addTransaction
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,6 +67,14 @@ fun AddRegularTransactionScreen(
     categoryActions: CategoryActions,
     currencyViewModel: CurrencyViewModel
 ) {
+    val context = LocalContext.current
+    var showCategoryAlreadyExistsToast by remember { mutableStateOf(false) }
+
+    if (showCategoryAlreadyExistsToast) {
+        Toast.makeText(context, context.getString(R.string.category_already_exists), Toast.LENGTH_SHORT).show()
+        showCategoryAlreadyExistsToast = false
+    }
+
     val options =
         listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val periods = mapOf(
@@ -100,7 +110,8 @@ fun AddRegularTransactionScreen(
                 showDialog.value = false
                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
             },
-            userViewModel
+            userViewModel,
+            categoryAlreadyExists = { showCategoryAlreadyExistsToast = false }
         )
     }
 
@@ -123,7 +134,8 @@ fun AddRegularTransactionScreen(
                 OutlinedTextField(
                     label = { Text("Title") },
                     value = title.value,
-                    onValueChange = { title.value = it }, modifier = Modifier
+                    onValueChange = { title.value = it },
+                    modifier = Modifier
                         .fillMaxWidth()
                 )
 

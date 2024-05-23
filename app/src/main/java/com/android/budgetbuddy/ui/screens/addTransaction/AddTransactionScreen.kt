@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -94,14 +95,20 @@ fun AddTransactionScreen(
     transaction: Transaction? = null
 ) {
     val context = LocalContext.current
+    var showCategoryAlreadyExistsToast by remember { mutableStateOf(false) }
+
+    if (showCategoryAlreadyExistsToast) {
+        Toast.makeText(context, context.getString(R.string.category_already_exists), Toast.LENGTH_SHORT).show()
+        showCategoryAlreadyExistsToast = false
+    }
+
     val options =
         listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(transaction?.type ?: options[0]) }
     val locationService = remember { LocationService(context) }
 
-    var selectedOptionText by remember { mutableStateOf(transaction?.category ?: "")
-    }
+    var selectedOptionText by remember { mutableStateOf(transaction?.category ?: "") }
     categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
 
     if (categoryActions.getCategories().isEmpty()) {
@@ -178,7 +185,8 @@ fun AddTransactionScreen(
                 showDialog.value = false
                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
             },
-            userViewModel
+            userViewModel,
+            categoryAlreadyExists = { showCategoryAlreadyExistsToast = true }
         )
     }
 
