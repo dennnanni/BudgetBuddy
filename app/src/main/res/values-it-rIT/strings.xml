@@ -94,4 +94,7 @@
     <string name="name_changed">Nome aggiornato con successo</string>
     <string name="invalid_username">Nome utente non valido, può contenere solo lettere, numeri, punti e trattini bassi</string>
     <string name="title_and_amount_are_required">Titolo e importo sono obbligatori</string>
+    <string name="choose_an_icon">Scegli un\'icona</string>
+    <string name="add_regular_transaction">Aggiungi transazione periodica</string>
+    <string name="transaction_details">Dettagli transazione</string>
 </resources>

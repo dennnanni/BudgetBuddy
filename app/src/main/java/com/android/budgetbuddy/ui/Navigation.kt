@@ -13,6 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.ui.screens.achievements.AllBadgesScreen
 import com.android.budgetbuddy.ui.screens.addTransaction.AddRegularTransactionScreen
@@ -45,47 +46,47 @@ import org.koin.compose.koinInject
 
 sealed class BudgetBuddyRoute(
     val route: String,
-    val title: String,
+    val title: Int,
     val args: List<NamedNavArgument> = emptyList()
 ) {
-    data object Home : BudgetBuddyRoute("home", "BudgetBuddy")
-    data object AddTransaction : BudgetBuddyRoute("transactions/add", "Add Transaction")
+    data object Home : BudgetBuddyRoute("home", R.string.app_name)
+    data object AddTransaction : BudgetBuddyRoute("transactions/add", R.string.add_transaction)
     data object AddRegularTransaction :
-        BudgetBuddyRoute("regular_transactions/add", "Add Regular Transaction")
+        BudgetBuddyRoute("regular_transactions/add", R.string.add_regular_transaction)
 
-    data object Profile : BudgetBuddyRoute("profile", "Profile")
+    data object Profile : BudgetBuddyRoute("profile", R.string.profile)
     data object TransactionDetails : BudgetBuddyRoute(
         "transactions/{transactionId}",
-        "Transaction details",
+        R.string.transaction_details,
         listOf(navArgument("transactionId") { type = NavType.StringType })
     ) {
         fun buildRoute(transactionId: String) = "transactions/$transactionId"
     }
 
-    data object Settings : BudgetBuddyRoute("settings", "Settings")
+    data object Settings : BudgetBuddyRoute("settings", R.string.settings)
     data object EditTransaction : BudgetBuddyRoute(
         "transactions/edit/{transactionId}",
-        "Edit Transaction",
+        R.string.edit_transaction,
         listOf(navArgument("transactionId") { type = NavType.StringType })
     ) {
         fun buildRoute(transactionId: String) = "transactions/edit/$transactionId"
     }
 
-    data object Register : BudgetBuddyRoute("register", "Register")
+    data object Register : BudgetBuddyRoute("register", R.string.register)
 
-    data object Login : BudgetBuddyRoute("login", "Login")
+    data object Login : BudgetBuddyRoute("login", R.string.login)
 
-    data object Transactions : BudgetBuddyRoute("transactions", "All transactions")
+    data object Transactions : BudgetBuddyRoute("transactions", R.string.all_transactions)
     data object RegularTransactions :
-        BudgetBuddyRoute("regular_transactions", "Regular transactions")
+        BudgetBuddyRoute("regular_transactions", R.string.regular_transactions)
 
-    data object Map : BudgetBuddyRoute("map", "Map")
-    data object Charts : BudgetBuddyRoute("charts", "Charts")
-    data object ChangeName : BudgetBuddyRoute("change/name", "Change name")
-    data object ChangeUsername : BudgetBuddyRoute("change/username", "Change username")
-    data object ChangePassword : BudgetBuddyRoute("change/password", "Change password")
+    data object Map : BudgetBuddyRoute("map", R.string.map)
+    data object Charts : BudgetBuddyRoute("charts", R.string.charts)
+    data object ChangeName : BudgetBuddyRoute("change/name", R.string.change_name)
+    data object ChangeUsername : BudgetBuddyRoute("change/username", R.string.change_username)
+    data object ChangePassword : BudgetBuddyRoute("change/password", R.string.change_password)
 
-    data object AllBadges : BudgetBuddyRoute("badges", "All badges")
+    data object AllBadges : BudgetBuddyRoute("badges", R.string.badges)
 
     companion object {
         val routes = setOf(

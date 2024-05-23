@@ -95,4 +95,6 @@
     <string name="invalid_username">Invalid username, it can contain only letters, numbers, dots and underscores</string>
     <string name="title_and_amount_are_required">Title and amount are required</string>
     <string name="choose_an_icon">Choose an icon</string>
+    <string name="add_regular_transaction">Add regular transaction</string>
+    <string name="transaction_details">Transaction details</string>
 </resources>

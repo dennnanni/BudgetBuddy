@@ -55,7 +55,7 @@ fun TopBar(
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
                 ProfileHome(name = name, username = username, profilePic = profilePic, navController = navController)
             } else {
-                val title: String = currentRoute.title
+                val title: String = stringResource(id = currentRoute.title)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
