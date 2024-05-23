@@ -52,6 +52,7 @@ import com.android.budgetbuddy.ui.composables.TransactionAlertDialog
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.Coordinates
 import com.android.budgetbuddy.ui.utils.isOnline
+import com.android.budgetbuddy.ui.utils.toLocaleString
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import kotlinx.coroutines.launch
 
@@ -145,7 +146,7 @@ fun DetailsScreen(
                     )
                     DetailRow(
                         key = stringResource(R.string.amount),
-                        value = "${currencyViewModel.convert(transaction.amount)} ${
+                        value = "${currencyViewModel.convert(transaction.amount).toLocaleString()} ${
                             currencyViewModel.getCurrency().getSymbol()
                         }"
                     )

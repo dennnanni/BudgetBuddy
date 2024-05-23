@@ -111,7 +111,7 @@ fun ChartsScreen(
                     .clip(RoundedCornerShape(30.dp))
                     .fillMaxSize()
             ){
-                LineChart(data = indexToBalanceMap, transactions.size == 1, dateValueFormatter)
+                LineChart(data = indexToBalanceMap, indexToBalanceMap.size == 1, dateValueFormatter)
             }
         }
 

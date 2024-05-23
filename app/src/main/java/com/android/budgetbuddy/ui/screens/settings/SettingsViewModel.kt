@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 enum class Theme {
     System,
@@ -89,10 +90,10 @@ class CurrencyViewModel(
     }
 
     fun convert(amount: Double): Double {
-        return  String.format("%.2f", amount * rate).toDouble()
+        return  String.format(Locale.US, "%.2f", amount * rate).toDouble()
     }
 
     fun convertToUSD(amount: Double): Double {
-        return String.format("%.2f", amount / rate).toDouble()
+        return String.format(Locale.US, "%.2f", amount / rate).toDouble()
     }
 }

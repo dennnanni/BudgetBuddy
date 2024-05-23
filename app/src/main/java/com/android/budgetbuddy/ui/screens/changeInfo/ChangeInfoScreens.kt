@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.utils.SPConstants
+import com.android.budgetbuddy.ui.utils.checkUsernameValidity
 import com.android.budgetbuddy.ui.utils.hashPassword
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import kotlinx.coroutines.launch
@@ -116,6 +117,8 @@ fun ChangeUsername(
     val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, 0)
     val coroutineScope = rememberCoroutineScope()
     var showConfirmToast by remember { mutableStateOf(false) }
+    var showInvalidUsernameToast by remember { mutableStateOf(false) }
+    var showUsernameAlreadyUsedToast by remember { mutableStateOf(false) }
     val user = userActions.getLoggedUser()!!
     var username by remember { mutableStateOf("") }
 
@@ -133,6 +136,24 @@ fun ChangeUsername(
         }
 
         navController.popBackStack()
+    }
+
+    if (showInvalidUsernameToast) {
+        Toast.makeText(
+            LocalContext.current,
+            stringResource(id = R.string.invalid_username),
+            Toast.LENGTH_LONG).show()
+
+        showInvalidUsernameToast = false
+    }
+
+    if (showUsernameAlreadyUsedToast) {
+        Toast.makeText(
+            LocalContext.current,
+            stringResource(id = R.string.username_already_exists),
+            Toast.LENGTH_LONG).show()
+
+        showUsernameAlreadyUsedToast = false
     }
 
     Column(
@@ -172,8 +193,14 @@ fun ChangeUsername(
                     return@Button
                 }
 
+                if (!checkUsernameValidity(username)) {
+                    showInvalidUsernameToast = true
+                    return@Button
+                }
+
                 coroutineScope.launch {
                     if (userActions.getUserByUsername(username) != null) {
+                        showUsernameAlreadyUsedToast = true
                         return@launch
                     }
                     userActions.addUser(user.copy(username = username))
@@ -217,7 +244,7 @@ fun ChangePassword(
         Toast.makeText(
             LocalContext.current,
             stringResource(id = R.string.passwords_do_not_match),
-            Toast.LENGTH_SHORT).show()
+            Toast.LENGTH_LONG).show()
 
         showPasswordMismatchToast = false
     }

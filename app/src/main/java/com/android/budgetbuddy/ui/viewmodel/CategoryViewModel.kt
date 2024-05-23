@@ -1,6 +1,5 @@
 package com.android.budgetbuddy.ui.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

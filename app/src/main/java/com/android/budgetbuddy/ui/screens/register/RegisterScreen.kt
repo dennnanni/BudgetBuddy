@@ -33,6 +33,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
@@ -44,6 +45,7 @@ import com.android.budgetbuddy.ui.viewmodel.UserActions
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
 import java.util.Base64
+import java.util.Locale
 
 @Composable
 fun RegisterScreen(navController: NavHostController, actions: UserActions) {
@@ -130,7 +132,7 @@ fun RegisterScreen(navController: NavHostController, actions: UserActions) {
                     error = registrationChecks(
                         context,
                         fullName.value,
-                        username.value,
+                        username.value.lowercase(Locale.ROOT),
                         password.value,
                         confirmPassword.value
                     )
@@ -195,7 +197,8 @@ fun registrationChecks(
     fullName: String,
     username: String,
     password: String,
-    confirmPassword: String
+    confirmPassword: String,
+    usernameChecks: (String) -> Boolean = { true }
 ): String? {
     if (fullName.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
         return context.getString(R.string.fields_cannot_be_empty)
@@ -212,6 +215,11 @@ fun registrationChecks(
     if (password != confirmPassword) {
         return context.getString(R.string.passwords_do_not_match)
     }
+
+    if (!usernameChecks(username)) {
+        return context.getString(R.string.invalid_username)
+    }
+
 
     return null
 }

@@ -50,6 +50,7 @@ import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.isOnline
 import com.android.budgetbuddy.ui.utils.openWirelessSettings
+import com.android.budgetbuddy.ui.utils.toLocaleString
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
@@ -235,7 +236,7 @@ fun HomeScreen(
                 )
 
                 Text(
-                    text = "${currencyViewModel.convert(totalBalance)} ${currency.getSymbol()}",
+                    text = "${currencyViewModel.convert(totalBalance).toLocaleString()} ${currency.getSymbol()}",
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -254,7 +255,7 @@ fun HomeScreen(
 
                 ) {
                     LineChart(indexToBalanceMap,
-                        transactionViewModel.userTransactions.size == 1,
+                        indexToBalanceMap.size == 1,
                         dateValueFormatter,
                         indexToBalanceMap.size > 20
                     )

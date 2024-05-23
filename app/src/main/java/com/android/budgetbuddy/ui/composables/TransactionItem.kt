@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
+import com.android.budgetbuddy.ui.utils.toLocaleString
 
 val iconList: List<ImageVector> = listOf(
     Icons.Filled.Add,
@@ -71,11 +72,11 @@ fun TransactionItem(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    iconList.filter {
+                    IconsList.entries.first {
                         it.name
                             .lowercase()
                             .contains(icon.lowercase())
-                    }[0], null,
+                    }.icon, null,
                     tint = MaterialTheme.colorScheme.onSecondary
                 )
             }
@@ -84,6 +85,6 @@ fun TransactionItem(
         }
 
         val sign = if (transaction.isExpense) "-" else "+"
-        Text(text = "${sign}${currencyViewModel.convert(transaction.amount)} ${currency.getSymbol()}")
+        Text(text = "${sign}${currencyViewModel.convert(transaction.amount).toLocaleString()} ${currency.getSymbol()}")
     }
 }

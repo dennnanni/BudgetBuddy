@@ -96,10 +96,16 @@ fun AddTransactionScreen(
 ) {
     val context = LocalContext.current
     var showCategoryAlreadyExistsToast by remember { mutableStateOf(false) }
+    var showIncompleteInformationToast by remember { mutableStateOf(false) }
 
     if (showCategoryAlreadyExistsToast) {
-        Toast.makeText(context, context.getString(R.string.category_already_exists), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.category_already_exists), Toast.LENGTH_LONG).show()
         showCategoryAlreadyExistsToast = false
+    }
+
+    if (showIncompleteInformationToast) {
+        Toast.makeText(context, context.getString(R.string.title_and_amount_are_required), Toast.LENGTH_SHORT).show()
+        showIncompleteInformationToast = false
     }
 
     val options =
@@ -315,12 +321,18 @@ fun AddTransactionScreen(
                 .height(50.dp),
             onClick = {
                 val userId = userViewModel.actions.getUserId() ?: return@Button
+                title.value = title.value.trim()
+                if (title.value.isEmpty() || amount.value == 0.0) {
+                    showIncompleteInformationToast = true
+                    return@Button
+                }
+
 
                 coroutineScope.launch {
                     if (transaction == null) {
                         actions.addTransaction(
                             Transaction(
-                                title = title.value.trim(),
+                                title = title.value,
                                 description = description.value.trim(),
                                 type = selectedOption,
                                 category = selectedOptionText,
@@ -335,7 +347,7 @@ fun AddTransactionScreen(
                             )
                         ).join()
                     } else {
-                        transaction.title = title.value.trim()
+                        transaction.title = title.value
                         transaction.description = description.value.trim()
                         transaction.type = selectedOption
                         transaction.category = selectedOptionText

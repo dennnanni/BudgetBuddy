@@ -21,6 +21,9 @@ import androidx.navigation.NavHostController
 import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
+import com.android.budgetbuddy.ui.utils.toLocaleString
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun RegularTransactionItem(
@@ -56,11 +59,11 @@ fun RegularTransactionItem(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    iconList.filter {
+                    IconsList.entries.first {
                         it.name
                             .lowercase()
                             .contains(icon.lowercase())
-                    }[0], null
+                    }.icon, null
                 )
             }
 
@@ -68,6 +71,6 @@ fun RegularTransactionItem(
         }
 
         val sign = if (transaction.isExpense) "-" else "+"
-        Text(text = "${sign}${currencyViewModel.convert(transaction.amount)} ${currency.getSymbol()}")
+        Text(text = "${sign}${currencyViewModel.convert(transaction.amount).toLocaleString()} ${currency.getSymbol()}")
     }
 }
