@@ -21,7 +21,7 @@ interface TransactionActions {
 
     fun loadUserTransactions(userId: Int): Job
     fun getUserTransactions(): List<Transaction>
-    fun loadMostPopularCategories(): Job
+    fun loadMostPopularCategories(userId: Int): Job
     fun getMostPopularCategories(): List<String>
 
     fun nukeTable(): Job
@@ -56,8 +56,8 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
             return userTransactions
         }
 
-        override fun loadMostPopularCategories(): Job = viewModelScope.launch {
-            mostPopularCategories.value = repository.getMostPopularCategories()
+        override fun loadMostPopularCategories(userId: Int): Job = viewModelScope.launch {
+            mostPopularCategories.value = repository.getMostPopularCategories(userId)
         }
 
         override fun getMostPopularCategories(): List<String> {

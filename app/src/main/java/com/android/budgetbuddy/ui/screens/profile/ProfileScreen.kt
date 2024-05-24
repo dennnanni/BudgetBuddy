@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,10 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -45,13 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
-import com.android.budgetbuddy.ui.viewmodel.TransactionActions
-import com.android.budgetbuddy.ui.viewmodel.TransactionsState
 import com.android.budgetbuddy.ui.composables.ProfileProfile
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.rememberCameraLauncher
 import com.android.budgetbuddy.ui.utils.rememberPermission
 import com.android.budgetbuddy.ui.utils.saveImageToStorage
+import com.android.budgetbuddy.ui.viewmodel.TransactionActions
+import com.android.budgetbuddy.ui.viewmodel.TransactionsState
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.android.budgetbuddy.ui.viewmodel.UserState
 
@@ -71,9 +68,9 @@ fun ProfileScreen(
     val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: ""
     val profilePic = sharedPreferences.getString(SPConstants.PROFILE_PIC, null) ?: ""
 
-    transactionActions.loadMostPopularCategories()
+    transactionActions.loadMostPopularCategories(userActions.getUserId()!!)
 
-    if(userActions.getLoggedUser() == null){
+    if (userActions.getLoggedUser() == null) {
         userActions.loadCurrentUser(username)
     }
     var selectedImageUri by remember {
@@ -194,7 +191,14 @@ fun ProfileScreen(
                 shape = MaterialTheme.shapes.large,
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
-                Column(modifier = Modifier.padding(top = 30.dp, end = 16.dp, start = 16.dp, bottom = 16.dp)) {
+                Column(
+                    modifier = Modifier.padding(
+                        top = 30.dp,
+                        end = 16.dp,
+                        start = 16.dp,
+                        bottom = 16.dp
+                    )
+                ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(id = R.string.choose_an_option),
@@ -204,7 +208,7 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly
-                    ){
+                    ) {
                         TextButton(
                             onClick = {
                                 showDialog = false
@@ -226,7 +230,5 @@ fun ProfileScreen(
                 }
             }
         }
-
     }
-
 }

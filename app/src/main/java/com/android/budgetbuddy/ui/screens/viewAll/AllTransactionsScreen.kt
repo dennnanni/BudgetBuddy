@@ -1,6 +1,5 @@
 package com.android.budgetbuddy.ui.screens.viewAll
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,7 +18,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -152,6 +150,7 @@ fun AllTransactionsScreen(
                     currencyViewModel = currencyViewModel,
                     icon = categoryActions.getCategoryIcon(it.category),
                     navController = navController,
+                    color = categoryActions.getCategoryColor(it.category),
                     modifier = Modifier.padding(16.dp, 10.dp)
                 )
             }

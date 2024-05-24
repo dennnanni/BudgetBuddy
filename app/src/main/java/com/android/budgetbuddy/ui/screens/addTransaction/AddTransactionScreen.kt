@@ -64,8 +64,8 @@ import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.AddCategory
+import com.android.budgetbuddy.ui.composables.CategoryPicker
 import com.android.budgetbuddy.ui.composables.CustomDatePicker
-import com.android.budgetbuddy.ui.composables.CustomDropDown
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.LocationService
 import com.android.budgetbuddy.ui.utils.PermissionStatus
@@ -99,12 +99,20 @@ fun AddTransactionScreen(
     var showIncompleteInformationToast by remember { mutableStateOf(false) }
 
     if (showCategoryAlreadyExistsToast) {
-        Toast.makeText(context, context.getString(R.string.category_already_exists), Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            context,
+            context.getString(R.string.category_already_exists),
+            Toast.LENGTH_LONG
+        ).show()
         showCategoryAlreadyExistsToast = false
     }
 
     if (showIncompleteInformationToast) {
-        Toast.makeText(context, context.getString(R.string.title_and_amount_are_required), Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            context.getString(R.string.title_and_amount_are_required),
+            Toast.LENGTH_SHORT
+        ).show()
         showIncompleteInformationToast = false
     }
 
@@ -264,9 +272,12 @@ fun AddTransactionScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (categoryActions.getCategories().isNotEmpty()) {
-                        CustomDropDown(
+                        CategoryPicker(
                             options = categoryActions.getCategories().map { it.name },
-                            fun(it: String) { selectedOptionText = it })
+                            fun(it: String) { selectedOptionText = it },
+                            categoryActions,
+                            userViewModel.actions.getUserId()!!
+                        )
                     }
                     IconButton(
                         onClick = { showDialog.value = true },

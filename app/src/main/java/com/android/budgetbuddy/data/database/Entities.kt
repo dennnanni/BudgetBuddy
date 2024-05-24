@@ -61,6 +61,7 @@ data class Category(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val name: String,
     @ColumnInfo val icon: String,
+    @ColumnInfo val color: String,
     @ColumnInfo val userId: Int,
 
     )

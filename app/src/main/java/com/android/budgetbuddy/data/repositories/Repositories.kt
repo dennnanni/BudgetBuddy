@@ -8,8 +8,8 @@ import com.android.budgetbuddy.data.database.Category
 import com.android.budgetbuddy.data.database.CategoryDAO
 import com.android.budgetbuddy.data.database.EarnedBadge
 import com.android.budgetbuddy.data.database.EarnedBadgeDAO
-import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.data.database.RegularTransactionDAO
+import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.database.TransactionDAO
 import com.android.budgetbuddy.data.database.User
@@ -26,7 +26,7 @@ class TransactionRepository(private val transactionDAO: TransactionDAO) {
 
     suspend fun upsert(transaction: Transaction) = transactionDAO.upsert(transaction)
     suspend fun delete(transaction: Transaction) = transactionDAO.delete(transaction)
-    suspend fun getMostPopularCategories(): List<String> = transactionDAO.getMostPopularCategories()
+    suspend fun getMostPopularCategories(userId: Int): List<String> = transactionDAO.getMostPopularCategories(userId)
     suspend fun getUserTransactions(username: Int): List<Transaction> = transactionDAO.getUserTransactions(username)
     suspend fun nukeTable() = transactionDAO.nukeTable()
 }
@@ -45,6 +45,7 @@ class UserRepository(private val userDAO: UserDAO) {
 
 class CategoryRepository(private val categoryDAO: CategoryDAO) {
     suspend fun getAll(userId: Int): List<Category> = categoryDAO.getAll(userId)
+    suspend fun deleteCategory(category:String, userId: Int) = categoryDAO.deleteCategory(category, userId)
     suspend fun upsert(category: Category) = categoryDAO.upsert(category)
     suspend fun delete(category: Category) = categoryDAO.delete(category)
 }

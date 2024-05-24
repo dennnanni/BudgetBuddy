@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,7 +36,11 @@ fun AddCategory(
 ) {
 
     val categoryName = remember { mutableStateOf("") }
-    var icon by remember { mutableStateOf("Filled.Add") }
+    var icon by remember { mutableStateOf("Add") }
+    var color by remember {
+        mutableStateOf(Color.Blue)
+    }
+    val showDialog = remember { mutableStateOf(false) }
     categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -71,6 +77,40 @@ fun AddCategory(
                     icon = it
                 })
 
+                // button to trigger color picker dialog
+                Button(
+                    onClick = { showDialog.value = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = color
+                    )
+                ) {
+                    Text("Color")
+                }
+
+
+                if (showDialog.value) {
+                    ColorPickerDialog(
+                        initialColor = MaterialTheme.colorScheme.primary.toHex(),
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary.toHex(),
+                            MaterialTheme.colorScheme.secondary.toHex(),
+                            MaterialTheme.colorScheme.tertiary.toHex(),
+                            MaterialTheme.colorScheme.surface.toHex(),
+                            MaterialTheme.colorScheme.onSurface.toHex(),
+                            MaterialTheme.colorScheme.onPrimary.toHex(),
+                            MaterialTheme.colorScheme.onSecondary.toHex(),
+                            MaterialTheme.colorScheme.onTertiary.toHex(),
+                        ),
+                        onChoice = {
+                            showDialog.value = false
+                            color = Color(android.graphics.Color.parseColor(it))
+                        }
+                    )
+                }
+
                 // add category button
                 Button(
                     onClick = {
@@ -84,6 +124,7 @@ fun AddCategory(
                             Category(
                                 name = categoryName.value.trim(),
                                 icon = icon,
+                                color = color.toHex(),
                                 userId = userViewModel.actions.getUserId()!!
                             ),
                             userViewModel.actions.getUserId()!!
@@ -99,4 +140,11 @@ fun AddCategory(
             }
         }
     }
+}
+
+private fun Color.toHex(): String {
+    val red = this.red * 255
+    val green = this.green * 255
+    val blue = this.blue * 255
+    return String.format("#%02x%02x%02x", red.toInt(), green.toInt(), blue.toInt())
 }

@@ -14,9 +14,59 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddChart
+import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.AutoAwesomeMosaic
+import androidx.compose.material.icons.filled.AutoAwesomeMotion
+import androidx.compose.material.icons.filled.AutoFixHigh
+import androidx.compose.material.icons.filled.AutoFixNormal
+import androidx.compose.material.icons.filled.Backpack
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Checkroom
+import androidx.compose.material.icons.filled.ChildCare
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.DesktopWindows
+import androidx.compose.material.icons.filled.DeveloperBoard
+import androidx.compose.material.icons.filled.DeviceHub
+import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material.icons.filled.DinnerDining
+import androidx.compose.material.icons.filled.Dock
+import androidx.compose.material.icons.filled.Earbuds
+import androidx.compose.material.icons.filled.EarbudsBattery
+import androidx.compose.material.icons.filled.East
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.ElectricBike
+import androidx.compose.material.icons.filled.ElectricCar
+import androidx.compose.material.icons.filled.ElectricMoped
+import androidx.compose.material.icons.filled.ElectricRickshaw
+import androidx.compose.material.icons.filled.ElectricScooter
+import androidx.compose.material.icons.filled.EmojiFoodBeverage
+import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.FoodBank
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.LocalDining
+import androidx.compose.material.icons.filled.LocalDrink
+import androidx.compose.material.icons.filled.LocalPizza
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.LunchDining
+import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.MoneyOffCsred
+import androidx.compose.material.icons.filled.Nightlife
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.RequestQuote
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.RestaurantMenu
+import androidx.compose.material.icons.filled.RiceBowl
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.StoreMallDirectory
+import androidx.compose.material.icons.filled.Storefront
+import androidx.compose.material.icons.filled.WineBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +85,7 @@ import androidx.compose.ui.unit.dp
 import com.android.budgetbuddy.R
 
 enum class IconsList(val icon: ImageVector) {
+    Add(Icons.Filled.Add),
     AddChart(Icons.Filled.AddChart),
     AttachMoney(Icons.Filled.AttachMoney),
     AutoAwesome(Icons.Filled.AutoAwesome),

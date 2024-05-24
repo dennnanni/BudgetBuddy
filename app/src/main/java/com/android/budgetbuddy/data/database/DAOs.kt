@@ -18,11 +18,12 @@ interface TransactionDAO {
     @Query(
         "SELECT category\n" +
                 "FROM `transaction`\n" +
+                "WHERE userId = :userId\n" +
                 "GROUP BY category\n" +
                 "ORDER BY SUM(amount) DESC\n" +
                 "LIMIT 2"
     )
-    suspend fun getMostPopularCategories(): List<String>
+    suspend fun getMostPopularCategories(userId: Int): List<String>
 
     @Upsert
     suspend fun upsert(transaction: Transaction)
@@ -62,6 +63,9 @@ interface UserDAO {
 interface CategoryDAO {
     @Query("SELECT * FROM `category` where userId = :userId")
     suspend fun getAll(userId: Int): List<Category>
+
+    @Query("DELETE FROM `category` WHERE name = :name AND userId = :userId")
+    suspend fun deleteCategory(name: String, userId: Int)
 
     @Upsert
     suspend fun upsert(category: Category)
