@@ -23,6 +23,7 @@ import com.android.budgetbuddy.ui.screens.changeInfo.ChangePassword
 import com.android.budgetbuddy.ui.screens.changeInfo.ChangeUsername
 import com.android.budgetbuddy.ui.screens.charts.ChartsScreen
 import com.android.budgetbuddy.ui.screens.details.DetailsScreen
+import com.android.budgetbuddy.ui.screens.details.RegularDetailsScreen
 import com.android.budgetbuddy.ui.screens.home.HomeScreen
 import com.android.budgetbuddy.ui.screens.login.LoginScreen
 import com.android.budgetbuddy.ui.screens.map.MapScreen
@@ -63,6 +64,14 @@ sealed class BudgetBuddyRoute(
         fun buildRoute(transactionId: String) = "transactions/$transactionId"
     }
 
+    data object RegularTransactionDetails : BudgetBuddyRoute(
+        "regular_transactions/{transactionId}",
+        R.string.transaction_details,
+        listOf(navArgument("transactionId") { type = NavType.StringType })
+    ) {
+        fun buildRoute(transactionId: String) = "regular_transactions/$transactionId"
+    }
+
     data object Settings : BudgetBuddyRoute("settings", R.string.settings)
     data object EditTransaction : BudgetBuddyRoute(
         "transactions/edit/{transactionId}",
@@ -96,6 +105,7 @@ sealed class BudgetBuddyRoute(
             Profile,
             AddTransaction,
             TransactionDetails,
+            RegularTransactionDetails,
             EditTransaction,
             Settings,
             Transactions,
@@ -273,7 +283,9 @@ fun BudgetBuddyNavGraph(
                     transactionsState,
                     transactionViewModel.actions,
                     userState,
-                    userViewModel.actions
+                    userViewModel.actions,
+                    earnedBadgeViewModel,
+                    categoryActions
                 )
             }
         }
@@ -292,6 +304,23 @@ fun BudgetBuddyNavGraph(
                 )
             }
         }
+
+        with(BudgetBuddyRoute.RegularTransactionDetails) {
+            composable(route, args) { backStackEntry ->
+                val transaction = regularTransactionViewModel.userTransactions.find {
+                    it.id == backStackEntry.arguments?.getString("transactionId")?.toInt()
+                }
+                RegularDetailsScreen(
+                    transaction,
+                    navController,
+                    currencyViewModel,
+                    regularTransactionViewModel.actions,
+                    osmDataSource,
+                    userViewModel.actions.getUserId()
+                )
+            }
+        }
+
         with(BudgetBuddyRoute.Map) {
             composable(route) {
                 MapScreen(

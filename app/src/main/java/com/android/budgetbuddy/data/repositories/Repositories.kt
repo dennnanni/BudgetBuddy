@@ -99,6 +99,7 @@ class RegularTransactionRepository(private val regularTransactionDAO: RegularTra
 class EarnedBadgeRepository(private val earnedBadgeDAO: EarnedBadgeDAO) {
 
     suspend fun getUserBadges(userId: Int): List<EarnedBadge> = earnedBadgeDAO.getUserBadges(userId)
+    suspend fun getLastEarnedBadge(userId: Int): EarnedBadge = earnedBadgeDAO.getLastEarnedBadge(userId)
     suspend fun upsert(badge: EarnedBadge) = earnedBadgeDAO.upsert(badge)
     suspend fun delete(badge: EarnedBadge) = earnedBadgeDAO.delete(badge)
 }

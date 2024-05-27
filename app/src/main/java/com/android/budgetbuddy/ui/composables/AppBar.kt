@@ -1,6 +1,5 @@
 package com.android.budgetbuddy.ui.composables
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,7 +51,12 @@ fun TopBar(
         ),
         title = {
             if (currentRoute.route == BudgetBuddyRoute.Home.route) {
-                ProfileHome(name = name, username = username, profilePic = profilePic, navController = navController)
+                ProfileHome(
+                    name = name,
+                    username = username,
+                    profilePic = profilePic,
+                    navController = navController
+                )
             } else {
                 val title: String = stringResource(id = currentRoute.title)
                 Row(
@@ -86,6 +89,19 @@ fun TopBar(
                 IconButton({ navController.navigate(BudgetBuddyRoute.Settings.route) }) {
                     Icon(
                         Icons.Outlined.Settings, stringResource(R.string.settings),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            if (currentRoute.route == BudgetBuddyRoute.RegularTransactions.route) {
+                IconButton(
+                    {
+                        navController.navigate(BudgetBuddyRoute.AddRegularTransaction.route)
+                    }
+                ) {
+                    Icon(
+                        Icons.Filled.Add, stringResource(R.string.add_regular_transaction),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }

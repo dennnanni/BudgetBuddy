@@ -47,6 +47,7 @@
     <string name="delete_transaction">Eliminazione di %1$s</string>
     <string name="delete_transaction_message">Sei sicuro? Questa operazione non può essere annullata</string>
     <string name="most_expenses_in">Maggiori spese in</string>
+    <string name="last_earned_badge">Ultimo badge ottenuto</string>
     <string name="title">Titolo</string>
     <string name="fields_cannot_be_empty">I campi non possono essere vuoti</string>
     <string name="username_must_be_at_least_4_characters_long">Il nome utente deve essere lungo almeno 4 caratteri</string>

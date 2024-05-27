@@ -11,7 +11,7 @@ class CallItEven : AbstractBadge() {
     override val badgeIcon: Int = 0
     override val badgeProgress: Int = 0
     override val badgeGoal: Int = 0
-    override val image: Int = R.drawable._45271
+    override val image: Int = R.drawable._7498472_4556_4bda_a433_798444d66a46_1664720118668
     override val badgeLambda: (List<Transaction>) -> Boolean = filter@{ transactions ->
         val currentDate = Calendar.getInstance()
 

@@ -22,8 +22,6 @@ import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.toLocaleString
-import java.text.NumberFormat
-import java.util.Locale
 
 @Composable
 fun RegularTransactionItem(
@@ -40,7 +38,7 @@ fun RegularTransactionItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                navController.navigate(BudgetBuddyRoute.TransactionDetails.buildRoute(transaction.id.toString()))
+                navController.navigate(BudgetBuddyRoute.RegularTransactionDetails.buildRoute(transaction.id.toString()))
             },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

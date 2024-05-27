@@ -5,8 +5,9 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,8 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +44,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
+import com.android.budgetbuddy.data.badges.AllBadges
+import com.android.budgetbuddy.ui.composables.IconsList
 import com.android.budgetbuddy.ui.composables.ProfileProfile
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.rememberCameraLauncher
 import com.android.budgetbuddy.ui.utils.rememberPermission
 import com.android.budgetbuddy.ui.utils.saveImageToStorage
+import com.android.budgetbuddy.ui.viewmodel.CategoryActions
+import com.android.budgetbuddy.ui.viewmodel.EarnedBadgeViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionsState
 import com.android.budgetbuddy.ui.viewmodel.UserActions
@@ -59,7 +65,9 @@ fun ProfileScreen(
     transactionsState: TransactionsState,
     transactionActions: TransactionActions,
     userState: UserState,
-    userActions: UserActions
+    userActions: UserActions,
+    earnedBadgeViewModel: EarnedBadgeViewModel,
+    categoryActions: CategoryActions
 ) {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -69,6 +77,7 @@ fun ProfileScreen(
     val profilePic = sharedPreferences.getString(SPConstants.PROFILE_PIC, null) ?: ""
 
     transactionActions.loadMostPopularCategories(userActions.getUserId()!!)
+    earnedBadgeViewModel.actions.loadLastEarnedBadge(userActions.getUserId()!!)
 
     if (userActions.getLoggedUser() == null) {
         userActions.loadCurrentUser(username)
@@ -158,22 +167,59 @@ fun ProfileScreen(
                     horizontalArrangement = Arrangement.spacedBy(30.dp)
                 ) {
                     for (transaction in transactionActions.getMostPopularCategories()) {
+                        val icon = categoryActions.getCategoryIcon(transaction)
+                        val color = categoryActions.getCategoryColor(transaction)
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
 
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.default_propic),
-                                contentDescription = R.string.category_icon.toString(),
-                                modifier = Modifier
+
+                            Box(
+                                Modifier
                                     .clip(RoundedCornerShape(10.dp))
-                                    .size(50.dp)
-                            )
+                                    .background(
+                                        Color(android.graphics.Color.parseColor(color))
+                                    )
+                                    .padding(15.dp)
+                            ) {
+                                Icon(
+                                    imageVector = IconsList.valueOf(icon).icon,
+                                    contentDescription = null
+                                )
+                            }
 
                             Text(text = transaction, fontWeight = FontWeight.Bold)
                         }
                     }
+                }
+            }
+        }
+
+        if (earnedBadgeViewModel.lastEarnedBadge.value != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(25.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.last_earned_badge) + ":", style = TextStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(
+                            MaterialTheme.colorScheme.primary
+                        )
+                        .padding(horizontal = 10.dp, vertical = 10.dp)
+
+                ) {
+                    AllBadges.badges[earnedBadgeViewModel.lastEarnedBadge.value!!.badgeName]?.DisplayBadge()
                 }
             }
         }

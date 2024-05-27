@@ -47,6 +47,7 @@
     <string name="delete_transaction">Deleting %1$s</string>
     <string name="delete_transaction_message">Are you sure? This operation cannot be undone</string>
     <string name="most_expenses_in">Most expenses in</string>
+    <string name="last_earned_badge">Last earned badge</string>
     <string name="title">Title</string>
     <string name="fields_cannot_be_empty">Fields cannot be empty</string>
     <string name="username_must_be_at_least_4_characters_long">Username must be at least 4 characters long</string>
@@ -97,4 +98,5 @@
     <string name="choose_an_icon">Choose an icon</string>
     <string name="add_regular_transaction">Add regular transaction</string>
     <string name="transaction_details">Transaction details</string>
+    <string name="interval">Interval</string>
 </resources>

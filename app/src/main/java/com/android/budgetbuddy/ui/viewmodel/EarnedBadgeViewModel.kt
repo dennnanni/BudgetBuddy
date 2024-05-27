@@ -10,17 +10,25 @@ import kotlinx.coroutines.launch
 
 interface EarnedBadgeActions {
     fun loadEarnedBadges(userId: Int) : Job
+    fun loadLastEarnedBadge(userId: Int): Job
     fun addEarnedBadge(earnedBadge: EarnedBadge): Job
     fun removeEarnedBadge(earnedBadge: EarnedBadge): Job
 }
 
 class EarnedBadgeViewModel(private val repository: EarnedBadgeRepository) : ViewModel() {
     val earnedBadges = mutableStateOf<List<EarnedBadge>>(emptyList())
+    val lastEarnedBadge = mutableStateOf<EarnedBadge?>(null)
 
     val actions = object : EarnedBadgeActions {
         override fun loadEarnedBadges(userId: Int): Job {
             return viewModelScope.launch {
                 earnedBadges.value = repository.getUserBadges(userId)
+            }
+        }
+
+        override fun loadLastEarnedBadge(userId: Int): Job {
+            return viewModelScope.launch {
+                lastEarnedBadge.value = repository.getLastEarnedBadge(userId)
             }
         }
 

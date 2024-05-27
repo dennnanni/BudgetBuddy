@@ -43,9 +43,8 @@ fun AllTransactionsScreen(
     currencyViewModel: CurrencyViewModel,
     categoryActions: CategoryActions
 ) {
-    var noFilter by remember { mutableStateOf(true)}
-    val displayedTransactions: MutableList<Transaction>
-        = remember { mutableStateListOf() }
+    var noFilter by remember { mutableStateOf(true) }
+    val displayedTransactions: MutableList<Transaction> = remember { mutableStateListOf() }
 
     if (displayedTransactions.isEmpty() && noFilter) {
         displayedTransactions.addAll(transactionViewModel.userTransactions)
@@ -78,7 +77,10 @@ fun AllTransactionsScreen(
                     onEndValueChange = { endDate = it })
                 Text(text = stringResource(id = R.string.by_type))
                 TypeFilter(
-                    types = listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income)),
+                    types = listOf(
+                        stringResource(id = R.string.expense),
+                        stringResource(id = R.string.income)
+                    ),
                     selectedTypes = selectedTypes
                 ) {
                     if (selectedTypes.contains(it)) selectedTypes.remove(it)
@@ -99,34 +101,36 @@ fun AllTransactionsScreen(
                     .fillMaxWidth()
                     .padding(top = 5.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ){
+            ) {
                 Button(
                     modifier = Modifier.fillMaxWidth(0.5f),
                     onClick = {
-                    displayedTransactions.clear()
-                    displayedTransactions.addAll(applyFilters(
-                        transactions = transactionViewModel.userTransactions,
-                        startDate = if (dateEnabled) startDate else null,
-                        endDate = if (dateEnabled) endDate else null,
-                        selectedCategories = selectedCategories,
-                        selectedTypes = selectedTypes
-                    ))
-                    noFilter = false
-                }) {
+                        displayedTransactions.clear()
+                        displayedTransactions.addAll(
+                            applyFilters(
+                                transactions = transactionViewModel.userTransactions,
+                                startDate = if (dateEnabled) startDate else null,
+                                endDate = if (dateEnabled) endDate else null,
+                                selectedCategories = selectedCategories,
+                                selectedTypes = selectedTypes
+                            )
+                        )
+                        noFilter = false
+                    }) {
                     Text(text = stringResource(id = R.string.apply))
                 }
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                    displayedTransactions.clear()
-                    selectedTypes.clear()
-                    selectedCategories.clear()
-                    startDate = LocalDate.now().minusMonths(1)
-                    endDate = LocalDate.now()
-                    dateEnabled = false
-                    noFilter = true
-                }) {
+                        displayedTransactions.clear()
+                        selectedTypes.clear()
+                        selectedCategories.clear()
+                        startDate = LocalDate.now().minusMonths(1)
+                        endDate = LocalDate.now()
+                        dateEnabled = false
+                        noFilter = true
+                    }) {
                     Text(text = stringResource(id = R.string.clear))
                 }
             }
@@ -165,7 +169,7 @@ private fun applyFilters(
     endDate: LocalDate? = null,
     selectedCategories: List<Pair<Int, String>> = emptyList(),
     selectedTypes: List<String> = emptyList()
-) : List<Transaction> {
+): List<Transaction> {
     var list = transactions
 
     if (startDate != null && endDate != null) {
@@ -179,7 +183,7 @@ private fun applyFilters(
     if (selectedCategories.isNotEmpty()) {
         // Filter by category
         list = list.filter {
-            selectedCategories.map{ pair -> pair.second }.contains(it.category)
+            selectedCategories.map { pair -> pair.second }.contains(it.category)
         }
     }
 

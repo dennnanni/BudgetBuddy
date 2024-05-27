@@ -107,6 +107,9 @@ interface EarnedBadgeDAO {
     @Query("SELECT * FROM `earned_badge` WHERE userId = :userId")
     suspend fun getUserBadges(userId: Int): List<EarnedBadge>
 
+    @Query("SELECT * FROM `earned_badge` WHERE userId = :userId ORDER BY id DESC LIMIT 1")
+    suspend fun getLastEarnedBadge(userId: Int): EarnedBadge
+
     @Upsert
     suspend fun upsert(earnedBadge: EarnedBadge)
 
