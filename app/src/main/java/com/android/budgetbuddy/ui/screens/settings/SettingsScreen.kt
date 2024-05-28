@@ -55,13 +55,12 @@ fun SettingsScreen(
     onCurrencyChange: (Currency) -> Unit,
     selectedCurrency: () -> Currency,
     themeState: ThemeState,
-    transactionActions: TransactionActions,
     userActions: UserActions,
     navController: NavHostController
 ) {
 
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("BudgetBuddy", 0)
+    val sharedPreferences = context.getSharedPreferences(SPConstants.APP_NAME, 0)
     var checked by remember { mutableStateOf(themeState.theme == Theme.Dark) }
     var expanded by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf(selectedCurrency()) }
@@ -243,6 +242,7 @@ fun SettingsScreen(
                                     onClick = {
                                         selected = currency
                                         onCurrencyChange(selected)
+                                        sharedPreferences.edit().putBoolean(SPConstants.UP_TO_DATE_RATE, false).apply()
                                     },
                                 )
                             }
@@ -310,14 +310,6 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }
-
-        // TODO: remove this button
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { transactionActions.nukeTable() }
-        ) {
-            Text(text = "Nuke")
         }
     }
 }

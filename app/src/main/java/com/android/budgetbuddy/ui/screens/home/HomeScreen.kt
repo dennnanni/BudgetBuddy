@@ -67,7 +67,6 @@ const val TRANSACTION_PREVIEW_COUNT = 10
 fun HomeScreen(
     navController: NavHostController,
     currencyViewModel: CurrencyViewModel,
-    transactionViewModel: TransactionViewModel,
     categoryActions: CategoryActions,
     transactionActions: TransactionActions,
     userActions: UserActions,
@@ -84,6 +83,7 @@ fun HomeScreen(
     val alreadyTriedConnection = sharedPreferences.getBoolean(SPConstants.TRIED_CONNECTION, false)
     var showInternetRequiredSnackBar by remember { mutableStateOf(false) }
     var showConnectionIssuesSnackBar by remember { mutableStateOf(false) }
+    var showChart by remember { mutableStateOf(true) }
 
     val showDialog =
         remember { mutableStateOf(sharedPreferences.getString("badgeEarned", "") != "") }
@@ -106,6 +106,7 @@ fun HomeScreen(
     /* Gestione dell'aggiornamento dei tassi di cambio in modo che venga
     visualizzata la snackbar una sola volta */
     if (!upToDateRate) {
+        showChart = false
         if (isOnline(context)) {
             LaunchedEffect(Unit) {
                 currencyViewModel.updateRate().join()
@@ -114,6 +115,7 @@ fun HomeScreen(
                 } else if (!alreadyTriedConnection) {
                     showConnectionIssuesSnackBar = true
                 }
+                showChart = true
             }
         } else if (!alreadyTriedConnection) {
             showInternetRequiredSnackBar = true
@@ -152,11 +154,7 @@ fun HomeScreen(
     val currency = currencyViewModel.getCurrency()
 
     userActions.loadCurrentUser(username)
-    val userId = userActions.getLoggedUser()?.id
-    if (userId == null) {
-        Log.d("HomeScreen", "User ID is null")
-        return
-    }
+    val userId = userActions.getLoggedUser()?.id ?: return
     transactionActions.loadUserTransactions(userId)
     val transactions = transactionActions.getUserTransactions()
 
@@ -187,10 +185,10 @@ fun HomeScreen(
 
     categoryActions.loadCategories(userActions.getUserId()!!)
 
-    val sortedTransactions = transactions.sortedBy { it.date }
-    val dateList = transactions.map {
+    val sortedTransactions = transactions.sortedByDescending { it.date }
+    val dateList = sortedTransactions.map {
         it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-    }.distinct().mapIndexed { index, date -> date to index }.toMap()
+    }.distinct().sorted().mapIndexed { index, date -> date to index }.toMap()
 
     // Create a map where each index is mapped to the sum of the balance for the corresponding date
     val indexToBalanceMap = mutableMapOf<Float, Float>()
@@ -203,7 +201,8 @@ fun HomeScreen(
         transactionsOnDate.forEach { transaction ->
             totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
         }
-        indexToBalanceMap[currentIndex.toFloat()] = totalBalance.toFloat()
+        indexToBalanceMap[dateList.size - currentIndex.toFloat() - 1] =
+            currencyViewModel.convert(totalBalance).toFloat()
     }
 
     val dateValueFormatter = CartesianValueFormatter { x, _, _ ->
@@ -253,11 +252,14 @@ fun HomeScreen(
                         .then(if (indexToBalanceMap.size < 20) Modifier.padding(bottom = 10.dp) else Modifier)
 
                 ) {
-                    LineChart(indexToBalanceMap,
-                        indexToBalanceMap.size == 1,
-                        dateValueFormatter,
-                        indexToBalanceMap.size > 20
-                    )
+                    if (showChart) {
+                        LineChart(
+                            indexToBalanceMap,
+                            indexToBalanceMap.size == 1,
+                            dateValueFormatter,
+                            indexToBalanceMap.size > 20
+                        )
+                    }
                 }
             }
         }
@@ -295,9 +297,9 @@ fun HomeScreen(
                 LazyColumn(
                     modifier = Modifier.padding(10.dp, 0.dp)
                 ) {
-                    val orderedList = transactionViewModel.userTransactions
-                        .sortedBy { it.date }
+                    val orderedList = transactions
                         .sortedByDescending { it.id }
+                        .sortedBy { it.date }
                         .take(TRANSACTION_PREVIEW_COUNT)
 
                     items(orderedList) {

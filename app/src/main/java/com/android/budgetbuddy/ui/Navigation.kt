@@ -172,7 +172,6 @@ fun BudgetBuddyNavGraph(
                 HomeScreen(
                     navController,
                     currencyViewModel,
-                    transactionViewModel,
                     categoryActions,
                     transactionViewModel.actions,
                     userViewModel.actions,
@@ -247,7 +246,6 @@ fun BudgetBuddyNavGraph(
                     currencyViewModel::changeCurrency,
                     currencyViewModel::getCurrency,
                     themeState,
-                    transactionViewModel.actions,
                     userViewModel.actions,
                     navController
                 )
@@ -335,7 +333,8 @@ fun BudgetBuddyNavGraph(
             composable(route) {
                 ChartsScreen(
                     transactionViewModel,
-                    categoryActions
+                    categoryActions,
+                    currencyViewModel
                 )
             }
         }

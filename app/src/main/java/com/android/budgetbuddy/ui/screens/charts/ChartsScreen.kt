@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.composables.LineChart
 import com.android.budgetbuddy.ui.composables.BarChart
+import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
@@ -35,7 +36,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ChartsScreen(
     transactionViewModel: TransactionViewModel,
-    categoryActions: CategoryActions
+    categoryActions: CategoryActions,
+    currencyViewModel: CurrencyViewModel
 ) {
     val context = LocalContext.current
     var totalBalance = 0.0
@@ -43,7 +45,7 @@ fun ChartsScreen(
     val sortedTransactions = transactions.sortedBy { it.date }
     val dateList = transactions.map {
         it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-    }.distinct().mapIndexed { index, date -> date to index }.toMap()
+    }.distinct().sorted().mapIndexed { index, date -> date to index }.toMap()
 
     // Create a map where each index is mapped to the sum of the balance for the corresponding date
     val indexToBalanceMap = mutableMapOf<Float, Float>()
@@ -56,7 +58,8 @@ fun ChartsScreen(
         transactionsOnDate.forEach { transaction ->
             totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
         }
-        indexToBalanceMap[currentIndex.toFloat()] = totalBalance.toFloat()
+        indexToBalanceMap[dateList.size - currentIndex.toFloat() - 1] =
+            currencyViewModel.convert(totalBalance).toFloat()
     }
 
     val dateValueFormatter = CartesianValueFormatter { x, _, _ ->
@@ -71,7 +74,9 @@ fun ChartsScreen(
         val categoryIndex = categoryIndexed[category] ?: 0
         val income = transactionsOnCategory.filter { it.type == context.getString(R.string.income) }.sumOf { it.amount }
         val expense = transactionsOnCategory.filter { it.type == context.getString(R.string.expense) }.sumOf { it.amount }
-        incomeExpensePairMap[categoryIndex] = Pair(income.toFloat(), expense.toFloat())
+        incomeExpensePairMap[categoryIndex] =
+            Pair(currencyViewModel.convert(income).toFloat(),
+                currencyViewModel.convert(expense).toFloat())
     }
 
     val categoryValueFormatter = CartesianValueFormatter { x, _, _ ->

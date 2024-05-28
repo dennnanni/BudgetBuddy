@@ -10,12 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,21 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.toLocaleString
-
-val iconList: List<ImageVector> = listOf(
-    Icons.Filled.Add,
-    Icons.Filled.MoreVert,
-    Icons.Filled.List,
-    Icons.Filled.Edit,
-    Icons.Filled.Close,
-)
 
 @Composable
 fun TransactionItem(
@@ -89,7 +76,7 @@ fun TransactionItem(
             Text(text = transaction.title)
         }
 
-        val sign = if (transaction.isExpense) "-" else "+"
+        val sign = if (transaction.type == stringResource(id = R.string.expense)) "-" else "+"
         Text(
             text = "${sign}${
                 currencyViewModel.convert(transaction.amount).toLocaleString()
