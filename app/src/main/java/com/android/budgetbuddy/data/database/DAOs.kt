@@ -19,6 +19,7 @@ interface TransactionDAO {
         "SELECT category\n" +
                 "FROM `transaction`\n" +
                 "WHERE userId = :userId\n" +
+                "AND type = \"Expense\"" +
                 "GROUP BY category\n" +
                 "ORDER BY SUM(amount) DESC\n" +
                 "LIMIT 2"
