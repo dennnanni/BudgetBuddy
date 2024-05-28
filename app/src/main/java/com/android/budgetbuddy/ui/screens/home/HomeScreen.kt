@@ -45,6 +45,7 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.BadgePopup
 import com.android.budgetbuddy.ui.composables.LineChart
 import com.android.budgetbuddy.ui.composables.TransactionItem
+import com.android.budgetbuddy.ui.screens.charts.TAG
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.isOnline
@@ -119,6 +120,7 @@ fun HomeScreen(
             }
         } else if (!alreadyTriedConnection) {
             showInternetRequiredSnackBar = true
+            showChart = true
         }
         sharedPreferences.edit().putBoolean(SPConstants.TRIED_CONNECTION, true).apply()
     }
@@ -195,13 +197,13 @@ fun HomeScreen(
 
     var currentIndex = 0
 
-    sortedTransactions.groupBy { it.date }.forEach { (date, transactionsOnDate) ->
+    sortedTransactions.groupBy { it.date }.toSortedMap().forEach { (date, transactionsOnDate) ->
         val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
         currentIndex = dateList[localDate] ?: 0
         transactionsOnDate.forEach { transaction ->
             totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
         }
-        indexToBalanceMap[dateList.size - currentIndex.toFloat() - 1] =
+        indexToBalanceMap[currentIndex.toFloat()] =
             currencyViewModel.convert(totalBalance).toFloat()
     }
 
@@ -299,7 +301,7 @@ fun HomeScreen(
                 ) {
                     val orderedList = transactions
                         .sortedByDescending { it.id }
-                        .sortedBy { it.date }
+                        .sortedByDescending { it.date }
                         .take(TRANSACTION_PREVIEW_COUNT)
 
                     items(orderedList) {

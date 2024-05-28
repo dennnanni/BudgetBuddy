@@ -145,8 +145,8 @@ fun AllTransactionsScreen(
 
         ) {
             val list = displayedTransactions
-                .sortedBy { it.date }
                 .sortedByDescending { it.id }
+                .sortedByDescending { it.date }
                 .toMutableList()
             items(list) {
                 TransactionItem(

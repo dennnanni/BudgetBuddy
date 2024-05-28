@@ -3,6 +3,7 @@ package com.android.budgetbuddy.ui.composables
 import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.text.Layout
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -209,6 +210,7 @@ fun BarChart(
     data: Map<Int, Pair<Float, Float>>,
     bottomAxisValueFormatter: CartesianValueFormatter = CartesianValueFormatter.decimal(),
 ) {
+    Log.i("PIPPO", "BarChart: $data")
     val modelProducer = remember { CartesianChartModelProducer.build() }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.Default) {
@@ -216,12 +218,12 @@ fun BarChart(
                 columnSeries {
                     series(
                         List(data.size) {
-                            data[it]!!.first
+                            data[it]?.first ?: 0f
                         },
                     )
                     series(
                         List(data.size) {
-                            data[it]!!.second
+                            data[it]?.second ?: 0f
                         },
                     )
                 }

@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.screens.charts
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+val TAG = "PIPPO"
 @Composable
 fun ChartsScreen(
     transactionViewModel: TransactionViewModel,
@@ -42,33 +44,33 @@ fun ChartsScreen(
     val context = LocalContext.current
     var totalBalance = 0.0
     val transactions = transactionViewModel.userTransactions
-    val sortedTransactions = transactions.sortedBy { it.date }
-    val dateList = transactions.map {
+    val sortedTransactions = transactions.sortedByDescending { it.date }
+    val dateList = sortedTransactions.map {
         it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
     }.distinct().sorted().mapIndexed { index, date -> date to index }.toMap()
 
     // Create a map where each index is mapped to the sum of the balance for the corresponding date
     val indexToBalanceMap = mutableMapOf<Float, Float>()
 
-    var currentIndex: Int
+    var currentIndex = 0
 
-    sortedTransactions.groupBy { it.date }.forEach { (date, transactionsOnDate) ->
+    sortedTransactions.groupBy { it.date }.toSortedMap().forEach { (date, transactionsOnDate) ->
         val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
         currentIndex = dateList[localDate] ?: 0
         transactionsOnDate.forEach { transaction ->
             totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
         }
-        indexToBalanceMap[dateList.size - currentIndex.toFloat() - 1] =
+        indexToBalanceMap[currentIndex.toFloat()] =
             currencyViewModel.convert(totalBalance).toFloat()
     }
 
     val dateValueFormatter = CartesianValueFormatter { x, _, _ ->
-        dateList.filter { it.value == x.toInt() }.keys.firstOrNull()?.format(DateTimeFormatter.ofPattern("dd/MM")).toString()
+        dateList.filter { it.value == x.toInt() }.keys.firstOrNull()
+            ?.format(DateTimeFormatter.ofPattern("dd/MM")).toString()
     }
 
     val categoryIndexed = categoryActions.getCategories().mapIndexed { index, category -> category.name to index }.toMap()
-
-    val incomeExpensePairMap = mutableMapOf<Int, Pair<Float, Float>>()
+    var incomeExpensePairMap = mutableMapOf<Int, Pair<Float, Float>>()
     currentIndex = 0
     sortedTransactions.groupBy { it.category }.forEach { (category, transactionsOnCategory) ->
         val categoryIndex = categoryIndexed[category] ?: 0
@@ -78,6 +80,10 @@ fun ChartsScreen(
             Pair(currencyViewModel.convert(income).toFloat(),
                 currencyViewModel.convert(expense).toFloat())
     }
+    categoryIndexed.filter { !incomeExpensePairMap.containsKey(it.value) }.forEach {
+        incomeExpensePairMap.putIfAbsent(it.value, Pair(0f, 0f))
+    }
+    incomeExpensePairMap = incomeExpensePairMap.toSortedMap()
 
     val categoryValueFormatter = CartesianValueFormatter { x, _, _ ->
         categoryIndexed.filter { it.value == x.toInt() }.keys.firstOrNull().toString()
