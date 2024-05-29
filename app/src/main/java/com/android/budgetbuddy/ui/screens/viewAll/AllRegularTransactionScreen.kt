@@ -40,6 +40,7 @@ fun AllRegularTransactionScreen(
                     transaction = it,
                     currencyViewModel = currencyViewModel,
                     icon = categoryActions.getCategoryIcon(it.category),
+                    color = categoryActions.getCategoryColor(it.category),
                     navController = navController,
                     modifier = Modifier.padding(16.dp, 10.dp)
                 )

@@ -1,7 +1,9 @@
 package com.android.budgetbuddy.ui.screens.register
 
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,7 +30,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -36,9 +42,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.data.database.User
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.hashPassword
 import com.android.budgetbuddy.ui.viewmodel.UserActions
@@ -48,7 +56,11 @@ import java.util.Base64
 import java.util.Locale
 
 @Composable
-fun RegisterScreen(navController: NavHostController, actions: UserActions) {
+fun RegisterScreen(
+    navController: NavHostController,
+    actions: UserActions,
+    themeViewModel: ThemeViewModel
+) {
 
     val fullName = rememberSaveable { mutableStateOf("") }
     val username = rememberSaveable { mutableStateOf("") }
@@ -80,14 +92,26 @@ fun RegisterScreen(navController: NavHostController, actions: UserActions) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize().padding(top = 70.dp),
     ) {
         Column(
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp, 16.dp)
         ) {
+            Box(
+                modifier = Modifier.height(100.dp)
+            ) {
+                Image(
+                    painter = if (themeViewModel.isDarkTheme())
+                                painterResource(id = R.drawable.app_light)
+                            else
+                                painterResource(id = R.drawable.app_dark),
+                    contentScale = ContentScale.Fit,
+                    contentDescription = stringResource(id = R.string.profile_picture),
+                )
+            }
+            Spacer(modifier = Modifier.height(50.dp))
+
             OutlinedTextField(
                 label = { Text(stringResource(R.string.full_name)) },
                 value = fullName.value,

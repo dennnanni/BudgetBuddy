@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.data.database.RegularTransactions
@@ -28,6 +29,7 @@ fun RegularTransactionItem(
     transaction: RegularTransactions,
     currencyViewModel: CurrencyViewModel,
     icon: String,
+    color: String,
     navController: NavHostController,
     modifier: Modifier = Modifier.padding(10.dp)
 ) {
@@ -53,14 +55,13 @@ fun RegularTransactionItem(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .size(50.dp)
-                    .background(MaterialTheme.colorScheme.secondary),
+                    .background(Color(android.graphics.Color.parseColor(color))),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     IconsList.entries.first {
                         it.name
-                            .lowercase()
-                            .contains(icon.lowercase())
+                            .lowercase() == icon.lowercase()
                     }.icon, null
                 )
             }

@@ -40,6 +40,10 @@ class ThemeViewModel(
         viewModelScope.launch {
             repository.setTheme(theme)
         }
+
+    fun isDarkTheme(): Boolean {
+        return state.value.theme == Theme.Dark
+    }
 }
 
 enum class Currency {

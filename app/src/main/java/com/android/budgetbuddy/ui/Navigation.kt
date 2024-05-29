@@ -229,13 +229,13 @@ fun BudgetBuddyNavGraph(
 
         with(BudgetBuddyRoute.Register) {
             composable(route) {
-                RegisterScreen(navController, userViewModel.actions)
+                RegisterScreen(navController, userViewModel.actions, themeViewModel)
             }
         }
 
         with(BudgetBuddyRoute.Login) {
             composable(route) {
-                LoginScreen(navController, userViewModel.actions)
+                LoginScreen(navController, userViewModel.actions, themeViewModel)
             }
         }
 
@@ -294,6 +294,8 @@ fun BudgetBuddyNavGraph(
                 }
                 DetailsScreen(
                     transaction,
+                    transaction?.category?.let { categoryActions.getCategoryIcon(it) },
+                    transaction?.category?.let { categoryActions.getCategoryColor(it) },
                     navController,
                     currencyViewModel,
                     transactionViewModel.actions,
@@ -310,10 +312,11 @@ fun BudgetBuddyNavGraph(
                 }
                 RegularDetailsScreen(
                     transaction,
+                    transaction?.category?.let { categoryActions.getCategoryIcon(it) },
+                    transaction?.category?.let { categoryActions.getCategoryColor(it) },
                     navController,
                     currencyViewModel,
                     regularTransactionViewModel.actions,
-                    osmDataSource,
                     userViewModel.actions.getUserId()
                 )
             }

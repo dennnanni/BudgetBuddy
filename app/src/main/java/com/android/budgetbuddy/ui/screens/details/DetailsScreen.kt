@@ -3,7 +3,9 @@ package com.android.budgetbuddy.ui.screens.details
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +50,7 @@ import com.android.budgetbuddy.data.database.Transaction
 import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.IconsList
 import com.android.budgetbuddy.ui.composables.LoadingAnimation
 import com.android.budgetbuddy.ui.composables.TransactionAlertDialog
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
@@ -59,6 +63,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun DetailsScreen(
     transaction: Transaction?,
+    icon: String?,
+    color: String?,
     navController: NavController,
     currencyViewModel: CurrencyViewModel,
     transactionActions: TransactionActions,
@@ -71,7 +77,7 @@ fun DetailsScreen(
     val coroutineScope = rememberCoroutineScope()
     var place: OSMPlace? by remember { mutableStateOf(null) }
 
-    if (transaction != null) {
+    if (transaction != null && icon != null && color != null) {
         val coordinates by remember {mutableStateOf(Coordinates(transaction.latitude, transaction.longitude))}
 
         LaunchedEffect(coordinates) {
@@ -121,13 +127,24 @@ fun DetailsScreen(
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.default_propic),
-                            contentDescription = stringResource(R.string.category_icon),
+
+                        Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .size(50.dp)
-                        )
+                                .background(Color(android.graphics.Color.parseColor(color))),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                IconsList.entries.first {
+                                    Log.d("Iconlist", "Icon: ${it.name} name ${icon}")
+                                    it.name
+                                        .lowercase() == icon.lowercase()
+                                }.icon,
+                                null,
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        }
 
                         Text(
                             text = transaction.title,

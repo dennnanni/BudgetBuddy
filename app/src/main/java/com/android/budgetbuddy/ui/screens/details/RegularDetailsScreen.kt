@@ -1,7 +1,8 @@
 package com.android.budgetbuddy.ui.screens.details
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,6 +44,7 @@ import com.android.budgetbuddy.data.database.RegularTransactions
 import com.android.budgetbuddy.data.remote.OSMDataSource
 import com.android.budgetbuddy.data.remote.OSMPlace
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.composables.IconsList
 import com.android.budgetbuddy.ui.composables.TransactionAlertDialog
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.toLocaleString
@@ -52,10 +56,11 @@ import kotlin.time.toDuration
 @Composable
 fun RegularDetailsScreen(
     transaction: RegularTransactions?,
+    icon: String?,
+    color: String?,
     navController: NavController,
     currencyViewModel: CurrencyViewModel,
     transactionActions: RegularTransactionActions,
-    osmDataSource: OSMDataSource,
     userId: Int? = 0
 ) {
     val context = LocalContext.current
@@ -66,7 +71,7 @@ fun RegularDetailsScreen(
 
 
 
-    if (transaction != null) {
+    if (transaction != null && icon != null && color != null) {
         var unit = "Days"
         val duration = transaction.interval
             .toDuration(DurationUnit.MILLISECONDS)
@@ -120,13 +125,23 @@ fun RegularDetailsScreen(
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.default_propic),
-                            contentDescription = stringResource(R.string.category_icon),
+
+                        Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .size(50.dp)
-                        )
+                                .background(Color(android.graphics.Color.parseColor(color))),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                IconsList.entries.first {
+                                    it.name
+                                        .lowercase() == icon.lowercase()
+                                }.icon,
+                                null,
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        }
 
                         Text(
                             text = transaction.title,

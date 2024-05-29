@@ -131,7 +131,11 @@ fun AddTransactionScreen(
         selectedOptionText = categoryActions.getCategories()[0].name
     }
 
-    val amount: MutableState<Double> = remember { mutableDoubleStateOf(transaction?.amount ?: 0.0) }
+    val amount: MutableState<Double> = remember {
+        mutableDoubleStateOf(
+            currencyViewModel.convert(transaction?.amount ?: 0.0)
+        )
+    }
     val tmp = if (transaction?.date == null) {
         LocalDate.now()
     } else {

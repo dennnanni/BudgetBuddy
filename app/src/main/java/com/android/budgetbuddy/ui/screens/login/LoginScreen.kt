@@ -3,6 +3,7 @@ package com.android.budgetbuddy.ui.screens.login
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.android.budgetbuddy.R
 import com.android.budgetbuddy.ui.BudgetBuddyRoute
+import com.android.budgetbuddy.ui.screens.settings.ThemeViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.hashPassword
 import com.android.budgetbuddy.ui.viewmodel.UserActions
@@ -45,7 +49,7 @@ import com.android.budgetbuddy.ui.viewmodel.UserState
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(navController: NavHostController, actions: UserActions) {
+fun LoginScreen(navController: NavHostController, actions: UserActions, themeViewModel: ThemeViewModel) {
 
     val username = rememberSaveable { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -75,13 +79,26 @@ fun LoginScreen(navController: NavHostController, actions: UserActions) {
 
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp, 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp).padding(top = 100.dp)
         ) {
+            Box(
+                modifier = Modifier.height(100.dp)
+            ) {
+                Image(
+                    painter = if (themeViewModel.isDarkTheme())
+                        painterResource(id = R.drawable.app_light)
+                    else
+                        painterResource(id = R.drawable.app_dark),
+                    contentScale = ContentScale.Fit,
+                    contentDescription = stringResource(id = R.string.profile_picture),
+                )
+            }
+            Spacer(modifier = Modifier.height(80.dp))
+
             OutlinedTextField(
                 label = { Text(stringResource(id = R.string.username)) },
                 value = username.value,
