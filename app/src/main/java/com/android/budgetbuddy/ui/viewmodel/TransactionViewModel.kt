@@ -23,7 +23,6 @@ interface TransactionActions {
     fun getUserTransactions(): List<Transaction>
     fun loadMostPopularCategories(userId: Int): Job
     fun getMostPopularCategories(): List<String>
-
     fun nukeTable(): Job
 
 }

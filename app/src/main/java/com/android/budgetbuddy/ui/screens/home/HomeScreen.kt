@@ -167,21 +167,24 @@ fun HomeScreen(
         if (System.currentTimeMillis()
             > transaction.lastUpdate.time + transaction.interval
         ) {
-            transactionActions.addTransaction(
-                Transaction(
-                    title = transaction.title,
-                    description = transaction.description,
-                    type = transaction.type,
-                    category = transaction.category,
-                    amount = transaction.amount,
-                    periodic = true,
-                    date = Date(transaction.lastUpdate.time + transaction.interval),
-                    userId = userId
+            LaunchedEffect(Unit) {
+                transactionActions.addTransaction(
+                    Transaction(
+                        title = transaction.title,
+                        description = transaction.description,
+                        type = transaction.type,
+                        category = transaction.category,
+                        amount = transaction.amount,
+                        periodic = true,
+                        date = Date(transaction.lastUpdate.time + transaction.interval),
+                        userId = userId
+                    )
                 )
-            )
 
-            transaction.lastUpdate = Date(transaction.lastUpdate.time + transaction.interval)
-            regularTransactionViewModel.actions.addTransaction(transaction)
+                transaction.lastUpdate = Date(transaction.lastUpdate.time + transaction.interval)
+                regularTransactionViewModel.actions.addTransaction(transaction)
+            }
+
         }
     }
 
