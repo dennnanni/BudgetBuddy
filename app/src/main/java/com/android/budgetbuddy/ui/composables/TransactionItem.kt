@@ -76,7 +76,7 @@ fun TransactionItem(
             Text(text = transaction.title)
         }
 
-        val sign = if (transaction.type == stringResource(id = R.string.expense)) "-" else "+"
+        val sign = if (transaction.type == "Expense") "-" else "+"
         Text(
             text = "${sign}${
                 currencyViewModel.convert(transaction.amount).toLocaleString()

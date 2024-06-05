@@ -110,6 +110,7 @@ fun AddRegularTransactionScreen(
                 showDialog.value = false
                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
             },
+            { selectedOptionText = it },
             userViewModel,
             categoryAlreadyExists = { showCategoryAlreadyExistsToast = false }
         )
@@ -240,13 +241,13 @@ fun AddRegularTransactionScreen(
                 .height(50.dp),
             onClick = {
                 val userId = userViewModel.actions.getUserId() ?: return@Button
-
+                val type = if (selectedOption == options[0]) "Expense" else "Income"
                 coroutineScope.launch {
                     actions.addTransaction(
                         RegularTransactions(
                             title = title.value,
                             description = description.value,
-                            type = selectedOption,
+                            type = type,
                             category = selectedOptionText,
                             amount = currencyViewModel.convertToUSD(amount.value),
                             interval = (periods[selectedOptionPeriod]!!*periodAmount.value).toLong(),

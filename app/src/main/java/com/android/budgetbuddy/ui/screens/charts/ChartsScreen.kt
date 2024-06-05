@@ -34,7 +34,6 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-val TAG = "PIPPO"
 @Composable
 fun ChartsScreen(
     transactionViewModel: TransactionViewModel,
@@ -58,7 +57,7 @@ fun ChartsScreen(
         val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
         currentIndex = dateList[localDate] ?: 0
         transactionsOnDate.forEach { transaction ->
-            totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
+            totalBalance += if (transaction.type == "Income") transaction.amount else -transaction.amount
         }
         indexToBalanceMap[currentIndex.toFloat()] =
             currencyViewModel.convert(totalBalance).toFloat()
@@ -74,8 +73,8 @@ fun ChartsScreen(
     currentIndex = 0
     sortedTransactions.groupBy { it.category }.forEach { (category, transactionsOnCategory) ->
         val categoryIndex = categoryIndexed[category] ?: 0
-        val income = transactionsOnCategory.filter { it.type == context.getString(R.string.income) }.sumOf { it.amount }
-        val expense = transactionsOnCategory.filter { it.type == context.getString(R.string.expense) }.sumOf { it.amount }
+        val income = transactionsOnCategory.filter { it.type == "Income"}.sumOf { it.amount }
+        val expense = transactionsOnCategory.filter { it.type == "Expense" }.sumOf { it.amount }
         incomeExpensePairMap[categoryIndex] =
             Pair(currencyViewModel.convert(income).toFloat(),
                 currencyViewModel.convert(expense).toFloat())

@@ -1,7 +1,6 @@
 package com.android.budgetbuddy.ui.screens.home
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,6 @@ import com.android.budgetbuddy.ui.BudgetBuddyRoute
 import com.android.budgetbuddy.ui.composables.BadgePopup
 import com.android.budgetbuddy.ui.composables.LineChart
 import com.android.budgetbuddy.ui.composables.TransactionItem
-import com.android.budgetbuddy.ui.screens.charts.TAG
 import com.android.budgetbuddy.ui.screens.settings.CurrencyViewModel
 import com.android.budgetbuddy.ui.utils.SPConstants
 import com.android.budgetbuddy.ui.utils.isOnline
@@ -54,7 +52,6 @@ import com.android.budgetbuddy.ui.utils.toLocaleString
 import com.android.budgetbuddy.ui.viewmodel.CategoryActions
 import com.android.budgetbuddy.ui.viewmodel.RegularTransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.TransactionActions
-import com.android.budgetbuddy.ui.viewmodel.TransactionViewModel
 import com.android.budgetbuddy.ui.viewmodel.UserActions
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import java.time.ZoneId
@@ -204,7 +201,7 @@ fun HomeScreen(
         val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
         currentIndex = dateList[localDate] ?: 0
         transactionsOnDate.forEach { transaction ->
-            totalBalance += if (transaction.type == context.getString(R.string.income)) transaction.amount else -transaction.amount
+            totalBalance += if (transaction.type == "Income") transaction.amount else -transaction.amount
         }
         indexToBalanceMap[currentIndex.toFloat()] =
             currencyViewModel.convert(totalBalance).toFloat()

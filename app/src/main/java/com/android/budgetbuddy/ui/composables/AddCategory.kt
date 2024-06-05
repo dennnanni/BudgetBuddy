@@ -31,6 +31,7 @@ import com.android.budgetbuddy.ui.viewmodel.UserViewModel
 fun AddCategory(
     categoryActions: CategoryActions,
     onDismissRequest: () -> Unit,
+    selectCategory: (String) -> Unit,
     userViewModel: UserViewModel,
     categoryAlreadyExists: () -> Unit
 ) {
@@ -114,7 +115,6 @@ fun AddCategory(
                 // add category button
                 Button(
                     onClick = {
-
                         if (categoryActions.getCategories().any { it.name == categoryName.value }) {
                             categoryAlreadyExists()
                             return@Button
@@ -129,6 +129,8 @@ fun AddCategory(
                             ),
                             userViewModel.actions.getUserId()!!
                         )
+
+                        selectCategory(categoryName.value)
                         onDismissRequest()
                     },
                     modifier = Modifier

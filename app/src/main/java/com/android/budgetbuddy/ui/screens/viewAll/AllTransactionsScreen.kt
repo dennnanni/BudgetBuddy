@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.screens.viewAll
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -43,6 +45,7 @@ fun AllTransactionsScreen(
     currencyViewModel: CurrencyViewModel,
     categoryActions: CategoryActions
 ) {
+    val context = LocalContext.current
     var noFilter by remember { mutableStateOf(true) }
     val displayedTransactions: MutableList<Transaction> = remember { mutableStateListOf() }
 
@@ -108,6 +111,7 @@ fun AllTransactionsScreen(
                         displayedTransactions.clear()
                         displayedTransactions.addAll(
                             applyFilters(
+                                context = context,
                                 transactions = transactionViewModel.userTransactions,
                                 startDate = if (dateEnabled) startDate else null,
                                 endDate = if (dateEnabled) endDate else null,
@@ -164,6 +168,7 @@ fun AllTransactionsScreen(
 }
 
 private fun applyFilters(
+    context: Context,
     transactions: List<Transaction>,
     startDate: LocalDate? = null,
     endDate: LocalDate? = null,
@@ -191,6 +196,7 @@ private fun applyFilters(
     if (selectedTypes.isNotEmpty()) {
         // Filter by type
         list = list.filter {
+            val type = if (it.type == context.getString(R.string.expense)) "Expense" else "Income"
             selectedTypes.contains(it.type)
         }
     }

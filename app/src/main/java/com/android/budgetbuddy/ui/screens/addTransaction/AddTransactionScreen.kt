@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -123,12 +125,15 @@ fun AddTransactionScreen(
     val locationService = remember { LocationService(context) }
 
     var selectedOptionText by remember { mutableStateOf(transaction?.category ?: "") }
-    categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
 
-    if (categoryActions.getCategories().isEmpty()) {
-        showDialog.value = true
-    } else if (selectedOptionText == "") {
-        selectedOptionText = categoryActions.getCategories()[0].name
+    LaunchedEffect(Unit) {
+        categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
+
+        if (categoryActions.getCategories().isEmpty()) {
+            showDialog.value = true
+        } else if (selectedOptionText == "") {
+            selectedOptionText = categoryActions.getCategories()[0].name
+        }
     }
 
     val amount: MutableState<Double> = remember {
@@ -203,6 +208,7 @@ fun AddTransactionScreen(
                 showDialog.value = false
                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
             },
+            { selectedOptionText = it },
             userViewModel,
             categoryAlreadyExists = { showCategoryAlreadyExistsToast = true }
         )
@@ -240,13 +246,17 @@ fun AddTransactionScreen(
                             Modifier
                                 .selectable(
                                     selected = (text == selectedOption),
-                                    onClick = { selectedOption = text }
+                                    onClick = {
+                                        selectedOption = text
+                                    }
                                 ),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(
                                 selected = (text == selectedOption),
-                                onClick = { selectedOption = text }
+                                onClick = {
+                                    selectedOption = text
+                                }
                             )
                             Text(
                                 text = text,
@@ -344,12 +354,13 @@ fun AddTransactionScreen(
 
 
                 coroutineScope.launch {
+                    val type = if (selectedOption == options[0]) "Expense" else "Income"
                     if (transaction == null) {
                         actions.addTransaction(
                             Transaction(
                                 title = title.value,
                                 description = description.value.trim(),
-                                type = selectedOption,
+                                type = type,
                                 category = selectedOptionText,
                                 amount = currencyViewModel.convertToUSD(amount.value),
                                 date = Date.from(
@@ -364,7 +375,7 @@ fun AddTransactionScreen(
                     } else {
                         transaction.title = title.value
                         transaction.description = description.value.trim()
-                        transaction.type = selectedOption
+                        transaction.type = type
                         transaction.category = selectedOptionText
                         transaction.amount = currencyViewModel.convertToUSD(amount.value)
                         transaction.date = Date.from(

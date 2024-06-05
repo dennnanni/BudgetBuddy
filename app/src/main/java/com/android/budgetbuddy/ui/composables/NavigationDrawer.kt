@@ -1,5 +1,6 @@
 package com.android.budgetbuddy.ui.composables
 
+import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -75,6 +76,7 @@ fun NavigationDrawer(
                 val name = sharedPreferences.getString(SPConstants.NAME, null) ?: ""
                 val username = sharedPreferences.getString(SPConstants.USERNAME, null) ?: ""
                 val profilePic = sharedPreferences.getString(SPConstants.PROFILE_PIC, null) ?: ""
+                Log.d("ProfilePic", profilePic)
 
                 Row(
                     modifier = Modifier
