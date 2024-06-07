@@ -30,10 +30,11 @@ fun CategoryPicker(
     options: List<String>,
     function: (String) -> Unit,
     categoryActions: CategoryActions,
-    userId: Int
+    userId: Int,
+    selected: String?
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(options[0]) }
+    var selectedOptionText by remember { mutableStateOf(selected ?: options[0]) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,

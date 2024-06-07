@@ -160,11 +160,11 @@ fun HomeScreen(
     regularTransactionViewModel.actions.loadUserTransactions(userId)
     val regularTransactions = regularTransactionViewModel.actions.getUserTransactions(userId)
 
-    for (transaction in regularTransactions) {
-        if (System.currentTimeMillis()
-            > transaction.lastUpdate.time + transaction.interval
-        ) {
-            LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
+        for (transaction in regularTransactions) {
+            if (System.currentTimeMillis()
+                > transaction.lastUpdate.time + transaction.interval
+            ) {
                 transactionActions.addTransaction(
                     Transaction(
                         title = transaction.title,
@@ -180,8 +180,8 @@ fun HomeScreen(
 
                 transaction.lastUpdate = Date(transaction.lastUpdate.time + transaction.interval)
                 regularTransactionViewModel.actions.addTransaction(transaction)
+                
             }
-
         }
     }
 

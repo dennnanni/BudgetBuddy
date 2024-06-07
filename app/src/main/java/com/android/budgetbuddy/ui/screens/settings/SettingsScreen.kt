@@ -56,7 +56,8 @@ fun SettingsScreen(
     selectedCurrency: () -> Currency,
     themeState: ThemeState,
     userActions: UserActions,
-    navController: NavHostController
+    navController: NavHostController,
+    transactionActions: TransactionActions
 ) {
 
     val context = LocalContext.current
@@ -294,6 +295,7 @@ fun SettingsScreen(
                 apply()
             }
 
+            transactionActions.clearTransactions()
             userActions.logout()
 
             navController.navigate(BudgetBuddyRoute.Login.route) {

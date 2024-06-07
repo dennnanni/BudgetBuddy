@@ -121,20 +121,21 @@ fun AddTransactionScreen(
     val options =
         listOf(stringResource(id = R.string.expense), stringResource(id = R.string.income))
     val showDialog = remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(transaction?.type ?: options[0]) }
+    var selectedOption by remember { mutableStateOf(if (transaction?.type == "Income") options[1] else options[0]) }
     val locationService = remember { LocationService(context) }
 
     var selectedOptionText by remember { mutableStateOf(transaction?.category ?: "") }
+    Log.d("PIPPO", "Selected option text: $selectedOptionText")
 
-    LaunchedEffect(Unit) {
-        categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
+    categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
 
-        if (categoryActions.getCategories().isEmpty()) {
-            showDialog.value = true
-        } else if (selectedOptionText == "") {
-            selectedOptionText = categoryActions.getCategories()[0].name
-        }
+    if (categoryActions.getCategories().isEmpty()) {
+        showDialog.value = true
+    } else if (selectedOptionText == "") {
+        Log.d("PIPPO", "Selected option text is empty")
+        selectedOptionText = categoryActions.getCategories()[0].name
     }
+
 
     val amount: MutableState<Double> = remember {
         mutableDoubleStateOf(
@@ -208,7 +209,6 @@ fun AddTransactionScreen(
                 showDialog.value = false
                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
             },
-            { selectedOptionText = it },
             userViewModel,
             categoryAlreadyExists = { showCategoryAlreadyExistsToast = true }
         )
@@ -290,7 +290,8 @@ fun AddTransactionScreen(
                             options = categoryActions.getCategories().map { it.name },
                             fun(it: String) { selectedOptionText = it },
                             categoryActions,
-                            userViewModel.actions.getUserId()!!
+                            userViewModel.actions.getUserId()!!,
+                            selectedOptionText
                         )
                     }
                     IconButton(

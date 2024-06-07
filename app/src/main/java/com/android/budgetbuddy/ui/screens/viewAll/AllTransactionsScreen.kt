@@ -196,8 +196,9 @@ private fun applyFilters(
     if (selectedTypes.isNotEmpty()) {
         // Filter by type
         list = list.filter {
-            val type = if (it.type == context.getString(R.string.expense)) "Expense" else "Income"
-            selectedTypes.contains(it.type)
+            val type = if (it.type == "Expense") context.getString(R.string.expense)
+            else context.getString(R.string.income)
+            selectedTypes.contains(type)
         }
     }
 

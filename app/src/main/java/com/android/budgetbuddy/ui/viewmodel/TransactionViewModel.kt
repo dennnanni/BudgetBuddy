@@ -23,7 +23,7 @@ interface TransactionActions {
     fun getUserTransactions(): List<Transaction>
     fun loadMostPopularCategories(userId: Int): Job
     fun getMostPopularCategories(): List<String>
-    fun nukeTable(): Job
+    fun clearTransactions(): Unit
 
 }
 
@@ -63,8 +63,9 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
             return mostPopularCategories.value
         }
 
-        override fun nukeTable(): Job = viewModelScope.launch {
-            repository.nukeTable()
+        override fun clearTransactions() {
+            userTransactions = emptyList()
+            mostPopularCategories.value = emptyList()
         }
     }
 }

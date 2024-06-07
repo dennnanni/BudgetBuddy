@@ -110,7 +110,6 @@ fun AddRegularTransactionScreen(
                 showDialog.value = false
                 categoryActions.loadCategories(userViewModel.actions.getUserId()!!)
             },
-            { selectedOptionText = it },
             userViewModel,
             categoryAlreadyExists = { showCategoryAlreadyExistsToast = false }
         )

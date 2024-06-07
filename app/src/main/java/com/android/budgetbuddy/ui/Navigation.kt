@@ -247,7 +247,8 @@ fun BudgetBuddyNavGraph(
                     currencyViewModel::getCurrency,
                     themeState,
                     userViewModel.actions,
-                    navController
+                    navController,
+                    transactionViewModel.actions,
                 )
             }
         }
